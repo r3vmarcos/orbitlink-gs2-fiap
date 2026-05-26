@@ -45,14 +45,17 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
     <div className="grid w-full min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-5">
         <CardBase>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Feed Central</p>
+          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Orbifeed</p>
           <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
-              <h1 className="text-3xl font-black uppercase leading-tight text-[var(--text-text)] md:text-5xl">
-                {perspectiva === 'terra' ? 'Rede vista da Terra' : 'Rede vista do espaço'}
+              <h1 className="text-4xl font-black uppercase leading-tight text-[var(--text-text)] md:text-6xl">
+                Orbifeed
               </h1>
+              <span className="mt-2 inline-flex rounded-full border border-[var(--border-border)] bg-[var(--bg-primary)] px-3 py-1 font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-primary)]">
+                {perspectiva === 'terra' ? 'Rede vista da Terra' : 'Rede vista do espaço'}
+              </span>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
-                Olá, {usuarioAtual?.nome ?? 'explorador'}. Publique imagens, comente, salve posts e abra pontos no DualView AR sem depender de API externa.
+                Olá, {usuarioAtual?.nome ?? 'explorador'}. O Orbifeed reúne posts, imagens, comentários e pontos AR em uma rede social espacial local.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2 sm:flex">

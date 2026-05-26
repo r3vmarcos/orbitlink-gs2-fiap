@@ -9,7 +9,7 @@ export function AcessoUsuario() {
   const [modo, setModo] = useState<'entrar' | 'cadastro'>('cadastro');
   const [nome, setNome] = useState('');
   const [usuario, setUsuario] = useState('');
-  const [email, setEmail] = useState('demo@orbitlink.local');
+  const [email, setEmail] = useState('lia@orbitlink.local');
   const [senha, setSenha] = useState('orbitlink');
   const [localizacaoAtual, setLocalizacaoAtual] = useState('São Paulo, Brasil');
   const [mensagem, setMensagem] = useState('');
@@ -33,10 +33,10 @@ export function AcessoUsuario() {
             Entre na rede social entre Terra e espaço.
           </h1>
           <p className="max-w-2xl text-base leading-8 text-[var(--text-muted)]">
-            Crie posts, salve imagens, comente no feed e abra o DualView AR com câmera e pontos orbitais. O banco desta versão é local no navegador.
+            Crie posts, salve imagens, comente no Orbifeed e abra o DualView AR com câmera e pontos orbitais. O banco desta versão é local no navegador.
           </p>
           <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
-            {['Feed central', 'Posts com imagem', 'Câmera AR'].map((item) => (
+            {['Orbifeed central', 'Posts com imagem', 'Câmera AR'].map((item) => (
               <div key={item} className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 text-sm font-black uppercase tracking-[0.08em] text-[var(--text-text)]">
                 {item}
               </div>
@@ -82,7 +82,7 @@ export function AcessoUsuario() {
             {mensagem ? <p className="rounded-2xl border border-rose-400/40 bg-rose-500/10 p-3 text-sm font-bold text-rose-200 light-theme:text-rose-700">{mensagem}</p> : null}
             <Botao onClick={modo === 'cadastro' ? handleCadastrar : handleEntrar} className="w-full justify-center">
               {modo === 'cadastro' ? <UserPlus className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
-              {modo === 'cadastro' ? 'Criar conta local' : 'Entrar na conta demo'}
+              {modo === 'cadastro' ? 'Criar conta local' : 'Entrar como Lia'}
             </Botao>
           </div>
         </section>

@@ -256,7 +256,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   const criarPost = useCallback((entrada: NovoPostEntrada) => {
     const novoPost: PostOrbitLink = {
       id: gerarId('post_usuario'),
-      autorId: usuarioAtual?.id ?? 'usuario_voce',
+      autorId: usuarioAtual?.id ?? 'lia_novaes',
       perspectiva: entrada.perspectiva,
       titulo: entrada.titulo,
       texto: entrada.texto,
@@ -280,7 +280,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     const expiraEm = new Date(criadoEm.getTime() + 24 * 60 * 60 * 1000);
     const novoStatus: StatusOrbital = {
       id: gerarId('status_usuario'),
-      autorId: usuarioAtual?.id ?? 'usuario_voce',
+      autorId: usuarioAtual?.id ?? 'lia_novaes',
       perspectiva: entrada.perspectiva,
       titulo: entrada.titulo,
       texto: entrada.texto,
