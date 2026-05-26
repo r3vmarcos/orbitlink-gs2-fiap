@@ -1,0 +1,106 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === ESTILO GLOBAL | inicio === */
+
+:root {
+  color-scheme: dark;
+  --bg-background: #060913;
+  --bg-surface: color-mix(in srgb, #060913 95%, white);
+  --bg-surface-secondary: color-mix(in srgb, #060913 90%, white);
+  --bg-popover: color-mix(in srgb, #060913 85%, white);
+  --bg-overlay: color-mix(in srgb, black 60%, transparent);
+  --bg-muted: color-mix(in srgb, #060913 85%, #718296);
+  --text-text: #f0f4f8;
+  --text-muted: #718296;
+  --text-placeholder: color-mix(in srgb, #718296 50%, #060913);
+  --text-inverse: #060913;
+  --text-link: #00e5ff;
+  --bg-primary: #00e5ff;
+  --text-primary: #060913;
+  --bg-primary-hover: color-mix(in srgb, #00e5ff 85%, white);
+  --bg-primary-active: color-mix(in srgb, #00e5ff 70%, white);
+  --bg-secondary: color-mix(in srgb, #060913 80%, #00e5ff);
+  --bg-accent: color-mix(in srgb, #00e5ff 70%, white);
+  --border-border: #2962ff;
+  --border-input: color-mix(in srgb, #2962ff 40%, #060913);
+  --border-focus: #00e5ff;
+  --ring-ring: color-mix(in srgb, #00e5ff 30%, transparent);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  background: var(--bg-background);
+}
+
+.light-theme {
+  color-scheme: light;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.8) rgba(15, 23, 42, 0.35);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.35);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.8);
+  border-radius: 999px;
+}
+/* === ESTILO GLOBAL | fim === */
+
+/* === FORMULARIOS | inicio === */
+@layer components {
+  .input-form {
+    @apply w-full rounded-2xl border px-4 py-3 text-sm font-semibold outline-none transition;
+    border-color: var(--border-input);
+    background: var(--bg-popover);
+    color: var(--text-text);
+  }
+
+  .input-form::placeholder {
+    color: var(--text-placeholder);
+  }
+
+  .input-form:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 4px var(--ring-ring);
+  }
+
+  .label-form {
+    @apply mb-2 block font-monoapp text-[10px] font-black uppercase tracking-[0.16em];
+    color: var(--text-link);
+  }
+}
+/* === FORMULARIOS | fim === */
+
+/* === AJUSTES MOBILE FULLSCREEN | inicio === */
+@supports (height: 100dvh) {
+  .h-tela-mobile {
+    height: 100dvh;
+  }
+}
+/* === AJUSTES MOBILE FULLSCREEN | fim === */
