@@ -15,7 +15,9 @@ interface DualViewArProps {
 }
 
 const camadasOrbitlink: TipoCamadaAr[] = ['social', 'planetas', 'lua', 'estacoes', 'satelites', 'missoes', 'eventos', 'cidades', 'turismo', 'clima', 'biomas', 'ods'];
-const intensidadeArrasteCamera = 0.12;
+const campoVisaoHorizontal = 72;
+const campoVisaoVertical = 58;
+const intensidadeArrasteCamera = 0.32;
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
@@ -23,7 +25,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [cameraAtiva, setCameraAtiva] = useState(false);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
-  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: 0 });
+  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: 42 });
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const arrasteRef = useRef<{ ativo: boolean; x: number; y: number }>({ ativo: false, x: 0, y: 0 });
 
@@ -100,8 +102,8 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
     arrasteRef.current = { ativo: true, x: evento.clientX, y: evento.clientY };
 
     setVisaoCamera((atual) => ({
-      azimute: normalizarPercentual(atual.azimute - deslocamentoX * intensidadeArrasteCamera),
-      inclinacao: limitar(atual.inclinacao + deslocamentoY * intensidadeArrasteCamera, -32, 32),
+      azimute: normalizarGraus(atual.azimute - deslocamentoX * intensidadeArrasteCamera),
+      inclinacao: limitar(atual.inclinacao - deslocamentoY * intensidadeArrasteCamera, -12, 88),
     }));
   }
 
@@ -116,8 +118,8 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
       }
 
       setVisaoCamera({
-        azimute: normalizarPercentual((evento.alpha ?? 0) / 3.6),
-        inclinacao: limitar(((evento.beta ?? 0) - 45) * 0.45, -32, 32),
+        azimute: normalizarGraus(evento.alpha ?? 0),
+        inclinacao: limitar(90 - (evento.beta ?? 90), -12, 88),
       });
     }
 
@@ -175,6 +177,9 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           {pontosVisiveis.map((ponto) => (
             <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} />
           ))}
+          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-cyan-300/35 bg-slate-950/45 px-3 py-1 font-monoapp text-[10px] font-black uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md light-theme:bg-white/55 light-theme:text-sky-900 sm:left-4 sm:top-4">
+            {Math.round(visaoCamera.azimute)} graus / {Math.round(visaoCamera.inclinacao)} graus
+          </div>
           <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
             <Badge tom="verde">{cameraAtiva ? 'Câmera ativa' : 'Simulação ativa'}</Badge>
@@ -204,8 +209,17 @@ function CenaOrbitlink() {
 
 function PontoArVisual({ ponto, ativo, visaoCamera, onSelecionar }: { ponto: PontoAr; ativo: boolean; visaoCamera: { azimute: number; inclinacao: number }; onSelecionar: () => void }) {
   const cor = ponto.perspectiva === 'espaco' ? 'bg-orange-400' : ponto.origemDados === 'nasa_eonet' ? 'bg-emerald-400' : ponto.statusAtivo ? 'bg-cyan-300' : 'bg-blue-400';
-  const esquerda = normalizarPercentual(ponto.x - visaoCamera.azimute);
-  const topo = limitar(ponto.y + visaoCamera.inclinacao, 6, 92);
+  const direcaoPonto = ponto.x * 3.6;
+  const altitudePonto = calcularAltitudePonto(ponto);
+  const deltaHorizontal = menorDiferencaGraus(direcaoPonto, visaoCamera.azimute);
+  const deltaVertical = altitudePonto - visaoCamera.inclinacao;
+  const visivel = Math.abs(deltaHorizontal) <= campoVisaoHorizontal && Math.abs(deltaVertical) <= campoVisaoVertical;
+  const esquerda = 50 + (deltaHorizontal / campoVisaoHorizontal) * 48;
+  const topo = 50 - (deltaVertical / campoVisaoVertical) * 44;
+
+  if (!visivel) {
+    return null;
+  }
 
   return (
     <button
@@ -224,8 +238,21 @@ function PontoArVisual({ ponto, ativo, visaoCamera, onSelecionar }: { ponto: Pon
   );
 }
 
-function normalizarPercentual(valor: number) {
-  return ((valor % 100) + 100) % 100;
+function calcularAltitudePonto(ponto: PontoAr) {
+  if (ponto.perspectiva === 'terra') {
+    return limitar(96 - ponto.y, 18, 84);
+  }
+
+  return limitar(78 - ponto.y * 0.72, 10, 62);
+}
+
+function normalizarGraus(valor: number) {
+  return ((valor % 360) + 360) % 360;
+}
+
+function menorDiferencaGraus(destino: number, origem: number) {
+  const diferenca = normalizarGraus(destino - origem);
+  return diferenca > 180 ? diferenca - 360 : diferenca;
 }
 
 function limitar(valor: number, minimo: number, maximo: number) {

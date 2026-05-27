@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { galeriaData } from '@/data/galeria.data';
 import { missoesData } from '@/data/missoes.data';
 import { odsData } from '@/data/ods.data';
@@ -6,6 +6,7 @@ import { pontosArData } from '@/data/pontos-ar.data';
 import { postsData } from '@/data/posts.data';
 import { statusData } from '@/data/status.data';
 import { usuariosData } from '@/data/usuarios.data';
+import { carregarBancoRemoto, salvarBancoRemoto, type EstadoRemotoOrbitLink } from '@/services/bancoRemotoService';
 import { lerLocalStorage, salvarLocalStorage } from '@/services/localStorageService';
 import {
   buscarEventosNaturaisNasa,
@@ -136,6 +137,15 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   const [ultimaSincronizacaoApi, setUltimaSincronizacaoApi] = useState<string | undefined>(() =>
     lerLocalStorage<string | undefined>('orbitlink_ultima_sinc_api', undefined),
   );
+  const [usuariosBase, setUsuariosBase] = useState<UsuarioOrbitLink[]>(usuariosData);
+  const [postsBase, setPostsBase] = useState<PostOrbitLink[]>(postsData);
+  const [statusBase, setStatusBase] = useState<StatusOrbital[]>(statusData);
+  const [pontosArBase, setPontosArBase] = useState<PontoAr[]>(pontosArData);
+  const [galeriaBase, setGaleriaBase] = useState<ItemGaleria[]>(galeriaData);
+  const [missoesBase, setMissoesBase] = useState(missoesData);
+  const [odsBase, setOdsBase] = useState(odsData);
+  const [bancoRemotoPronto, setBancoRemotoPronto] = useState(false);
+  const salvamentoRemotoRef = useRef<number | undefined>(undefined);
 
   useEffect(() => salvarLocalStorage('orbitlink_tema', tema), [tema]);
   useEffect(() => salvarLocalStorage('orbitlink_posts_usuario', postsUsuario), [postsUsuario]);
@@ -152,20 +162,136 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   useEffect(() => salvarLocalStorage('orbitlink_imagem_epic', imagemEpic), [imagemEpic]);
   useEffect(() => salvarLocalStorage('orbitlink_ultima_sinc_api', ultimaSincronizacaoApi), [ultimaSincronizacaoApi]);
 
-  const statusValidos = useMemo(() => {
-    const todos = [...statusData, ...statusUsuario];
-    return todos.filter((status) => new Date(status.expiraEm).getTime() > Date.now());
-  }, [statusUsuario]);
+  useEffect(() => {
+    let cancelado = false;
 
-  const usuarios = useMemo(() => [...usuariosLocais, ...usuariosData], [usuariosLocais]);
+    async function carregarRemoto() {
+      try {
+        const remoto = await carregarBancoRemoto();
+
+        if (cancelado) {
+          return;
+        }
+
+        aplicarEstadoRemoto(remoto);
+      } catch {
+        if (!cancelado) {
+          setErroApi('Banco remoto indisponivel. Usando fallback local neste navegador.');
+        }
+      } finally {
+        if (!cancelado) {
+          setBancoRemotoPronto(true);
+        }
+      }
+    }
+
+    void carregarRemoto();
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!bancoRemotoPronto) {
+      return undefined;
+    }
+
+    window.clearTimeout(salvamentoRemotoRef.current);
+    salvamentoRemotoRef.current = window.setTimeout(() => {
+      const estado: EstadoRemotoOrbitLink = {
+        tema,
+        postsUsuario,
+        statusUsuario,
+        postsCurtidos,
+        postsSalvos,
+        pontosSeguidos,
+        usuariosLocais,
+        usuarioAtualId,
+        comentariosLocais,
+        compartilhamentosExtras,
+        pontosApi,
+        galeriaApi,
+        imagemEpic,
+        ultimaSincronizacaoApi,
+        usuariosBase,
+        postsBase,
+        statusBase,
+        pontosArBase,
+        galeriaBase,
+        missoesBase,
+        odsBase,
+      };
+
+      void salvarBancoRemoto(estado).catch(() => {
+        setErroApi('Falha ao salvar no banco remoto. O fallback local foi mantido.');
+      });
+    }, 450);
+
+    return () => window.clearTimeout(salvamentoRemotoRef.current);
+  }, [
+    bancoRemotoPronto,
+    tema,
+    postsUsuario,
+    statusUsuario,
+    postsCurtidos,
+    postsSalvos,
+    pontosSeguidos,
+    usuariosLocais,
+    usuarioAtualId,
+    comentariosLocais,
+    compartilhamentosExtras,
+    pontosApi,
+    galeriaApi,
+    imagemEpic,
+    ultimaSincronizacaoApi,
+    usuariosBase,
+    postsBase,
+    statusBase,
+    pontosArBase,
+    galeriaBase,
+    missoesBase,
+    odsBase,
+  ]);
+
+  function aplicarEstadoRemoto(remoto: EstadoRemotoOrbitLink) {
+    if (remoto.tema) setTema(remoto.tema);
+    if (remoto.postsUsuario) setPostsUsuario(remoto.postsUsuario);
+    if (remoto.statusUsuario) setStatusUsuario(remoto.statusUsuario);
+    if (remoto.postsCurtidos) setPostsCurtidos(remoto.postsCurtidos);
+    if (remoto.postsSalvos) setPostsSalvos(remoto.postsSalvos);
+    if (remoto.pontosSeguidos) setPontosSeguidos(remoto.pontosSeguidos);
+    if (remoto.usuariosLocais) setUsuariosLocais(remoto.usuariosLocais);
+    if ('usuarioAtualId' in remoto) setUsuarioAtualId(remoto.usuarioAtualId);
+    if (remoto.comentariosLocais) setComentariosLocais(remoto.comentariosLocais);
+    if (remoto.compartilhamentosExtras) setCompartilhamentosExtras(remoto.compartilhamentosExtras);
+    if (remoto.pontosApi) setPontosApi(remoto.pontosApi);
+    if (remoto.galeriaApi) setGaleriaApi(remoto.galeriaApi);
+    if ('imagemEpic' in remoto) setImagemEpic(remoto.imagemEpic);
+    if ('ultimaSincronizacaoApi' in remoto) setUltimaSincronizacaoApi(remoto.ultimaSincronizacaoApi);
+    if (remoto.usuariosBase) setUsuariosBase(remoto.usuariosBase);
+    if (remoto.postsBase) setPostsBase(remoto.postsBase);
+    if (remoto.statusBase) setStatusBase(remoto.statusBase);
+    if (remoto.pontosArBase) setPontosArBase(remoto.pontosArBase);
+    if (remoto.galeriaBase) setGaleriaBase(remoto.galeriaBase);
+    if (remoto.missoesBase) setMissoesBase(remoto.missoesBase);
+    if (remoto.odsBase) setOdsBase(remoto.odsBase);
+  }
+
+  const statusValidos = useMemo(() => {
+    const todos = [...statusBase, ...statusUsuario];
+    return todos.filter((status) => new Date(status.expiraEm).getTime() > Date.now());
+  }, [statusBase, statusUsuario]);
+
+  const usuarios = useMemo(() => [...usuariosLocais, ...usuariosBase], [usuariosBase, usuariosLocais]);
   const usuarioAtual = useMemo(() => usuarios.find((usuario) => usuario.id === usuarioAtualId), [usuarioAtualId, usuarios]);
   const posts = useMemo(() => {
-    return [...postsUsuario, ...postsData].map((post) => ({
+    return [...postsUsuario, ...postsBase].map((post) => ({
       ...post,
       comentarios: [...post.comentarios, ...(comentariosLocais[post.id] ?? [])],
       compartilhamentos: post.compartilhamentos + (compartilhamentosExtras[post.id] ?? 0),
     }));
-  }, [comentariosLocais, compartilhamentosExtras, postsUsuario]);
+  }, [comentariosLocais, compartilhamentosExtras, postsBase, postsUsuario]);
   const galeriaUsuario = useMemo<ItemGaleria[]>(() => {
     return postsUsuario
       .filter((post) => Boolean(post.imagem))
@@ -178,12 +304,12 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
         autorId: post.autorId,
         postId: post.id,
         pontoArId: post.pontoArId,
-        origemDados: 'localStorage',
+        origemDados: 'cloudflare_d1',
       }));
   }, [postsUsuario]);
 
-  const galeria = useMemo(() => [...galeriaUsuario, ...galeriaApi, ...galeriaData], [galeriaApi, galeriaUsuario]);
-  const pontosAr = useMemo(() => [...pontosApi, ...pontosArData], [pontosApi]);
+  const galeria = useMemo(() => [...galeriaUsuario, ...galeriaApi, ...galeriaBase], [galeriaApi, galeriaBase, galeriaUsuario]);
+  const pontosAr = useMemo(() => [...pontosApi, ...pontosArBase], [pontosApi, pontosArBase]);
 
   const alternarTema = useCallback(() => {
     setTema((temaAtual) => (temaAtual === 'dark' ? 'light' : 'dark'));
@@ -197,7 +323,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
       return { sucesso: false, mensagem: 'Preencha nome, usuário, e-mail e senha com pelo menos 6 caracteres.' };
     }
 
-    const usuarioJaExiste = [...usuariosLocais, ...usuariosData].some(
+    const usuarioJaExiste = [...usuariosLocais, ...usuariosBase].some(
       (usuario) => usuario.email?.toLowerCase() === email || usuario.usuario.toLowerCase() === `@${usuarioNormalizado}`,
     );
 
@@ -206,7 +332,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     }
 
     const novoUsuario: UsuarioOrbitLink = {
-      id: gerarId('usuario_local'),
+      id: gerarId('usuario_remoto'),
       nome: entrada.nome.trim(),
       usuario: `@${usuarioNormalizado}`,
       email,
@@ -214,30 +340,30 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
       tipo: 'observador_terra',
       avatarGradiente: 'from-cyan-300 to-orange-500',
       cargo: 'Explorador Orbitlink',
-      localizacaoAtual: entrada.localizacaoAtual.trim() || 'Base local Orbitlink',
+      localizacaoAtual: entrada.localizacaoAtual.trim() || 'Base remota Orbitlink',
       seguidores: 0,
       publicacoes: 0,
-      conquistas: ['Conta criada no banco local', 'Primeiro acesso Orbitlink'],
+      conquistas: ['Conta criada no banco remoto', 'Primeiro acesso Orbitlink'],
       criadoLocalmente: true,
     };
 
     setUsuariosLocais((atuais) => [novoUsuario, ...atuais]);
     setUsuarioAtualId(novoUsuario.id);
     return { sucesso: true };
-  }, [usuariosLocais]);
+  }, [usuariosBase, usuariosLocais]);
 
   const entrarUsuario = useCallback((email: string, senha: string) => {
-    const usuarioEncontrado = [...usuariosLocais, ...usuariosData].find(
+    const usuarioEncontrado = [...usuariosLocais, ...usuariosBase].find(
       (usuario) => usuario.email?.toLowerCase() === email.trim().toLowerCase() && usuario.senha === senha,
     );
 
     if (!usuarioEncontrado) {
-      return { sucesso: false, mensagem: 'E-mail ou senha inválidos para este banco local.' };
+      return { sucesso: false, mensagem: 'E-mail ou senha invalidos para este banco remoto.' };
     }
 
     setUsuarioAtualId(usuarioEncontrado.id);
     return { sucesso: true };
-  }, [usuariosLocais]);
+  }, [usuariosBase, usuariosLocais]);
 
   const sairUsuario = useCallback(() => {
     setUsuarioAtualId(undefined);
@@ -258,7 +384,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
       comentarios: [],
       compartilhamentos: 0,
       criadoEm: new Date().toISOString(),
-      origemDados: 'localStorage',
+      origemDados: 'cloudflare_d1',
       criadoPeloUsuario: true,
     };
 
@@ -279,7 +405,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
       pontoArId: entrada.pontoArId,
       criadoEm: criadoEm.toISOString(),
       expiraEm: expiraEm.toISOString(),
-      origemDados: 'localStorage',
+      origemDados: 'cloudflare_d1',
       criadoPeloUsuario: true,
     };
 
@@ -370,9 +496,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     posts,
     statusOrbitais: statusValidos,
     pontosAr,
-    missoes: missoesData,
+    missoes: missoesBase,
     galeria,
-    ods: odsData,
+    ods: odsBase,
     postsCurtidos,
     postsSalvos,
     pontosSeguidos,
@@ -401,7 +527,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     posts,
     statusValidos,
     pontosAr,
+    missoesBase,
     galeria,
+    odsBase,
     postsCurtidos,
     postsSalvos,
     pontosSeguidos,

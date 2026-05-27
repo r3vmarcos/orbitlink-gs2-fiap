@@ -56,7 +56,7 @@ export type TipoCamadaAr =
   | 'biomas'
   | 'ods';
 
-export type TipoOrigemDados = 'simulado' | 'localStorage' | 'nasa_eonet' | 'nasa_epic' | 'nasa_images';
+export type TipoOrigemDados = 'simulado' | 'localStorage' | 'cloudflare_d1' | 'nasa_eonet' | 'nasa_epic' | 'nasa_images';
 
 export interface UsuarioOrbitLink {
   id: string;
