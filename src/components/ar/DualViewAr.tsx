@@ -174,7 +174,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             toquePinchRef.current = undefined;
           }}
         >
-          <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
+          <video ref={videoRef} className="pointer-events-none absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" />
           {pontosVisiveis.map((ponto) => (
@@ -232,7 +232,7 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, on
   const deltaVertical = altitudePonto - visaoCamera.inclinacao;
   const visivel = Math.abs(deltaHorizontal) <= campoVisaoHorizontal && Math.abs(deltaVertical) <= campoVisaoVertical;
   const esquerda = 50 + (deltaHorizontal / campoVisaoHorizontal) * 48;
-  const topo = 50 + (deltaVertical / campoVisaoVertical) * 44;
+  const topo = 50 - (deltaVertical / campoVisaoVertical) * 44;
 
   if (!visivel) {
     return null;
@@ -326,7 +326,7 @@ function MapaMarks({ pontos, pontoSelecionadoId, onSelecionar, onAbrir }: { pont
 
 function calcularAltitudePonto(ponto: PontoAr) {
   if (ponto.perspectiva === 'terra') {
-    return limitar(56 + ((100 - ponto.y) / 100) * 32, 54, 88);
+    return limitar(64 + ((100 - ponto.y) / 100) * 24, 62, 88);
   }
 
   return limitar(78 - ponto.y * 0.72, 10, 62);

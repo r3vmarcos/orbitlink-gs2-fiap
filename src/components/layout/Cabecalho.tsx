@@ -37,7 +37,7 @@ export function Cabecalho(props: CabecalhoProps) {
 
   return (
     <header className="sticky top-0 z-50 max-w-[100vw] border-b border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_88%,transparent)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-md items-center gap-2 px-2.5 py-2.5 min-[380px]:px-3">
+      <div className="mx-auto flex max-w-md items-center gap-2 px-2.5 py-2.5 min-[380px]:px-3 lg:max-w-6xl lg:px-6 xl:max-w-7xl 2xl:max-w-[1440px]">
         <NavLink to="/" className="flex min-w-0 items-center gap-2">
           <span
             aria-label="Orbitlink"

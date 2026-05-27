@@ -43,7 +43,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
   }
 
   return (
-    <div className="grid w-full min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+    <div className="grid w-full min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]">
       <div className="min-w-0 space-y-5">
         <CardBase>
           <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Orbitlink</p>
@@ -70,7 +70,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
         </div>
       </div>
 
-      <aside className="hidden min-w-0 space-y-5 xl:sticky xl:top-28 xl:block xl:self-start">
+      <aside className="hidden min-w-0 space-y-5 lg:sticky lg:top-28 lg:block lg:self-start">
         <CardBase>
           <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Tendencias</p>
           <div className="mt-4 space-y-3">

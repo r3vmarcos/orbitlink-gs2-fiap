@@ -28,7 +28,7 @@ export function GaleriaPage() {
         <h1 className="mt-2 text-4xl font-black uppercase text-white light-theme:text-sky-950">Galeria do Universo</h1>
       </CardBase>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2">
         {itens.map((item) => <CardImagemGaleria key={item.id} item={item} onAbrir={setItemAberto} />)}
       </div>
 

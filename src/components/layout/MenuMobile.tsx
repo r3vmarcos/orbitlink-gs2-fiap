@@ -22,7 +22,8 @@ export function MenuMobile({ onAbrirPost, onAbrirStatus }: MenuMobileProps) {
         </NavLink>
         <NavLink to="/dualview-ar" className={itemClasse}>
           <Rocket className="h-5 w-5" />
-          <span className="truncate">AR</span>
+          <span className="truncate lg:hidden">AR</span>
+          <span className="hidden truncate lg:inline">Mapa</span>
         </NavLink>
         <button onClick={onAbrirPost} className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl bg-[color-mix(in_srgb,var(--bg-primary)_70%,transparent)] px-1 py-2 text-[8px] font-black uppercase tracking-normal text-[var(--text-primary)] min-[380px]:text-[9px]">
           <Plus className="h-5 w-5" />

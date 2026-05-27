@@ -7,6 +7,7 @@ import { formatarNumeroCompacto } from '@/utils/formatadores';
 /* === CARD PERFIL | inicio === */
 export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuario: UsuarioOrbitLink; destaque?: boolean; onAlterarFoto?: (foto: string) => void }) {
   const foto = usuario.fotoPerfil ?? `https://i.pravatar.cc/240?u=${usuario.id}`;
+  const bio = criarBioUsuario(usuario);
 
   function handleFoto(arquivo?: File) {
     if (!arquivo || !onAlterarFoto) return;
@@ -32,7 +33,8 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
           <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-blue-300 light-theme:text-sky-700">{usuario.usuario}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm leading-6 text-slate-300 light-theme:text-slate-700">{usuario.cargo} · {usuario.localizacaoAtual}</p>
+      <p className="mt-4 text-sm leading-6 text-slate-300 light-theme:text-slate-700">{usuario.cargo} - {usuario.localizacaoAtual}</p>
+      <p className="mt-3 text-sm leading-6 text-slate-300 light-theme:text-slate-700">{bio}</p>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-3">
           <p className="text-xl font-black text-white light-theme:text-sky-950">{formatarNumeroCompacto(usuario.seguidores)}</p>
@@ -44,7 +46,7 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {usuario.conquistas.slice(0, 3).map((conquista) => <Badge key={conquista} tom="roxo">{conquista}</Badge>)}
+        {usuario.conquistas.map((conquista) => <Badge key={conquista} tom="roxo">{conquista}</Badge>)}
       </div>
       {destaque ? (
         <div className="mt-4 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3 text-xs leading-5 text-[var(--text-muted)]">
@@ -56,5 +58,19 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
       <Botao className="mt-4 w-full" variante="secundario"><UserPlus className="h-4 w-4" /> Seguir</Botao>
     </article>
   );
+}
+
+function criarBioUsuario(usuario: UsuarioOrbitLink) {
+  const bios: Record<string, string> = {
+    astronauta: 'Compartilha rotina orbital, bastidores de missao e registros para aproximar ciencia espacial da comunidade.',
+    cientista: 'Transforma dados de clima, satelites e observacao terrestre em publicacoes simples para o Orbifeed.',
+    turista_espacial: 'Registra experiencias de viagem, pontos turisticos e a sensacao de ver a Terra por outro angulo.',
+    comunidade_terra: 'Leva relatos locais, fotos e alertas ambientais para conectar a superficie com quem observa do espaco.',
+    observador_terra: 'Acompanha o ceu, passagens orbitais e eventos astronomicos para alimentar os marks em tempo real.',
+    estacao_espacial: 'Perfil institucional com status, diarios tecnicos e atualizacoes de infraestrutura orbital.',
+    missao: 'Central de comunicacao de uma missao ativa, reunindo objetivos, tripulacao e marcos de exploracao.',
+  };
+
+  return bios[usuario.tipo] ?? 'Participante Orbitlink com publicacoes conectadas a Terra, ceu e dados espaciais.';
 }
 /* === CARD PERFIL | fim === */
