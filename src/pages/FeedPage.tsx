@@ -93,9 +93,9 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
           <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocinio</p>
           <div className="mt-4 space-y-3">
             {anunciosVisiveis.map(([produto, texto, imagem]) => (
-              <div key={produto} className="overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)]">
-                <img src={imagem} alt={produto} className="h-24 w-full object-cover" />
-                <div className="px-4 py-3">
+              <div key={produto} className="flex gap-3 overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-2">
+                <img src={imagem} alt={produto} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                <div className="min-w-0 py-1">
                   <p className="text-sm font-black text-[var(--text-text)]">{produto}</p>
                   <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">{texto}</p>
                 </div>

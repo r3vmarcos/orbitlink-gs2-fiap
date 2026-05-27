@@ -18,7 +18,7 @@ const campoVisaoHorizontalBase = 72;
 const campoVisaoVerticalBase = 58;
 const intensidadeArrasteCamera = 0.32;
 const perspectivaCamera = 'terra';
-const inclinacaoCeuPadrao = 72;
+const inclinacaoCeuPadrao = 58;
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
@@ -124,15 +124,17 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
       }
 
       const headingIos = (evento as DeviceOrientationEvent & { webkitCompassHeading?: number }).webkitCompassHeading;
-      const azimuteBruto = normalizarGraus(typeof headingIos === 'number' ? headingIos : 360 - (evento.alpha ?? 0));
-      const inclinacaoBruta = 90 - (evento.beta ?? 90);
-      const inclinacaoBase = inclinacaoCeuPadrao + inclinacaoBruta;
+      const alpha = evento.alpha ?? 0;
+      const beta = evento.beta ?? 90;
+      const gama = evento.gamma ?? 0;
+      const azimuteBruto = normalizarGraus(typeof headingIos === 'number' ? headingIos : alpha);
+      const inclinacaoBruta = limitar(65 - beta * 0.55 + Math.abs(gama) * 0.08, 10, 86);
       ultimoAzimuteSensorRef.current = azimuteBruto;
       ultimaInclinacaoSensorRef.current = inclinacaoBruta;
 
       setVisaoCamera({
         azimute: normalizarGraus(azimuteBruto + calibracaoAzimute),
-        inclinacao: limitar(inclinacaoBase + calibracaoInclinacao, -12, 88),
+        inclinacao: limitar(inclinacaoBruta + calibracaoInclinacao, 8, 88),
       });
     }
 
@@ -143,7 +145,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
 
   async function calibrarCeu() {
     await solicitarPermissaoMovimento();
-    const deslocamento = inclinacaoCeuPadrao - (inclinacaoCeuPadrao + ultimaInclinacaoSensorRef.current);
+    const deslocamento = inclinacaoCeuPadrao - ultimaInclinacaoSensorRef.current;
     setCalibracaoInclinacao(deslocamento);
     setCalibracaoAzimute(-ultimoAzimuteSensorRef.current);
     setVisaoCamera({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
@@ -245,16 +247,18 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, on
   const altitudePonto = calcularAltitudePonto(ponto);
   const deltaHorizontal = menorDiferencaGraus(direcaoPonto, visaoCamera.azimute);
   const deltaVertical = altitudePonto - visaoCamera.inclinacao;
+  const profundidade = limitar(1 - (Math.abs(deltaHorizontal) / 180) * 0.45 - (Math.abs(deltaVertical) / 90) * 0.25, 0.42, 1);
   const visivel = Math.abs(deltaHorizontal) <= campoVisaoHorizontal && Math.abs(deltaVertical) <= campoVisaoVertical;
-  const esquerda = 50 + (deltaHorizontal / campoVisaoHorizontal) * 48;
-  const topo = 50 - (deltaVertical / campoVisaoVertical) * 44;
+  const esquerda = 50 + (deltaHorizontal / campoVisaoHorizontal) * 48 * profundidade;
+  const topo = 42 - (deltaVertical / campoVisaoVertical) * 38 * profundidade;
+  const escala = 0.78 + profundidade * 0.32;
 
   if (!visivel) {
     return null;
   }
 
   return (
-    <div className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-left" style={{ left: `${esquerda}%`, top: `${topo}%` }}>
+    <div className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-left transition-[left,top,transform] duration-150 ease-out" style={{ left: `${esquerda}%`, top: `${topo}%`, transform: `translate(-50%, -50%) scale(${escala})` }}>
       <button onPointerDown={(evento) => evento.stopPropagation()} onClick={onSelecionar}>
         <span className={`relative flex h-6 w-6 items-center justify-center rounded-full text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''} ${ativo ? 'ring-4 ring-white/70' : ''}`} style={{ backgroundColor: cor }}>
           <span className="absolute h-10 w-10 rounded-full border border-current opacity-35 sm:h-12 sm:w-12" />
@@ -345,7 +349,7 @@ function MapaMarks({ pontos, pontoSelecionadoId, onSelecionar, onAbrir }: { pont
 
 function calcularAltitudePonto(ponto: PontoAr) {
   if (ponto.perspectiva === 'terra') {
-    return limitar(64 + ((100 - ponto.y) / 100) * 24, 62, 88);
+    return limitar(48 + ((100 - ponto.y) / 100) * 34, 48, 84);
   }
 
   return limitar(78 - ponto.y * 0.72, 10, 62);
