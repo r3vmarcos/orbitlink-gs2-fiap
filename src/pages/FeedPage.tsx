@@ -42,6 +42,8 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
     navigate(`/dualview-ar${query}`);
   }
 
+  const marksRecomendados = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === 'terra').slice(0, 10), [pontosAr]);
+
   return (
     <div className="grid w-full min-w-0 gap-5 lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
       <aside className="hidden min-w-0 space-y-5 lg:sticky lg:top-20 lg:block lg:h-[calc(100dvh-6rem)] lg:overflow-hidden lg:pr-1">
@@ -86,12 +88,14 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
         </CardBase>
         <CardBase>
           <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Marks recomendados</p>
-          <div className="mt-4 space-y-2">
-            {pontosAr.filter((ponto) => ponto.perspectiva === 'terra').slice(0, 6).map((ponto) => (
-              <button key={ponto.id} onClick={() => handleVerAr(ponto.id)} className="w-full rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] px-4 py-3 text-left text-sm font-bold text-[var(--text-text)] hover:bg-[var(--bg-surface-hover)]">
-                {ponto.nome}
-              </button>
-            ))}
+          <div className="pausar-animacao mt-4 h-[168px] overflow-hidden">
+            <div className="animacao-lista-vertical space-y-2">
+              {[...marksRecomendados, ...marksRecomendados].map((ponto, indice) => (
+                <button key={`${ponto.id}_${indice}`} onClick={() => handleVerAr(ponto.id)} className="h-12 w-full rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] px-4 py-3 text-left text-sm font-bold text-[var(--text-text)] hover:bg-[var(--bg-surface-hover)]">
+                  {ponto.nome}
+                </button>
+              ))}
+            </div>
           </div>
         </CardBase>
       </aside>

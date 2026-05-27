@@ -7,6 +7,7 @@ import { ImpactoPage } from '@/pages/ImpactoPage';
 import { MarkPage } from '@/pages/MarkPage';
 import { MissoesPage } from '@/pages/MissoesPage';
 import { PerfisPage } from '@/pages/PerfisPage';
+import { PessoasPage } from '@/pages/PessoasPage';
 import type { PostOrbitLink, StatusOrbital } from '@/types/orbitlink.types';
 
 /* === ROTAS DO APP | inicio === */
@@ -48,6 +49,7 @@ export function AppRoutes({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAb
       <Route path="/galeria" element={<GaleriaPage />} />
       <Route path="/perfis" element={<PerfisPage />} />
       <Route path="/perfis/:usuarioId" element={<PerfisPage />} />
+      <Route path="/pessoas" element={<PessoasPage />} />
       <Route path="/impacto" element={<ImpactoPage />} />
       <Route path="/dados-nasa" element={<DadosNasaPage />} />
       <Route

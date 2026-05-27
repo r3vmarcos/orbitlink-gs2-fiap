@@ -104,3 +104,38 @@ body {
   }
 }
 /* === AJUSTES MOBILE FULLSCREEN | fim === */
+
+/* === ANIMACOES ORBITLINK | inicio === */
+@keyframes orbitlink-marquee-horizontal {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes orbitlink-lista-vertical {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.animacao-marquee-horizontal {
+  animation: orbitlink-marquee-horizontal 26s linear infinite;
+}
+
+.animacao-lista-vertical {
+  animation: orbitlink-lista-vertical 20s linear infinite;
+}
+
+.pausar-animacao:hover .animacao-marquee-horizontal,
+.pausar-animacao:hover .animacao-lista-vertical {
+  animation-play-state: paused;
+}
+/* === ANIMACOES ORBITLINK | fim === */

@@ -27,6 +27,7 @@ const linksAntesPost = [
 ];
 
 const linksDepoisPost = [
+  { to: '/pessoas', label: 'Pessoas' },
   { to: '/galeria', label: 'Fotos' },
   { to: '/perfis', label: 'Perfil' },
 ];
@@ -61,7 +62,7 @@ export function Cabecalho(props: CabecalhoProps) {
               {link.label}
             </NavLink>
           ))}
-          <button onClick={onAbrirPost} className="rounded-2xl bg-[color-mix(in_srgb,var(--bg-primary)_70%,transparent)] px-3 py-2 font-monoapp text-[11px] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] transition hover:opacity-90">
+          <button onClick={onAbrirPost} className="rounded-2xl border border-[var(--bg-primary)] bg-transparent px-3 py-2 font-monoapp text-[11px] font-black uppercase tracking-[0.12em] text-[var(--bg-primary)] transition hover:bg-[color-mix(in_srgb,var(--bg-primary)_12%,transparent)]">
             Post
           </button>
           {linksDepoisPost.map((link) => (
