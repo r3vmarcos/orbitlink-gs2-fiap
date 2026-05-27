@@ -12,15 +12,58 @@ interface SementePostagem {
   ods: TipoOds[];
 }
 
-function gerarImagemDaPostagem(consulta: string, indice: number): string {
-  const tags = consulta
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, ',')
-    .replace(/^,+|,+$/g, '');
-
-  return `https://loremflickr.com/1200/800/${tags}?lock=${indice + 101}`;
-}
+const imagensPostagens = [
+  'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1543059080-f9b1272213d5?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1517976487492-5750f3195933?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1457364983758-510f8afa9f5f?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1614726365930-627c75da663e?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1492571350019-22de08371fd3?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1446776858070-70c3d5ed6758?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1526406915894-7bcd65f60845?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1536697246787-1f7ae568d89a?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1518365050014-70fe7232897f?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1614728263952-84ea256f9679?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1581822261290-991b38693d1b?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1443926818681-717d074a57af?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1522030299830-16b8d3d049fe?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1431274172761-fca41d930114?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1523580494863-6f3031224c94?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1200&q=82',
+  'https://images.unsplash.com/photo-1490806843957-31f4c9a91c65?auto=format&fit=crop&w=1200&q=82',
+] as const;
 
 const sementesPostagens: SementePostagem[] = [
   { autorId: 'helena_duarte', perspectiva: 'terra', titulo: 'Passando sobre a América do Sul', texto: 'A costa brasileira apareceu como uma fita de luz. Marquei o registro para comparar cidade, oceano e nuvens no Orbifeed.', consultaImagem: 'south america from space night lights coast', categoria: 'estacao', pontoArId: 'aurora', ods: ['ODS 11', 'ODS 13'] },
@@ -76,12 +119,12 @@ const sementesPostagens: SementePostagem[] = [
 ];
 
 export const postsData: PostOrbitLink[] = sementesPostagens.map((postagem, indice) => {
-  const { consultaImagem, ...dadosPostagem } = postagem;
+  const { consultaImagem: _consultaImagem, ...dadosPostagem } = postagem;
 
   return {
     id: `post_orbifeed_${String(indice + 1).padStart(2, '0')}`,
     ...dadosPostagem,
-    imagem: gerarImagemDaPostagem(consultaImagem, indice),
+    imagem: imagensPostagens[indice],
     curtidas: 340 + indice * 73,
     comentarios: indice % 4 === 0
       ? [{ id: `comentario_base_${indice}`, autor: 'Orbifeed', texto: 'Discussão aberta para a comunidade.', criadoEm: new Date(Date.now() - 1000 * 60 * (indice + 8)).toISOString() }]
