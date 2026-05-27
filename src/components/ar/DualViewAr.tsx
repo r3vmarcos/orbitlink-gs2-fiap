@@ -66,12 +66,12 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   }
 
   return (
-    <div className="grid w-full min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <div className="grid w-full min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-5">
       <section className="min-w-0 overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] shadow-neon">
-        <div className="flex flex-col gap-3 border-b border-[var(--border-border)] p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">DualView AR</p>
-            <h1 className="mt-1 text-2xl font-black uppercase text-[var(--text-text)]">
+        <div className="flex flex-col gap-3 border-b border-[var(--border-border)] p-3 sm:flex-row sm:items-center sm:justify-between sm:p-4">
+          <div className="min-w-0">
+            <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">DualView AR</p>
+            <h1 className="mt-1 text-xl font-black uppercase leading-tight text-[var(--text-text)] sm:text-2xl">
               Camada única da Orbitlink
             </h1>
             <p className="mt-1 text-sm text-[var(--text-muted)]">Pontos da Terra e do céu aparecem juntos, sem troca de modo.</p>
@@ -79,7 +79,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             <Botao tamanho="sm" variante={cameraAtiva ? 'primario' : 'secundario'} onClick={() => setCameraAtiva((ativa) => !ativa)}>
               {cameraAtiva ? <CameraOff className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
-              {cameraAtiva ? 'Desligar câmera' : 'Usar câmera'}
+              {cameraAtiva ? 'Desligar' : 'Câmera'}
             </Botao>
             <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sincronizando' : 'APIs NASA'}</Botao>
           </div>
@@ -99,7 +99,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           ))}
         </div>
 
-        <div className="relative h-[calc(100dvh-15rem)] min-h-[460px] overflow-hidden bg-slate-950 light-theme:bg-sky-50 md:h-[640px]">
+        <div className="relative h-[calc(100dvh-17rem)] min-h-[360px] overflow-hidden bg-slate-950 light-theme:bg-sky-50 min-[420px]:min-h-[420px] md:h-[640px]">
           {cameraAtiva ? (
             <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
           ) : <CenaOrbitlink />}
@@ -108,12 +108,12 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           {pontosVisiveis.map((ponto) => (
             <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} onSelecionar={() => setPontoSelecionadoId(ponto.id)} />
           ))}
-          <div className="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2">
+          <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
             <Badge tom="verde">{cameraAtiva ? 'Câmera ativa' : 'Simulação ativa'}</Badge>
             <Badge tom="roxo">Terra + céu</Badge>
           </div>
-          {erroCamera ? <div className="absolute left-4 right-4 top-4 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-sm font-bold text-amber-100 light-theme:text-amber-800">{erroCamera}</div> : null}
+          {erroCamera ? <div className="absolute left-3 right-3 top-3 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-xs font-bold leading-5 text-amber-100 light-theme:text-amber-800 sm:left-4 sm:right-4 sm:top-4 sm:text-sm">{erroCamera}</div> : null}
         </div>
       </section>
       <CardPontoAr ponto={pontoSelecionado} onVerPosts={onVerPosts} onVerStatus={onVerStatus} />
@@ -129,7 +129,7 @@ function CenaOrbitlink() {
         <div className="absolute inset-0 rounded-full border border-cyan-300/30" />
         <div className="absolute -inset-10 animate-orbitar rounded-full border border-dashed border-blue-300/25" />
       </div>
-      <div className="absolute left-[8%] top-[18%] h-28 w-28 rounded-full border border-blue-400/20 bg-[radial-gradient(circle_at_30%_30%,#fef3c7,#64748b_45%,#0f172a_72%)] shadow-neon" />
+      <div className="absolute left-[8%] top-[18%] h-20 w-20 rounded-full border border-blue-400/20 bg-[radial-gradient(circle_at_30%_30%,#fef3c7,#64748b_45%,#0f172a_72%)] shadow-neon sm:h-28 sm:w-28" />
       <div className="absolute bottom-[18%] left-[42%] h-1 w-[56%] rotate-[-12deg] bg-gradient-to-r from-transparent via-cyan-300 to-transparent opacity-70" />
     </div>
   );
@@ -145,7 +145,7 @@ function PontoArVisual({ ponto, ativo, onSelecionar }: { ponto: PontoAr; ativo: 
       style={{ left: `${ponto.x}%`, top: `${ponto.y}%` }}
     >
       <span className={`relative flex h-6 w-6 items-center justify-center rounded-full ${cor} text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''}`}>
-        <span className="absolute h-12 w-12 rounded-full border border-current opacity-35" />
+        <span className="absolute h-10 w-10 rounded-full border border-current opacity-35 sm:h-12 sm:w-12" />
         <span className="h-2 w-2 rounded-full bg-slate-950" />
       </span>
       <span className={`mt-2 hidden rounded-xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_82%,transparent)] px-3 py-2 text-xs font-bold text-[var(--text-text)] backdrop-blur-md md:block ${ativo ? 'ring-2 ring-[var(--border-focus)]' : ''}`}>

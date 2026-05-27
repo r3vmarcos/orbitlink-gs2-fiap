@@ -14,10 +14,10 @@ export function StatusOrbitalLista({ onAbrirStatus, onCriarStatus }: StatusOrbit
   const { statusOrbitais, usuarios } = useOrbitLink();
 
   return (
-    <section className="rounded-[2rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-4 backdrop-blur-xl">
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Status Orbitlink 24h</h2>
-        <button onClick={onCriarStatus} className="rounded-xl bg-[var(--bg-primary)] px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
+    <section className="rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-3 backdrop-blur-xl sm:rounded-[2rem] sm:p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 className="min-w-0 font-monoapp text-[11px] font-black uppercase tracking-[0.08em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Status Orbitlink 24h</h2>
+        <button onClick={onCriarStatus} className="shrink-0 rounded-xl bg-[var(--bg-primary)] px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] text-[var(--text-primary)] sm:tracking-[0.12em]">
           Criar
         </button>
       </div>

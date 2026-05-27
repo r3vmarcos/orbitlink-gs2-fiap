@@ -16,8 +16,8 @@ export function CardPontoAr({ ponto, onVerPosts, onVerStatus }: CardPontoArProps
 
   if (!ponto) {
     return (
-      <section className="rounded-[2rem] border border-blue-500/35 bg-slate-950/74 p-5 backdrop-blur-xl light-theme:bg-white/80">
-        <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300 light-theme:text-sky-700">Selecione um ponto</p>
+      <section className="rounded-[1.5rem] border border-blue-500/35 bg-slate-950/74 p-4 backdrop-blur-xl light-theme:bg-white/80 sm:rounded-[2rem] sm:p-5">
+        <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.08em] text-blue-300 light-theme:text-sky-700 sm:text-xs sm:tracking-[0.18em]">Selecione um ponto</p>
         <p className="mt-3 text-sm leading-6 text-slate-300 light-theme:text-slate-700">Toque em um planeta, estação, cidade, bioma ou alerta para abrir detalhes sociais e dados simulados/API.</p>
       </section>
     );
@@ -26,11 +26,11 @@ export function CardPontoAr({ ponto, onVerPosts, onVerStatus }: CardPontoArProps
   const seguido = pontosSeguidos.includes(ponto.id);
 
   return (
-    <section className="rounded-[2rem] border border-blue-500/35 bg-slate-950/82 p-5 shadow-neon backdrop-blur-xl light-theme:bg-white/86">
+    <section className="rounded-[1.5rem] border border-blue-500/35 bg-slate-950/82 p-4 shadow-neon backdrop-blur-xl light-theme:bg-white/86 sm:rounded-[2rem] sm:p-5">
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300 light-theme:text-sky-700">{ponto.tipo.replaceAll('_', ' ')}</p>
-          <h2 className="mt-2 text-2xl font-black uppercase text-white light-theme:text-sky-950">{ponto.nome}</h2>
+        <div className="min-w-0">
+          <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.08em] text-blue-300 light-theme:text-sky-700 sm:text-xs sm:tracking-[0.18em]">{ponto.tipo.replaceAll('_', ' ')}</p>
+          <h2 className="mt-2 text-xl font-black uppercase leading-tight text-white light-theme:text-sky-950 sm:text-2xl">{ponto.nome}</h2>
         </div>
         {ponto.statusAtivo ? <Badge tom="laranja">Status ativo</Badge> : null}
       </div>
@@ -46,7 +46,7 @@ export function CardPontoAr({ ponto, onVerPosts, onVerStatus }: CardPontoArProps
           </div>
         ))}
       </div>
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         <Botao tamanho="sm" onClick={() => onVerPosts(ponto.id)}><Eye className="h-4 w-4" /> Posts</Botao>
         <Botao tamanho="sm" variante="secundario" onClick={() => onVerStatus(ponto.id)}><Radio className="h-4 w-4" /> Status</Botao>
         <Botao tamanho="sm" variante={seguido ? 'primario' : 'secundario'} onClick={() => seguirPonto(ponto.id)}><Star className="h-4 w-4" /> {seguido ? 'Seguindo' : 'Seguir'}</Botao>

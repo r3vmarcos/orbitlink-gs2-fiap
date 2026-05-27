@@ -25,19 +25,19 @@ export function AcessoUsuario() {
   }
 
   return (
-    <main className="min-h-[100dvh] overflow-x-hidden bg-[var(--bg-background)] px-4 py-6 font-orbit text-[var(--text-text)] sm:px-6">
+    <main className="min-h-[100dvh] overflow-x-hidden bg-[var(--bg-background)] px-3 py-4 font-orbit text-[var(--text-text)] sm:px-6 sm:py-6">
       <div className="mx-auto grid min-h-[calc(100dvh-3rem)] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1fr_420px]">
         <section className="space-y-5">
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Orbitlink social</p>
-          <h1 className="max-w-3xl text-4xl font-black uppercase leading-tight text-[var(--text-text)] md:text-6xl">
+          <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Orbitlink social</p>
+          <h1 className="max-w-3xl text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl md:text-6xl">
             Entre na rede social entre Terra e espaço.
           </h1>
-          <p className="max-w-2xl text-base leading-8 text-[var(--text-muted)]">
+          <p className="max-w-2xl text-sm leading-7 text-[var(--text-muted)] sm:text-base sm:leading-8">
             Crie posts, salve imagens, comente no Orbifeed e abra o DualView AR com câmera e pontos orbitais. O banco desta versão é local no navegador.
           </p>
           <div className="grid max-w-2xl gap-3 sm:grid-cols-3">
             {['Orbifeed central', 'Posts com imagem', 'Câmera AR'].map((item) => (
-              <div key={item} className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 text-sm font-black uppercase tracking-[0.08em] text-[var(--text-text)]">
+              <div key={item} className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-3 text-xs font-black uppercase tracking-[0.04em] text-[var(--text-text)] sm:p-4 sm:text-sm sm:tracking-[0.08em]">
                 {item}
               </div>
             ))}
@@ -46,10 +46,10 @@ export function AcessoUsuario() {
 
         <section className="rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 shadow-soft sm:p-5">
           <div className="mb-5 grid grid-cols-2 gap-2 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-1">
-            <button onClick={() => setModo('cadastro')} className={`rounded-xl px-3 py-3 text-xs font-black uppercase tracking-[0.12em] ${modo === 'cadastro' ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+            <button onClick={() => setModo('cadastro')} className={`rounded-xl px-3 py-3 text-[11px] font-black uppercase tracking-[0.06em] sm:text-xs sm:tracking-[0.12em] ${modo === 'cadastro' ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
               Cadastro
             </button>
-            <button onClick={() => setModo('entrar')} className={`rounded-xl px-3 py-3 text-xs font-black uppercase tracking-[0.12em] ${modo === 'entrar' ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+            <button onClick={() => setModo('entrar')} className={`rounded-xl px-3 py-3 text-[11px] font-black uppercase tracking-[0.06em] sm:text-xs sm:tracking-[0.12em] ${modo === 'entrar' ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
               Entrar
             </button>
           </div>

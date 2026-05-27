@@ -57,22 +57,22 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
     <div className="grid w-full min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div className="min-w-0 space-y-5">
         <CardBase>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Orbitlink</p>
+          <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Orbitlink</p>
           <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0">
-              <h1 className="text-4xl font-black uppercase leading-tight text-[var(--text-text)] md:text-6xl">
+              <h1 className="text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl md:text-6xl">
                 Orbifeed
               </h1>
-              <span className="mt-2 inline-flex rounded-full border border-[var(--border-border)] bg-[var(--bg-primary)] px-3 py-1 font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-primary)]">
-                Feed geral da Terra e do céu
+              <span className="mt-2 inline-flex max-w-full rounded-full border border-[var(--border-border)] bg-[var(--bg-primary)] px-3 py-1 font-monoapp text-[9px] font-black uppercase tracking-[0.08em] text-[var(--text-primary)] sm:text-[10px] sm:tracking-[0.14em]">
+                Feed geral Terra e céu
               </span>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
                 Olá, {usuarioAtual?.nome ?? 'explorador'}. Todos veem o mesmo feed; cada publicação mostra se foi postada da Terra ou do céu.
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex">
-              <Botao onClick={onAbrirPost}>Publicar</Botao>
-              <Botao variante="secundario" onClick={onAbrirStatus}>Status 24h</Botao>
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:shrink-0">
+              <Botao onClick={onAbrirPost} className="px-3">Publicar</Botao>
+              <Botao variante="secundario" onClick={onAbrirStatus} className="px-3">Status</Botao>
             </div>
           </div>
           <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-5" placeholder="Buscar posts, missões, locais, pontos AR ou ODS..." />
@@ -87,9 +87,9 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
 
         <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
 
-        <button onClick={onAbrirPost} className="w-full rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] p-5 text-left text-[var(--text-muted)] transition hover:bg-[var(--bg-surface-hover)]">
-          <span className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Criar publicação rápida</span>
-          <span className="mt-2 block text-lg font-bold text-[var(--text-text)]">De onde você está postando agora?</span>
+        <button onClick={onAbrirPost} className="w-full rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 text-left text-[var(--text-muted)] transition hover:bg-[var(--bg-surface-hover)] sm:p-5">
+          <span className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Criar publicação rápida</span>
+          <span className="mt-2 block text-base font-bold text-[var(--text-text)] sm:text-lg">De onde você está postando agora?</span>
         </button>
 
         <div className="space-y-5">

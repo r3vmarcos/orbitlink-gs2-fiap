@@ -80,7 +80,7 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
 
   return (
     <Modal aberto={aberto} titulo="Nova publicação Orbitlink" onFechar={onFechar} telaCheiaMobile>
-      <div className="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[1.2fr_.8fr] lg:gap-5">
         <div className="space-y-4">
           <label className="block">
             <span className="label-form">Título *</span>
@@ -92,9 +92,9 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
           </label>
           <label className="block">
             <span className="label-form">Imagem opcional</span>
-            <div className="flex items-center gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
-              <ImagePlus className="h-5 w-5 text-[var(--text-link)]" />
-              <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="w-full text-xs text-[var(--text-muted)] file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--bg-primary)] file:px-3 file:py-2 file:font-bold file:text-[var(--text-primary)]" />
+            <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
+              <ImagePlus className="h-5 w-5 shrink-0 text-[var(--text-link)]" />
+              <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="min-w-0 w-full text-xs text-[var(--text-muted)] file:mb-2 file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--bg-primary)] file:px-3 file:py-2 file:font-bold file:text-[var(--text-primary)] min-[420px]:file:mb-0" />
             </div>
           </label>
           {imagem ? <img src={imagem} alt="Preview da publicação" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : null}
@@ -104,10 +104,10 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
           <div>
             <span className="label-form">Onde você está postando?</span>
             <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => handleLocalPostagem('terra')} className={`rounded-2xl border px-3 py-3 text-xs font-black uppercase tracking-[0.1em] ${localPostagem === 'terra' ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+              <button onClick={() => handleLocalPostagem('terra')} className={`rounded-2xl border px-2 py-3 text-[11px] font-black uppercase tracking-[0.04em] sm:px-3 sm:text-xs sm:tracking-[0.1em] ${localPostagem === 'terra' ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
                 Estou na Terra
               </button>
-              <button onClick={() => handleLocalPostagem('espaco')} className={`rounded-2xl border px-3 py-3 text-xs font-black uppercase tracking-[0.1em] ${localPostagem === 'espaco' ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+              <button onClick={() => handleLocalPostagem('espaco')} className={`rounded-2xl border px-2 py-3 text-[11px] font-black uppercase tracking-[0.04em] sm:px-3 sm:text-xs sm:tracking-[0.1em] ${localPostagem === 'espaco' ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
                 Estou no céu
               </button>
             </div>
@@ -131,10 +131,10 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
               {opcoesOds.map((opcao) => <option key={opcao} value={opcao}>{opcao}</option>)}
             </select>
           </label>
-          <div className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 text-sm leading-6 text-[var(--text-muted)]">
+          <div className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-3 text-sm leading-6 text-[var(--text-muted)] sm:p-4">
             A publicação será exibida para todos no Orbifeed. O local escolhido aparece no post como “postado da Terra” ou “postado do céu”.
           </div>
-          <div className="flex gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <Botao variante="fantasma" onClick={onFechar} className="flex-1">Cancelar</Botao>
             <Botao onClick={handlePublicar} className="flex-1"><Send className="h-4 w-4" /> Publicar</Botao>
           </div>

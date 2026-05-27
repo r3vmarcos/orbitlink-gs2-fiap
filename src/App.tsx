@@ -54,16 +54,16 @@ function AppInterno() {
       <Modal aberto={Boolean(postDetalhe)} titulo={postDetalhe?.titulo ?? 'Publicação'} onFechar={() => setPostDetalhe(undefined)} telaCheiaMobile>
         {postDetalhe ? (
           <div className="space-y-5">
-            {postDetalhe.imagem ? <img src={postDetalhe.imagem} alt={postDetalhe.titulo} className="max-h-[62dvh] w-full rounded-[2rem] object-cover" /> : null}
+            {postDetalhe.imagem ? <img src={postDetalhe.imagem} alt={postDetalhe.titulo} className="max-h-[58dvh] w-full rounded-[1.5rem] object-cover sm:max-h-[62dvh] sm:rounded-[2rem]" /> : null}
             <div>
-              <p className="font-monoapp text-xs font-black uppercase tracking-[0.16em] text-blue-300">
+              <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.08em] text-blue-300 sm:text-xs sm:tracking-[0.16em]">
                 {autorPost?.nome ?? 'Orbitlink'} · {pontoPost?.nome ?? 'Sem ponto AR'}
               </p>
-              <h2 className="mt-2 text-3xl font-black uppercase text-white light-theme:text-sky-950">{postDetalhe.titulo}</h2>
-              <p className="mt-4 text-base leading-8 text-slate-300 light-theme:text-slate-700">{postDetalhe.texto}</p>
+              <h2 className="mt-2 text-2xl font-black uppercase leading-tight text-white light-theme:text-sky-950 sm:text-3xl">{postDetalhe.titulo}</h2>
+              <p className="mt-4 text-sm leading-7 text-slate-300 light-theme:text-slate-700 sm:text-base sm:leading-8">{postDetalhe.texto}</p>
             </div>
-            <div className="flex flex-wrap gap-3">
-              <Botao onClick={() => handleVerAr(postDetalhe.pontoArId)}>Ver no DualView AR</Botao>
+            <div className="grid gap-3 sm:flex sm:flex-wrap">
+              <Botao onClick={() => handleVerAr(postDetalhe.pontoArId)}>Ver no AR</Botao>
               <Botao variante="secundario" onClick={() => setPostDetalhe(undefined)}>Fechar</Botao>
             </div>
           </div>

@@ -8,7 +8,7 @@ interface BotaoProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Botao({ children, variante = 'primario', tamanho = 'md', className = '', ...props }: BotaoProps) {
-  const classesBase = 'inline-flex items-center justify-center gap-2 rounded-2xl font-monoapp font-black uppercase tracking-[0.12em] transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50';
+  const classesBase = 'inline-flex min-w-0 items-center justify-center gap-2 rounded-2xl text-center font-monoapp font-black uppercase tracking-[0.08em] transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:tracking-[0.12em]';
   const classesTamanho = {
     sm: 'px-3 py-2 text-[10px]',
     md: 'px-4 py-3 text-xs',

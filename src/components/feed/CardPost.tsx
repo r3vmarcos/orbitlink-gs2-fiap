@@ -30,12 +30,15 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
 
   return (
     <article className="animate-subir overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_86%,transparent)] shadow-soft backdrop-blur-xl">
-      <header className="flex items-center gap-3 p-4">
+      <header className="flex items-center gap-3 p-3 sm:p-4">
         <AvatarOrbital gradiente={autor.avatarGradiente} nome={autor.nome} />
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-black text-[var(--text-text)]">{autor.nome}</h3>
-          <p className="truncate font-monoapp text-[10px] uppercase tracking-[0.08em] text-[var(--text-muted)]">
-            {autor.usuario} · {ponto?.nome ?? autor.localizacaoAtual} · {formatarTempoRelativo(post.criadoEm)}
+          <p className="truncate font-monoapp text-[9px] uppercase tracking-[0.04em] text-[var(--text-muted)] min-[380px]:text-[10px] min-[380px]:tracking-[0.08em]">
+            {autor.usuario} · {formatarTempoRelativo(post.criadoEm)}
+          </p>
+          <p className="truncate text-[11px] font-semibold text-[var(--text-muted)] sm:hidden">
+            {ponto?.nome ?? autor.localizacaoAtual}
           </p>
         </div>
         {post.criadoPeloUsuario ? (
@@ -51,9 +54,9 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
         </button>
       ) : null}
 
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 p-3 sm:p-4">
         <div>
-          <h2 className="text-xl font-black uppercase text-[var(--text-text)]">{post.titulo}</h2>
+          <h2 className="text-lg font-black uppercase leading-snug text-[var(--text-text)] sm:text-xl">{post.titulo}</h2>
           <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--text-muted)]">{post.texto}</p>
         </div>
 
@@ -66,17 +69,17 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
           {ponto ? <Badge tom="roxo">{ponto.nome}</Badge> : null}
         </div>
 
-        <div className="grid grid-cols-5 gap-2">
-          <button onClick={() => curtirPost(post.id)} className={`rounded-2xl border px-2 py-2 text-left text-xs font-bold transition ${curtido ? 'border-rose-400 bg-rose-500/15 text-rose-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
+        <div className="grid grid-cols-3 gap-2 min-[420px]:grid-cols-5">
+          <button onClick={() => curtirPost(post.id)} className={`min-w-0 rounded-2xl border px-2 py-2 text-left text-[11px] font-bold transition sm:text-xs ${curtido ? 'border-rose-400 bg-rose-500/15 text-rose-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
             <Heart className="mb-1 h-4 w-4" /> {formatarNumeroCompacto(post.curtidas + (curtido ? 1 : 0))}
           </button>
-          <button className="rounded-2xl border border-[var(--border-border)] px-2 py-2 text-left text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]">
+          <button className="min-w-0 rounded-2xl border border-[var(--border-border)] px-2 py-2 text-left text-[11px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)] sm:text-xs">
             <MessageCircle className="mb-1 h-4 w-4" /> {formatarNumeroCompacto(post.comentarios.length)}
           </button>
-          <button onClick={() => compartilharPost(post.id)} className="rounded-2xl border border-[var(--border-border)] px-2 py-2 text-left text-xs font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]">
+          <button onClick={() => compartilharPost(post.id)} className="min-w-0 rounded-2xl border border-[var(--border-border)] px-2 py-2 text-left text-[11px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)] sm:text-xs">
             <Share2 className="mb-1 h-4 w-4" /> {formatarNumeroCompacto(post.compartilhamentos)}
           </button>
-          <button onClick={() => salvarPost(post.id)} className={`rounded-2xl border px-2 py-2 text-left text-xs font-bold transition ${salvo ? 'border-amber-400 bg-amber-500/15 text-amber-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
+          <button onClick={() => salvarPost(post.id)} className={`min-w-0 rounded-2xl border px-2 py-2 text-left text-[11px] font-bold transition sm:text-xs ${salvo ? 'border-amber-400 bg-amber-500/15 text-amber-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
             <Bookmark className="mb-1 h-4 w-4" /> Salvar
           </button>
           <Botao variante="secundario" tamanho="sm" onClick={() => onVerAr(post.pontoArId)} className="w-full">
