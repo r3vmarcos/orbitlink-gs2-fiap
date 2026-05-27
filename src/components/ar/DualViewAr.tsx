@@ -1,4 +1,5 @@
 import { Camera, CameraOff } from 'lucide-react';
+import type { PointerEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CardPontoAr } from '@/components/ar/CardPontoAr';
 import { Badge } from '@/components/ui/Badge';
@@ -14,6 +15,7 @@ interface DualViewArProps {
 }
 
 const camadasOrbitlink: TipoCamadaAr[] = ['social', 'planetas', 'lua', 'estacoes', 'satelites', 'missoes', 'eventos', 'cidades', 'turismo', 'clima', 'biomas', 'ods'];
+const intensidadeArrasteCamera = 0.12;
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
@@ -21,7 +23,9 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [cameraAtiva, setCameraAtiva] = useState(false);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
+  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: 0 });
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const arrasteRef = useRef<{ ativo: boolean; x: number; y: number }>({ ativo: false, x: 0, y: 0 });
 
   const pontosVisiveis = useMemo(() => {
     return pontosAr.filter((ponto) => ponto.camada.some((camada) => camadasAtivas.includes(camada)));
@@ -65,6 +69,62 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
     setCamadasAtivas((atuais) => (atuais.includes(camada) ? atuais.filter((item) => item !== camada) : [...atuais, camada]));
   }
 
+  async function alternarCamera() {
+    const eventoOrientacao = window.DeviceOrientationEvent as typeof DeviceOrientationEvent & {
+      requestPermission?: () => Promise<'granted' | 'denied'>;
+    } | undefined;
+
+    if (!cameraAtiva && typeof eventoOrientacao?.requestPermission === 'function') {
+      try {
+        await eventoOrientacao.requestPermission();
+      } catch {
+        setErroCamera('Permissao de movimento indisponivel. Use o arraste na tela para simular a camera 360.');
+      }
+    }
+
+    setCameraAtiva((ativa) => !ativa);
+  }
+
+  function iniciarArrasteCamera(evento: PointerEvent<HTMLDivElement>) {
+    arrasteRef.current = { ativo: true, x: evento.clientX, y: evento.clientY };
+    evento.currentTarget.setPointerCapture(evento.pointerId);
+  }
+
+  function moverArrasteCamera(evento: PointerEvent<HTMLDivElement>) {
+    if (!arrasteRef.current.ativo) {
+      return;
+    }
+
+    const deslocamentoX = evento.clientX - arrasteRef.current.x;
+    const deslocamentoY = evento.clientY - arrasteRef.current.y;
+    arrasteRef.current = { ativo: true, x: evento.clientX, y: evento.clientY };
+
+    setVisaoCamera((atual) => ({
+      azimute: normalizarPercentual(atual.azimute - deslocamentoX * intensidadeArrasteCamera),
+      inclinacao: limitar(atual.inclinacao + deslocamentoY * intensidadeArrasteCamera, -32, 32),
+    }));
+  }
+
+  function finalizarArrasteCamera() {
+    arrasteRef.current.ativo = false;
+  }
+
+  useEffect(() => {
+    function atualizarOrientacaoCamera(evento: DeviceOrientationEvent) {
+      if (typeof evento.alpha !== 'number' && typeof evento.beta !== 'number') {
+        return;
+      }
+
+      setVisaoCamera({
+        azimute: normalizarPercentual((evento.alpha ?? 0) / 3.6),
+        inclinacao: limitar(((evento.beta ?? 0) - 45) * 0.45, -32, 32),
+      });
+    }
+
+    window.addEventListener('deviceorientation', atualizarOrientacaoCamera);
+    return () => window.removeEventListener('deviceorientation', atualizarOrientacaoCamera);
+  }, []);
+
   return (
     <div className="grid w-full min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-5">
       <section className="min-w-0 overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] shadow-neon">
@@ -77,7 +137,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             <p className="mt-1 text-sm text-[var(--text-muted)]">Pontos da Terra e do céu aparecem juntos, sem troca de modo.</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-            <Botao tamanho="sm" variante={cameraAtiva ? 'primario' : 'secundario'} onClick={() => setCameraAtiva((ativa) => !ativa)}>
+            <Botao tamanho="sm" variante={cameraAtiva ? 'primario' : 'secundario'} onClick={() => void alternarCamera()}>
               {cameraAtiva ? <CameraOff className="h-4 w-4" /> : <Camera className="h-4 w-4" />}
               {cameraAtiva ? 'Desligar' : 'Câmera'}
             </Botao>
@@ -99,14 +159,21 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           ))}
         </div>
 
-        <div className="relative h-[calc(100dvh-17rem)] min-h-[360px] overflow-hidden bg-slate-950 light-theme:bg-sky-50 min-[420px]:min-h-[420px] md:h-[640px]">
+        <div
+          className="relative h-[calc(100dvh-17rem)] min-h-[360px] touch-none overflow-hidden bg-slate-950 light-theme:bg-sky-50 min-[420px]:min-h-[420px] md:h-[640px]"
+          onPointerDown={iniciarArrasteCamera}
+          onPointerMove={moverArrasteCamera}
+          onPointerUp={finalizarArrasteCamera}
+          onPointerCancel={finalizarArrasteCamera}
+          onPointerLeave={finalizarArrasteCamera}
+        >
           {cameraAtiva ? (
             <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
           ) : <CenaOrbitlink />}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
           {cameraAtiva ? <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" /> : null}
           {pontosVisiveis.map((ponto) => (
-            <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} onSelecionar={() => setPontoSelecionadoId(ponto.id)} />
+            <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} />
           ))}
           <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
@@ -135,14 +202,16 @@ function CenaOrbitlink() {
   );
 }
 
-function PontoArVisual({ ponto, ativo, onSelecionar }: { ponto: PontoAr; ativo: boolean; onSelecionar: () => void }) {
+function PontoArVisual({ ponto, ativo, visaoCamera, onSelecionar }: { ponto: PontoAr; ativo: boolean; visaoCamera: { azimute: number; inclinacao: number }; onSelecionar: () => void }) {
   const cor = ponto.perspectiva === 'espaco' ? 'bg-orange-400' : ponto.origemDados === 'nasa_eonet' ? 'bg-emerald-400' : ponto.statusAtivo ? 'bg-cyan-300' : 'bg-blue-400';
+  const esquerda = normalizarPercentual(ponto.x - visaoCamera.azimute);
+  const topo = limitar(ponto.y + visaoCamera.inclinacao, 6, 92);
 
   return (
     <button
       onClick={onSelecionar}
       className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-left"
-      style={{ left: `${ponto.x}%`, top: `${ponto.y}%` }}
+      style={{ left: `${esquerda}%`, top: `${topo}%` }}
     >
       <span className={`relative flex h-6 w-6 items-center justify-center rounded-full ${cor} text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''}`}>
         <span className="absolute h-10 w-10 rounded-full border border-current opacity-35 sm:h-12 sm:w-12" />
@@ -153,5 +222,13 @@ function PontoArVisual({ ponto, ativo, onSelecionar }: { ponto: PontoAr; ativo: 
       </span>
     </button>
   );
+}
+
+function normalizarPercentual(valor: number) {
+  return ((valor % 100) + 100) % 100;
+}
+
+function limitar(valor: number, minimo: number, maximo: number) {
+  return Math.min(Math.max(valor, minimo), maximo);
 }
 /* === DUALVIEW AR | fim === */
