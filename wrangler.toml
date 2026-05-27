@@ -4,5 +4,5 @@ compatibility_date = "2026-05-27"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "hss_roi_db"
-database_id = "867e174b-291a-47d0-8964-2e8d4fa2cc84"
+database_name = "orbitlink_db"
+database_id = "2783a9de-924a-4df7-94d4-c487e1ceef3a"
