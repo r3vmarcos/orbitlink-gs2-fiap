@@ -19,6 +19,7 @@ const campoVisaoVerticalBase = 58;
 const intensidadeArrasteCamera = 0.32;
 const perspectivaCamera = 'terra';
 const inclinacaoCeuPadrao = 58;
+const betaReferenciaPadrao = 90;
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
@@ -27,13 +28,13 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [erroCamera, setErroCamera] = useState<string | undefined>();
   const [cameraAtiva, setCameraAtiva] = useState(false);
   const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
-  const [calibracaoInclinacao, setCalibracaoInclinacao] = useState(0);
   const [calibracaoAzimute, setCalibracaoAzimute] = useState(0);
+  const [betaReferencia, setBetaReferencia] = useState(betaReferenciaPadrao);
   const [zoomCamera, setZoomCamera] = useState(1);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const arrasteRef = useRef<{ ativo: boolean; x: number; y: number }>({ ativo: false, x: 0, y: 0 });
   const toquePinchRef = useRef<{ distancia: number; zoom: number } | undefined>(undefined);
-  const ultimaInclinacaoSensorRef = useRef(70);
+  const ultimoBetaSensorRef = useRef(betaReferenciaPadrao);
   const ultimoAzimuteSensorRef = useRef(0);
 
   const pontosVisiveis = useMemo(() => {
@@ -143,27 +144,25 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
       const headingIos = (evento as DeviceOrientationEvent & { webkitCompassHeading?: number }).webkitCompassHeading;
       const alpha = evento.alpha ?? 0;
       const beta = evento.beta ?? 90;
-      const gama = evento.gamma ?? 0;
-      const azimuteBruto = normalizarGraus(typeof headingIos === 'number' ? headingIos : alpha);
-      const inclinacaoBruta = limitar(65 - beta * 0.55 + Math.abs(gama) * 0.08, 10, 86);
+      const azimuteBruto = normalizarGraus(typeof headingIos === 'number' ? headingIos : 360 - alpha);
+      const inclinacaoBruta = limitar(inclinacaoCeuPadrao + (betaReferencia - beta) * 0.9, 8, 88);
       ultimoAzimuteSensorRef.current = azimuteBruto;
-      ultimaInclinacaoSensorRef.current = inclinacaoBruta;
+      ultimoBetaSensorRef.current = beta;
 
       setVisaoCamera({
         azimute: normalizarGraus(azimuteBruto + calibracaoAzimute),
-        inclinacao: limitar(inclinacaoBruta + calibracaoInclinacao, 8, 88),
+        inclinacao: inclinacaoBruta,
       });
     }
 
     void solicitarPermissaoMovimento();
     window.addEventListener('deviceorientation', atualizarOrientacaoCamera);
     return () => window.removeEventListener('deviceorientation', atualizarOrientacaoCamera);
-  }, [calibracaoAzimute, calibracaoInclinacao]);
+  }, [betaReferencia, calibracaoAzimute]);
 
   async function calibrarCeu() {
     await solicitarPermissaoMovimento();
-    const deslocamento = inclinacaoCeuPadrao - ultimaInclinacaoSensorRef.current;
-    setCalibracaoInclinacao(deslocamento);
+    setBetaReferencia(ultimoBetaSensorRef.current);
     setCalibracaoAzimute(-ultimoAzimuteSensorRef.current);
     setVisaoCamera({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
   }
@@ -203,8 +202,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           }}
         >
           <video ref={videoRef} className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover" playsInline muted autoPlay />
-          {!cameraAtiva ? <div className="pointer-events-none absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=82')] bg-cover bg-center" /> : null}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.08)_42%,rgba(2,6,23,.38)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.04)_40%,rgba(255,69,0,.12)_100%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.05)_44%,rgba(2,6,23,.26)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.03)_40%,rgba(255,69,0,.1)_100%)]" />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" />
           {pontosVisiveis.map((ponto) => (
             <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} zoomCamera={zoomCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} onAbrir={() => onVerPosts(ponto.id)} />
