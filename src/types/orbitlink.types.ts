@@ -66,6 +66,7 @@ export interface UsuarioOrbitLink {
   usuario: string;
   tipo: TipoPerfil;
   avatarGradiente: string;
+  fotoPerfil?: string;
   cargo: string;
   localizacaoAtual: string;
   missaoAtual?: string;

@@ -7,8 +7,9 @@ import { LayoutPrincipal } from '@/components/layout/LayoutPrincipal';
 import { Modal } from '@/components/ui/Modal';
 import { Botao } from '@/components/ui/Botao';
 import { OrbitLinkProvider, useOrbitLink } from '@/context/OrbitLinkContext';
-import { temasOrbitLink } from '@/data/temas.data';
+import { categoriasTema, temasPorCategoria } from '@/data/temas-page-test.data';
 import { AppRoutes } from '@/routes/AppRoutes';
+import type { CategoriaTemaId } from '@/types/tema';
 import type { PostOrbitLink, StatusOrbital } from '@/types/orbitlink.types';
 import { aplicarTokensTema, gerarTokensTema } from '@/utils/tema';
 
@@ -18,13 +19,28 @@ function AppInterno() {
   const [abaPublicacao, setAbaPublicacao] = useState<'post' | 'status'>('post');
   const [statusAberto, setStatusAberto] = useState<StatusOrbital | undefined>();
   const [postDetalhe, setPostDetalhe] = useState<PostOrbitLink | undefined>();
+  const [indiceTemaDark, setIndiceTemaDark] = useState(0);
+  const [indiceTemaLight, setIndiceTemaLight] = useState(0);
+  const [indicePaleta, setIndicePaleta] = useState(0);
   const navigate = useNavigate();
-  const { usuarios, pontosAr, tema, usuarioAutenticado } = useOrbitLink();
-  const temaAtivo = useMemo(() => temasOrbitLink[tema], [tema]);
+  const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
+  const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
+  const categoriaAtiva = categoriasDoModo[tema === 'dark' ? indiceTemaDark % categoriasDoModo.length : indiceTemaLight % categoriasDoModo.length]?.id as CategoriaTemaId;
+  const paletasAtivas = temasPorCategoria[categoriaAtiva];
+  const temaAtivo = paletasAtivas[indicePaleta % paletasAtivas.length] ?? paletasAtivas[0];
 
   useEffect(() => {
-    aplicarTokensTema(gerarTokensTema(temaAtivo, tema));
-  }, [tema, temaAtivo]);
+    aplicarTokensTema(gerarTokensTema({
+      nome: temaAtivo.name,
+      categoria: categoriaAtiva,
+      paleta: temaAtivo.name,
+      bg: temaAtivo.bg,
+      text: temaAtivo.text,
+      sec: temaAtivo.sec,
+      accent: temaAtivo.accent,
+      border: temaAtivo.border,
+    }, tema));
+  }, [categoriaAtiva, tema, temaAtivo]);
 
   if (!usuarioAutenticado) {
     return <AcessoUsuario />;
@@ -45,7 +61,13 @@ function AppInterno() {
   const pontoPost = postDetalhe ? pontosAr.find((ponto) => ponto.id === postDetalhe.pontoArId) : undefined;
 
   return (
-    <LayoutPrincipal onAbrirPost={() => abrirPublicacao('post')} onAbrirStatus={() => abrirPublicacao('status')}>
+    <LayoutPrincipal
+      onAbrirPost={() => abrirPublicacao('post')}
+      onAbrirStatus={() => abrirPublicacao('status')}
+      onAlternarTemaVisual={() => tema === 'dark' ? setIndiceTemaDark((valor) => valor + 1) : setIndiceTemaLight((valor) => valor + 1)}
+      onAlternarPaleta={() => setIndicePaleta((valor) => valor + 1)}
+      onAlternarClaroEscuro={alternarTema}
+    >
       <AppRoutes
         onAbrirPost={() => abrirPublicacao('post')}
         onAbrirStatus={() => abrirPublicacao('status')}

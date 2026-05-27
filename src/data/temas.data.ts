@@ -1,8 +1,8 @@
 /* === TEMAS ORBITLINK | inicio === */
 export interface TemaOrbitLink {
   nome: string;
-  categoria: 'Dark Classico' | 'Light Neon';
-  paleta: 'Telemetry Blue' | 'Laser Flare';
+  categoria: string;
+  paleta: string;
   bg: string;
   text: string;
   sec: string;

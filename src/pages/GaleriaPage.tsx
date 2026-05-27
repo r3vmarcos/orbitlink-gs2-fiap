@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CardImagemGaleria } from '@/components/galeria/CardImagemGaleria';
 import { Botao } from '@/components/ui/Botao';
@@ -12,22 +12,24 @@ export function GaleriaPage() {
   const { galeria, sincronizarApisNasa, carregandoApi } = useOrbitLink();
   const [itemAberto, setItemAberto] = useState<ItemGaleria | undefined>();
   const navigate = useNavigate();
+  const galeriaNasa = useMemo(() => galeria.filter((item) => item.origemDados === 'nasa_images' || item.origemDados === 'nasa_epic'), [galeria]);
+  const itens = galeriaNasa.length > 0 ? galeriaNasa : galeria;
+
+  useEffect(() => {
+    if (galeriaNasa.length === 0 && !carregandoApi) {
+      void sincronizarApisNasa();
+    }
+  }, [carregandoApi, galeriaNasa.length, sincronizarApisNasa]);
 
   return (
     <div className="space-y-5">
       <CardBase>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Galeria Orbitlink</p>
-            <h1 className="mt-2 text-4xl font-black uppercase text-white light-theme:text-sky-950">Fotos, vídeos e registros</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 light-theme:text-slate-700">Imagens simuladas, imagens criadas pelo usuário e imagens importadas da NASA Image and Video Library quando a API estiver disponível.</p>
-          </div>
-          <Botao onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sincronizando' : 'Buscar NASA'}</Botao>
-        </div>
+        <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Galeria Orbitlink</p>
+        <h1 className="mt-2 text-4xl font-black uppercase text-white light-theme:text-sky-950">Galeria do Universo</h1>
       </CardBase>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {galeria.map((item) => <CardImagemGaleria key={item.id} item={item} onAbrir={setItemAberto} />)}
+        {itens.map((item) => <CardImagemGaleria key={item.id} item={item} onAbrir={setItemAberto} />)}
       </div>
 
       <Modal aberto={Boolean(itemAberto)} titulo={itemAberto?.titulo ?? 'Imagem'} onFechar={() => setItemAberto(undefined)} telaCheiaMobile>

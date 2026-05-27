@@ -1,7 +1,6 @@
 import { ZoomIn, ZoomOut } from 'lucide-react';
-import type { PointerEvent } from 'react';
+import type { PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { CardPontoAr } from '@/components/ar/CardPontoAr';
 import { Badge } from '@/components/ui/Badge';
 import { Botao } from '@/components/ui/Botao';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
@@ -28,9 +27,11 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [zoomCamera, setZoomCamera] = useState(1);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const arrasteRef = useRef<{ ativo: boolean; x: number; y: number }>({ ativo: false, x: 0, y: 0 });
+  const toquePinchRef = useRef<{ distancia: number; zoom: number } | undefined>(undefined);
+  const perspectivaCamera = 'terra';
 
   const pontosVisiveis = useMemo(() => {
-    return pontosAr.filter((ponto) => ponto.camada.some((camada) => camadasAtivas.includes(camada)));
+    return pontosAr.filter((ponto) => ponto.perspectiva !== perspectivaCamera && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
   }, [camadasAtivas, pontosAr]);
   const pontoSelecionado = pontosAr.find((ponto) => ponto.id === pontoSelecionadoId) ?? pontosVisiveis[0];
 
@@ -96,7 +97,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
 
     setVisaoCamera((atual) => ({
       azimute: normalizarGraus(atual.azimute + deslocamentoX * intensidadeArrasteCamera),
-      inclinacao: limitar(atual.inclinacao + deslocamentoY * intensidadeArrasteCamera, -12, 88),
+      inclinacao: limitar(atual.inclinacao - deslocamentoY * intensidadeArrasteCamera, -12, 88),
     }));
   }
 
@@ -112,7 +113,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
 
       setVisaoCamera({
         azimute: normalizarGraus(360 - (evento.alpha ?? 0)),
-        inclinacao: limitar((evento.beta ?? 90) - 90, -12, 88),
+        inclinacao: limitar(90 - (evento.beta ?? 90), -12, 88),
       });
     }
 
@@ -121,9 +122,28 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
     return () => window.removeEventListener('deviceorientation', atualizarOrientacaoCamera);
   }, []);
 
+  function handleToquePinch(evento: TouchEvent<HTMLDivElement>) {
+    if (evento.touches.length !== 2) {
+      toquePinchRef.current = undefined;
+      return;
+    }
+
+    const distancia = Math.hypot(
+      evento.touches[0].clientX - evento.touches[1].clientX,
+      evento.touches[0].clientY - evento.touches[1].clientY,
+    );
+
+    if (!toquePinchRef.current) {
+      toquePinchRef.current = { distancia, zoom: zoomCamera };
+      return;
+    }
+
+    setZoomCamera(limitar(toquePinchRef.current.zoom * (distancia / toquePinchRef.current.distancia), 0.8, 2.8));
+  }
+
   return (
-    <div className="grid w-full min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_360px] xl:gap-5">
-      <section className="min-w-0 overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] shadow-neon">
+    <div className="fixed inset-0 z-[49] h-[100dvh] w-[100vw] overflow-hidden bg-slate-950">
+      <section className="h-full w-full overflow-hidden bg-[var(--bg-surface)] shadow-neon">
         <div className="hidden flex-col gap-3 border-b border-[var(--border-border)] p-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:p-4">
           <div className="min-w-0">
             <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">DualView AR</p>
@@ -148,12 +168,16 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
         </div>
 
         <div
-          className="relative h-[calc(100dvh-11rem)] min-h-[460px] touch-none overflow-hidden bg-slate-950 light-theme:bg-sky-50 md:h-[640px]"
+          className="relative h-[100dvh] w-[100vw] touch-none overflow-hidden bg-slate-950 light-theme:bg-sky-50"
           onPointerDown={iniciarArrasteCamera}
           onPointerMove={moverArrasteCamera}
           onPointerUp={finalizarArrasteCamera}
           onPointerCancel={finalizarArrasteCamera}
           onPointerLeave={finalizarArrasteCamera}
+          onTouchMove={handleToquePinch}
+          onTouchEnd={() => {
+            toquePinchRef.current = undefined;
+          }}
         >
           <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
@@ -161,8 +185,8 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           {pontosVisiveis.map((ponto) => (
             <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} zoomCamera={zoomCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} />
           ))}
-          <div className="pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-cyan-300/35 bg-slate-950/45 px-3 py-1 font-monoapp text-[10px] font-black uppercase tracking-[0.12em] text-cyan-100 backdrop-blur-md light-theme:bg-white/55 light-theme:text-sky-900 sm:left-4 sm:top-4">
-            {Math.round(visaoCamera.azimute)} graus / {Math.round(visaoCamera.inclinacao)} graus / {zoomCamera.toFixed(1)}x
+          <div className="pointer-events-none absolute left-2 top-2 z-10 rounded-full border border-cyan-300/25 bg-slate-950/35 px-2 py-0.5 font-monoapp text-[9px] font-black text-cyan-100 backdrop-blur-md light-theme:bg-white/55 light-theme:text-sky-900">
+            {zoomCamera.toFixed(1)}x
           </div>
           <div className="absolute right-3 top-3 z-30 flex gap-2 sm:right-4 sm:top-4">
             <button aria-label="Diminuir zoom" onClick={() => setZoomCamera((atual) => limitar(atual - 0.2, 0.8, 2.4))} className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/35 bg-slate-950/55 text-cyan-100 backdrop-blur-md light-theme:bg-white/65 light-theme:text-sky-900">
@@ -173,7 +197,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             </button>
           </div>
           {pontoSelecionado ? <CaixaMark ponto={pontoSelecionado} onAbrir={() => onVerPosts(pontoSelecionado.id)} /> : null}
-          <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
+          <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
             <Badge tom="verde">Camera ativa</Badge>
             <Badge tom="roxo">Terra + ceu</Badge>
@@ -181,7 +205,6 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           {erroCamera ? <div className="absolute left-3 right-3 top-16 z-30 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-xs font-bold leading-5 text-amber-100 light-theme:text-amber-800 sm:left-4 sm:right-4 sm:text-sm">{erroCamera}</div> : null}
         </div>
       </section>
-      <CardPontoAr ponto={pontoSelecionado} onVerPosts={onVerPosts} onVerStatus={onVerStatus} />
     </div>
   );
 }

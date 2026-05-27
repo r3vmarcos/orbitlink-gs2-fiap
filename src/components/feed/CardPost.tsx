@@ -1,5 +1,6 @@
 import { Bookmark, Heart, MapPin, MessageCircle, Send, Share2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { Badge } from '@/components/ui/Badge';
 import { Botao } from '@/components/ui/Botao';
@@ -16,6 +17,7 @@ interface CardPostProps {
 
 export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   const { usuarios, pontosAr, postsCurtidos, postsSalvos, curtirPost, salvarPost, excluirPost, comentarPost, compartilharPost } = useOrbitLink();
+  const navigate = useNavigate();
   const [comentario, setComentario] = useState('');
   const autor = usuarios.find((usuario) => usuario.id === post.autorId) ?? usuarios[0];
   const ponto = pontosAr.find((pontoAr) => pontoAr.id === post.pontoArId);
@@ -33,7 +35,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
       <header className="flex items-center gap-3 p-3 sm:p-4">
         <AvatarOrbital gradiente={autor.avatarGradiente} nome={autor.nome} />
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm font-black text-[var(--text-text)]">{autor.nome}</h3>
+          <button onClick={() => navigate(`/perfis?usuario=${autor.id}`)} className="block max-w-full truncate text-left text-sm font-black text-[var(--text-text)] hover:text-[var(--text-link)]">{autor.nome}</button>
           <p className="truncate font-monoapp text-[9px] uppercase tracking-[0.04em] text-[var(--text-muted)] min-[380px]:text-[10px] min-[380px]:tracking-[0.08em]">
             {autor.usuario} - {formatarTempoRelativo(post.criadoEm)}
           </p>

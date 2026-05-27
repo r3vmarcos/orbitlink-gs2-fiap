@@ -9,6 +9,9 @@ import logoWhite from '@/assets/logo_white.png';
 interface CabecalhoProps {
   onAbrirPost: () => void;
   onAbrirStatus: () => void;
+  onAlternarTemaVisual: () => void;
+  onAlternarPaleta: () => void;
+  onAlternarClaroEscuro: () => void;
 }
 
 const links = [
@@ -21,8 +24,8 @@ const links = [
   { to: '/dados-nasa', label: 'NASA' },
 ];
 
-export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
-  const { tema, alternarTema, usuarioAtual, sairUsuario } = useOrbitLink();
+export function Cabecalho({ onAbrirPost, onAbrirStatus, onAlternarTemaVisual, onAlternarPaleta, onAlternarClaroEscuro }: CabecalhoProps) {
+  const { tema, usuarioAtual, sairUsuario } = useOrbitLink();
   const logo = tema === 'dark' ? logoWhite : logoBlack;
 
   return (
@@ -55,7 +58,8 @@ export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
           <Botao tamanho="sm" onClick={onAbrirPost}>
             <Rocket className="h-4 w-4" /> Publicar
           </Botao>
-          <button title="Alternar tema" onClick={alternarTema} className="rounded-2xl border border-[var(--border-border)] p-3 text-[var(--text-link)] hover:bg-[var(--bg-surface-hover)]">
+          <BolinhasTema onAlternarTemaVisual={onAlternarTemaVisual} onAlternarPaleta={onAlternarPaleta} onAlternarClaroEscuro={onAlternarClaroEscuro} />
+          <button title="Alternar tema" onClick={onAlternarClaroEscuro} className="hidden rounded-2xl border border-[var(--border-border)] p-3 text-[var(--text-link)] hover:bg-[var(--bg-surface-hover)]">
             {tema === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
           <div className="max-w-40 truncate rounded-2xl border border-[var(--border-border)] px-3 py-2 text-xs font-bold text-[var(--text-muted)]">
@@ -65,11 +69,19 @@ export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
             <LogOut className="h-5 w-5" />
           </button>
         </div>
-        <button title="Alternar tema" onClick={alternarTema} className="ml-auto rounded-2xl border border-[var(--border-border)] p-2.5 text-[var(--text-link)] hover:bg-[var(--bg-surface-hover)] lg:hidden">
-          {tema === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </button>
+        <div className="ml-auto lg:hidden"><BolinhasTema onAlternarTemaVisual={onAlternarTemaVisual} onAlternarPaleta={onAlternarPaleta} onAlternarClaroEscuro={onAlternarClaroEscuro} /></div>
       </div>
     </header>
+  );
+}
+
+function BolinhasTema({ onAlternarTemaVisual, onAlternarPaleta, onAlternarClaroEscuro }: Pick<CabecalhoProps, 'onAlternarTemaVisual' | 'onAlternarPaleta' | 'onAlternarClaroEscuro'>) {
+  return (
+    <div className="flex items-center gap-2">
+      <button title="Tema" onClick={onAlternarTemaVisual} className="h-5 w-5 rounded-full border border-[var(--border-border)] bg-[var(--bg-surface-hover)]" />
+      <button title="Paleta" onClick={onAlternarPaleta} className="h-5 w-5 rounded-full border border-[var(--border-border)] bg-[var(--bg-primary)]" />
+      <button title="Dark/light" onClick={onAlternarClaroEscuro} className="h-5 w-5 rounded-full border border-[var(--border-border)] bg-[var(--text-text)]" />
+    </div>
   );
 }
 /* === CABECALHO | fim === */
