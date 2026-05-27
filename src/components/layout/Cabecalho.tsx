@@ -21,9 +21,12 @@ interface CabecalhoProps {
   onSelecionarPaleta: (indice: number) => void;
 }
 
-const links = [
+const linksAntesPost = [
   { to: '/', label: 'Feed' },
   { to: '/dualview-ar', label: 'Mapa' },
+];
+
+const linksDepoisPost = [
   { to: '/galeria', label: 'Fotos' },
   { to: '/perfis', label: 'Perfil' },
 ];
@@ -45,7 +48,7 @@ export function Cabecalho(props: CabecalhoProps) {
         </NavLink>
 
         <nav className="ml-4 hidden flex-1 items-center justify-center gap-2 lg:flex">
-          {links.map((link) => (
+          {linksAntesPost.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}
@@ -61,6 +64,19 @@ export function Cabecalho(props: CabecalhoProps) {
           <button onClick={onAbrirPost} className="rounded-2xl bg-[color-mix(in_srgb,var(--bg-primary)_70%,transparent)] px-3 py-2 font-monoapp text-[11px] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] transition hover:opacity-90">
             Post
           </button>
+          {linksDepoisPost.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) =>
+                `rounded-2xl px-3 py-2 font-monoapp text-[11px] font-black uppercase tracking-[0.12em] transition ${
+                  isActive ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'
+                }`
+              }
+            >
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
 
         <div className="ml-auto">

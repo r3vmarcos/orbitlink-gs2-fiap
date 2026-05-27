@@ -27,11 +27,13 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [erroCamera, setErroCamera] = useState<string | undefined>();
   const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
   const [calibracaoInclinacao, setCalibracaoInclinacao] = useState(0);
+  const [calibracaoAzimute, setCalibracaoAzimute] = useState(0);
   const [zoomCamera, setZoomCamera] = useState(1);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const arrasteRef = useRef<{ ativo: boolean; x: number; y: number }>({ ativo: false, x: 0, y: 0 });
   const toquePinchRef = useRef<{ distancia: number; zoom: number } | undefined>(undefined);
   const ultimaInclinacaoSensorRef = useRef(70);
+  const ultimoAzimuteSensorRef = useRef(0);
 
   const pontosVisiveis = useMemo(() => {
     return pontosAr.filter((ponto) => ponto.perspectiva === perspectivaCamera && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
@@ -121,12 +123,15 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
         return;
       }
 
+      const headingIos = (evento as DeviceOrientationEvent & { webkitCompassHeading?: number }).webkitCompassHeading;
+      const azimuteBruto = normalizarGraus(typeof headingIos === 'number' ? headingIos : 360 - (evento.alpha ?? 0));
       const inclinacaoBruta = 90 - (evento.beta ?? 90);
       const inclinacaoBase = inclinacaoCeuPadrao + inclinacaoBruta;
+      ultimoAzimuteSensorRef.current = azimuteBruto;
       ultimaInclinacaoSensorRef.current = inclinacaoBruta;
 
       setVisaoCamera({
-        azimute: normalizarGraus(360 - (evento.alpha ?? 0)),
+        azimute: normalizarGraus(azimuteBruto + calibracaoAzimute),
         inclinacao: limitar(inclinacaoBase + calibracaoInclinacao, -12, 88),
       });
     }
@@ -134,12 +139,14 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
     void solicitarPermissaoMovimento();
     window.addEventListener('deviceorientation', atualizarOrientacaoCamera);
     return () => window.removeEventListener('deviceorientation', atualizarOrientacaoCamera);
-  }, [calibracaoInclinacao]);
+  }, [calibracaoAzimute, calibracaoInclinacao]);
 
-  function calibrarCeu() {
+  async function calibrarCeu() {
+    await solicitarPermissaoMovimento();
     const deslocamento = inclinacaoCeuPadrao - (inclinacaoCeuPadrao + ultimaInclinacaoSensorRef.current);
     setCalibracaoInclinacao(deslocamento);
-    setVisaoCamera((atual) => ({ ...atual, inclinacao: inclinacaoCeuPadrao }));
+    setCalibracaoAzimute(-ultimoAzimuteSensorRef.current);
+    setVisaoCamera({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
   }
 
   function handleToquePinch(evento: TouchEvent<HTMLDivElement>) {
@@ -185,11 +192,13 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           <div className="pointer-events-none absolute left-2 top-2 z-10 rounded-full border border-cyan-300/25 bg-slate-950/35 px-2 py-0.5 font-monoapp text-[9px] font-black text-cyan-100 backdrop-blur-md light-theme:bg-white/55 light-theme:text-sky-900">
             {zoomCamera.toFixed(1)}x
           </div>
-          <div className="absolute right-3 top-3 z-30 flex gap-2">
-            <button aria-label="Calibrar ceu" onClick={calibrarCeu} className="flex h-10 items-center gap-1 rounded-full border border-cyan-300/35 bg-slate-950/55 px-3 font-monoapp text-[9px] font-black uppercase text-cyan-100 backdrop-blur-md light-theme:bg-white/65 light-theme:text-sky-900">
+          <div className="absolute left-3 top-3 z-40 flex gap-2">
+            <button aria-label="Calibrar ceu" onClick={() => void calibrarCeu()} className="flex h-11 items-center gap-1 rounded-full border border-cyan-300/55 bg-cyan-300 px-4 font-monoapp text-[10px] font-black uppercase text-slate-950 shadow-neon">
               <Compass className="h-4 w-4" />
               Calibrar
             </button>
+          </div>
+          <div className="absolute right-3 top-3 z-30 flex gap-2">
             <button aria-label="Diminuir zoom" onClick={() => setZoomCamera((atual) => limitar(atual - 0.2, 0.8, 2.4))} className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/35 bg-slate-950/55 text-cyan-100 backdrop-blur-md light-theme:bg-white/65 light-theme:text-sky-900">
               <ZoomOut className="h-4 w-4" />
             </button>
@@ -197,7 +206,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
               <ZoomIn className="h-4 w-4" />
             </button>
           </div>
-          <div className="absolute left-3 top-14 z-30 max-w-[calc(100vw-1.5rem)]">
+          <div className="absolute left-3 top-16 z-30 max-w-[calc(100vw-1.5rem)]">
             <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} recolhidoMobile />
           </div>
           <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2">
@@ -210,15 +219,17 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
       </div>
 
       <section className="fixed inset-x-0 bottom-0 top-[58px] z-40 hidden overflow-hidden bg-[var(--bg-background)] p-4 lg:block">
-        <div className="absolute left-5 top-5 z-30 w-[min(380px,calc(100vw-2.5rem))] space-y-3">
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_82%,transparent)] p-3 backdrop-blur-xl">
+        <div className="absolute left-5 right-5 top-5 z-30">
+          <div className="flex items-start justify-between gap-4 rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_82%,transparent)] p-3 backdrop-blur-xl">
             <div>
               <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Mapa</p>
               <h1 className="text-lg font-black uppercase text-[var(--text-text)]">Mapa Orbitlink</h1>
             </div>
+            <div className="min-w-0 flex-1">
+              <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
+            </div>
             <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sync' : 'NASA'}</Botao>
           </div>
-          <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
         </div>
         <MapaMarks pontos={pontosMapa} pontoSelecionadoId={pontoSelecionadoId} onSelecionar={setPontoSelecionadoId} onAbrir={onVerPosts} />
       </section>
@@ -271,7 +282,7 @@ function MenuCamadas({ camadasAtivas, onAlternarCamada, recolhidoMobile = false 
         <Layers3 className="h-3.5 w-3.5" />
         Camadas
       </button>
-      <div className={`${mostrarItens ? 'mt-2 flex' : 'hidden'} max-w-full gap-2 overflow-x-auto`}>
+      <div className={`${mostrarItens ? 'mt-2 max-h-[430px] opacity-100' : 'max-h-0 opacity-0'} grid max-w-full gap-2 overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${recolhidoMobile ? 'grid-cols-1' : 'grid-cols-2 xl:grid-cols-6'}`}>
         {camadasOrbitlink.map((camada) => {
           const ativa = camadasAtivas.includes(camada);
 
@@ -279,7 +290,7 @@ function MenuCamadas({ camadasAtivas, onAlternarCamada, recolhidoMobile = false 
             <button
               key={camada}
               onClick={() => onAlternarCamada(camada)}
-              className={`shrink-0 rounded-full border px-3 py-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] ${ativa ? 'text-slate-950' : 'text-[var(--text-muted)]'}`}
+              className={`shrink-0 rounded-full border px-3 py-1.5 text-left font-monoapp text-[9px] font-black uppercase tracking-[0.06em] ${ativa ? 'text-slate-950' : 'text-[var(--text-muted)]'}`}
               style={{ backgroundColor: ativa ? corCamada(camada) : 'transparent', borderColor: corCamada(camada) }}
             >
               {camada}
@@ -293,7 +304,8 @@ function MenuCamadas({ camadasAtivas, onAlternarCamada, recolhidoMobile = false 
 
 function MapaMarks({ pontos, pontoSelecionadoId, onSelecionar, onAbrir }: { pontos: PontoAr[]; pontoSelecionadoId?: string; onSelecionar: (id?: string) => void; onAbrir: (id: string) => void }) {
   return (
-    <div onClick={() => onSelecionar(undefined)} className="relative h-full w-full overflow-hidden rounded-[2rem] border border-[var(--border-border)] bg-[radial-gradient(circle_at_50%_45%,rgba(34,211,238,.18),transparent_18rem),linear-gradient(135deg,rgba(15,23,42,.96),rgba(2,6,23,.98))] shadow-neon light-theme:bg-[linear-gradient(135deg,#e0f2fe,#f8fafc)]">
+    <div onClick={() => onSelecionar(undefined)} className="relative h-full w-full overflow-hidden rounded-[2rem] border border-[var(--border-border)] bg-[url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=2400&q=82')] bg-cover bg-fixed bg-center shadow-neon">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(34,211,238,.22),rgba(2,6,23,.82)_58%,rgba(2,6,23,.96)),linear-gradient(135deg,rgba(15,23,42,.58),rgba(2,6,23,.88))]" />
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(34,211,238,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,.12)_1px,transparent_1px)] bg-[length:44px_44px]" />
       <Map className="pointer-events-none absolute right-5 top-5 h-6 w-6 text-cyan-200/70 light-theme:text-sky-900/70" />
       {pontos.map((ponto) => {
