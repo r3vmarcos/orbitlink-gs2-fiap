@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AcessoUsuario } from '@/components/auth/AcessoUsuario';
 import { CriarPostModal } from '@/components/feed/CriarPostModal';
 import { VisualizadorStatus } from '@/components/feed/VisualizadorStatus';
@@ -23,6 +23,7 @@ function AppInterno() {
   const [indiceTemaLight, setIndiceTemaLight] = useState(0);
   const [indicePaleta, setIndicePaleta] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation();
   const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
   const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
   const categoriaAtiva = categoriasDoModo[tema === 'dark' ? indiceTemaDark % categoriasDoModo.length : indiceTemaLight % categoriasDoModo.length]?.id as CategoriaTemaId;
@@ -41,6 +42,16 @@ function AppInterno() {
       border: temaAtivo.border,
     }, tema));
   }, [categoriaAtiva, tema, temaAtivo]);
+
+  useEffect(() => {
+    const chaveInicio = 'orbitlink_inicio_feed';
+    if (usuarioAutenticado && !sessionStorage.getItem(chaveInicio)) {
+      sessionStorage.setItem(chaveInicio, '1');
+      if (location.pathname !== '/') {
+        navigate('/', { replace: true });
+      }
+    }
+  }, [location.pathname, navigate, usuarioAutenticado]);
 
   if (!usuarioAutenticado) {
     return <AcessoUsuario />;

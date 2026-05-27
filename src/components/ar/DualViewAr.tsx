@@ -195,8 +195,8 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
               <ZoomIn className="h-4 w-4" />
             </button>
           </div>
-          <div className="absolute left-3 right-3 top-14 z-30">
-            <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
+          <div className="absolute left-3 top-14 z-30 max-w-[calc(100vw-1.5rem)]">
+            <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} recolhidoMobile />
           </div>
           <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
@@ -207,15 +207,17 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
         </div>
       </div>
 
-      <section className="hidden lg:block">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Mapa</p>
-            <h1 className="text-lg font-black uppercase text-[var(--text-text)]">Mapa Orbitlink</h1>
+      <section className="fixed inset-x-0 bottom-0 top-[58px] z-40 hidden overflow-hidden bg-[var(--bg-background)] p-4 lg:block">
+        <div className="absolute left-5 top-5 z-30 w-[min(380px,calc(100vw-2.5rem))] space-y-3">
+          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_82%,transparent)] p-3 backdrop-blur-xl">
+            <div>
+              <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Mapa</p>
+              <h1 className="text-lg font-black uppercase text-[var(--text-text)]">Mapa Orbitlink</h1>
+            </div>
+            <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sync' : 'NASA'}</Botao>
           </div>
-          <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sincronizando' : 'NASA'}</Botao>
+          <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
         </div>
-        <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
         <MapaMarks pontos={pontosMapa} pontoSelecionadoId={pontoSelecionadoId} onSelecionar={setPontoSelecionadoId} onAbrir={onVerPosts} />
       </section>
     </>
@@ -257,14 +259,17 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, on
   );
 }
 
-function MenuCamadas({ camadasAtivas, onAlternarCamada }: { camadasAtivas: TipoCamadaAr[]; onAlternarCamada: (camada: TipoCamadaAr) => void }) {
+function MenuCamadas({ camadasAtivas, onAlternarCamada, recolhidoMobile = false }: { camadasAtivas: TipoCamadaAr[]; onAlternarCamada: (camada: TipoCamadaAr) => void; recolhidoMobile?: boolean }) {
+  const [aberto, setAberto] = useState(!recolhidoMobile);
+  const mostrarItens = aberto || !recolhidoMobile;
+
   return (
     <div className="rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_78%,transparent)] p-2 backdrop-blur-xl">
-      <div className="mb-2 flex items-center gap-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
+      <button onClick={() => setAberto((valor) => !valor)} className="flex items-center gap-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
         <Layers3 className="h-3.5 w-3.5" />
         Camadas
-      </div>
-      <div className="flex max-w-full gap-2 overflow-x-auto">
+      </button>
+      <div className={`${mostrarItens ? 'mt-2 flex' : 'hidden'} max-w-full gap-2 overflow-x-auto`}>
         {camadasOrbitlink.map((camada) => {
           const ativa = camadasAtivas.includes(camada);
 
@@ -286,7 +291,7 @@ function MenuCamadas({ camadasAtivas, onAlternarCamada }: { camadasAtivas: TipoC
 
 function MapaMarks({ pontos, pontoSelecionadoId, onSelecionar, onAbrir }: { pontos: PontoAr[]; pontoSelecionadoId?: string; onSelecionar: (id?: string) => void; onAbrir: (id: string) => void }) {
   return (
-    <div onClick={() => onSelecionar(undefined)} className="relative mt-3 h-[calc(100dvh-15rem)] min-h-[620px] overflow-hidden rounded-[2rem] border border-[var(--border-border)] bg-[radial-gradient(circle_at_50%_45%,rgba(34,211,238,.18),transparent_18rem),linear-gradient(135deg,rgba(15,23,42,.96),rgba(2,6,23,.98))] shadow-neon light-theme:bg-[linear-gradient(135deg,#e0f2fe,#f8fafc)]">
+    <div onClick={() => onSelecionar(undefined)} className="relative h-full w-full overflow-hidden rounded-[2rem] border border-[var(--border-border)] bg-[radial-gradient(circle_at_50%_45%,rgba(34,211,238,.18),transparent_18rem),linear-gradient(135deg,rgba(15,23,42,.96),rgba(2,6,23,.98))] shadow-neon light-theme:bg-[linear-gradient(135deg,#e0f2fe,#f8fafc)]">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(34,211,238,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,.12)_1px,transparent_1px)] bg-[length:44px_44px]" />
       <Map className="pointer-events-none absolute right-5 top-5 h-6 w-6 text-cyan-200/70 light-theme:text-sky-900/70" />
       {pontos.map((ponto) => {

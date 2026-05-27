@@ -1,9 +1,9 @@
 import { Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useOrbitLink } from '@/context/OrbitLinkContext';
 import logoBlack from '@/assets/logo_black.png';
 import logoWhite from '@/assets/logo_white.png';
+import { useOrbitLink } from '@/context/OrbitLinkContext';
 import type { CategoriaTemaId, TemaVisual } from '@/types/tema';
 
 /* === CABECALHO | inicio === */
@@ -23,15 +23,13 @@ interface CabecalhoProps {
 
 const links = [
   { to: '/', label: 'Feed' },
-  { to: '/dualview-ar', label: 'DualView AR' },
-  { to: '/missoes', label: 'Missões' },
-  { to: '/galeria', label: 'Galeria' },
-  { to: '/perfis', label: 'Perfis' },
-  { to: '/impacto', label: 'Impacto' },
-  { to: '/dados-nasa', label: 'NASA' },
+  { to: '/dualview-ar', label: 'Mapa' },
+  { to: '/galeria', label: 'Fotos' },
+  { to: '/perfis', label: 'Perfil' },
 ];
 
 export function Cabecalho(props: CabecalhoProps) {
+  const { onAbrirPost } = props;
   const { tema } = useOrbitLink();
   const logo = tema === 'dark' ? logoWhite : logoBlack;
 
@@ -46,7 +44,7 @@ export function Cabecalho(props: CabecalhoProps) {
           />
         </NavLink>
 
-        <nav className="hidden">
+        <nav className="ml-4 hidden flex-1 items-center justify-center gap-2 lg:flex">
           {links.map((link) => (
             <NavLink
               key={link.to}
@@ -60,9 +58,14 @@ export function Cabecalho(props: CabecalhoProps) {
               {link.label}
             </NavLink>
           ))}
+          <button onClick={onAbrirPost} className="rounded-2xl bg-[color-mix(in_srgb,var(--bg-primary)_70%,transparent)] px-3 py-2 font-monoapp text-[11px] font-black uppercase tracking-[0.12em] text-[var(--text-primary)] transition hover:opacity-90">
+            Post
+          </button>
         </nav>
 
-        <div className="ml-auto"><MenuTemas {...props} /></div>
+        <div className="ml-auto">
+          <MenuTemas {...props} />
+        </div>
       </div>
     </header>
   );
