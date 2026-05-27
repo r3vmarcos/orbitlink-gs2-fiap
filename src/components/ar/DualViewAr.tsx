@@ -27,7 +27,6 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
   const [cameraAtiva, setCameraAtiva] = useState(false);
-  const [solicitandoCamera, setSolicitandoCamera] = useState(false);
   const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
   const [calibracaoAzimute, setCalibracaoAzimute] = useState(0);
   const [betaReferencia, setBetaReferencia] = useState(betaReferenciaPadrao);
@@ -37,7 +36,6 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const toquePinchRef = useRef<{ distancia: number; zoom: number } | undefined>(undefined);
   const ultimoBetaSensorRef = useRef(betaReferenciaPadrao);
   const ultimoAzimuteSensorRef = useRef(0);
-  const streamCameraRef = useRef<MediaStream | undefined>(undefined);
 
   const pontosVisiveis = useMemo(() => {
     return pontosAr.filter((ponto) => ponto.perspectiva === perspectivaCamera && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
@@ -48,62 +46,34 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const pontoSelecionado = pontosAr.find((ponto) => ponto.id === pontoSelecionadoId);
 
   useEffect(() => {
-    void iniciarCameraReal();
+    let streamAtual: MediaStream | undefined;
+
+    async function iniciarCamera() {
+      try {
+        setErroCamera(undefined);
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' } },
+          audio: false,
+        });
+        streamAtual = stream;
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+          setCameraAtiva(true);
+        }
+      } catch {
+        setCameraAtiva(false);
+        setErroCamera('Camera indisponivel neste contexto. Use HTTPS, localhost ou mantenha a simulacao por arraste.');
+      }
+    }
+
+    void iniciarCamera();
 
     return () => {
-      streamCameraRef.current?.getTracks().forEach((track) => track.stop());
+      streamAtual?.getTracks().forEach((track) => track.stop());
     };
   }, []);
-
-  async function iniciarCameraReal() {
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setCameraAtiva(false);
-      setErroCamera('Camera nao suportada neste navegador. Abra em Chrome/Samsung Internet/Safari atualizado.');
-      return;
-    }
-
-    try {
-      setSolicitandoCamera(true);
-      setErroCamera(undefined);
-      streamCameraRef.current?.getTracks().forEach((track) => track.stop());
-
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      };
-      let stream: MediaStream;
-
-      try {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-      } catch {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      }
-
-      streamCameraRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.muted = true;
-        videoRef.current.playsInline = true;
-        await videoRef.current.play();
-      }
-
-      setCameraAtiva(true);
-    } catch (erro) {
-      setCameraAtiva(false);
-      const nomeErro = erro instanceof DOMException ? erro.name : '';
-      const mensagem = nomeErro === 'NotAllowedError' || nomeErro === 'SecurityError'
-        ? 'Permissao da camera bloqueada. Toque em Ativar camera e libere o acesso no navegador.'
-        : 'Camera indisponivel neste contexto. Use HTTPS, localhost ou mantenha a simulacao por arraste.';
-      setErroCamera(mensagem);
-    } finally {
-      setSolicitandoCamera(false);
-    }
-  }
 
   function alternarCamada(camada: TipoCamadaAr) {
     setCamadasAtivas((atuais) => (atuais.includes(camada) ? atuais.filter((item) => item !== camada) : [...atuais, camada]));
@@ -249,11 +219,6 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             <Badge tom="roxo">AR Terra</Badge>
           </div>
           {erroCamera ? <div className="absolute left-3 right-3 top-16 z-30 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-xs font-bold leading-5 text-amber-100 light-theme:text-amber-800 sm:left-4 sm:right-4 sm:text-sm">{erroCamera}</div> : null}
-          {!cameraAtiva ? (
-            <button onClick={() => void iniciarCameraReal()} className="absolute left-1/2 top-1/2 z-40 -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-300 bg-cyan-300 px-5 py-3 font-monoapp text-[11px] font-black uppercase text-slate-950 shadow-neon">
-              {solicitandoCamera ? 'Abrindo camera' : 'Ativar camera'}
-            </button>
-          ) : null}
         </div>
       </div>
 
