@@ -168,7 +168,7 @@ export function converterEventosNasaParaPontos(eventos: EventoNaturalNasa[]): Po
     perspectiva: 'espaco',
     camada: ['clima', 'ods'],
     titulo: evento.titulo,
-    descricao: 'Evento natural importado da NASA EONET e convertido em mark no Modo Espaço.',
+    descricao: 'Evento natural importado da NASA EONET e convertido em mark na camada da Orbitlink.',
     x: 15 + ((indice * 17) % 70),
     y: 18 + ((indice * 13) % 64),
     latitude: evento.latitude,

@@ -1,4 +1,4 @@
-import { ArrowRight, Camera, DatabaseZap, Globe2, Orbit, Rocket, Satellite, Users } from 'lucide-react';
+import { ArrowRight, Camera, DatabaseZap, MapPin, Rocket, Satellite, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/Badge';
 import { Botao } from '@/components/ui/Botao';
@@ -7,7 +7,7 @@ import { useOrbitLink } from '@/context/OrbitLinkContext';
 
 /* === HOME PAGE | inicio === */
 export function HomePage() {
-  const { perspectiva, definirPerspectiva, posts, statusOrbitais, pontosAr } = useOrbitLink();
+  const { posts, statusOrbitais, pontosAr } = useOrbitLink();
 
   return (
     <div className="space-y-8">
@@ -15,18 +15,17 @@ export function HomePage() {
         <CardBase className="p-6 md:p-10">
           <Badge tom="azul">Global Solution · Rede social espacial</Badge>
           <h1 className="mt-5 max-w-4xl text-4xl font-black uppercase leading-tight tracking-[0.02em] text-white light-theme:text-sky-950 md:text-6xl">
-            OrbitLink conecta a Terra e o espaço em uma rede social de dupla perspectiva.
+            Orbitlink conecta publicações da Terra e do céu em um feed único.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300 light-theme:text-slate-700">
-            Usuários na Terra exploram planetas, Lua, estações e missões. Usuários no espaço visualizam países, cidades, comunidades, alertas ambientais e pontos turísticos sobre a Terra.
+            Todos os usuários veem o mesmo Orbifeed. A diferença aparece na publicação: cada pessoa informa se está postando da Terra ou do céu.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Botao onClick={() => definirPerspectiva('terra')}>
-              <Orbit className="h-4 w-4" /> Entrar como Terra
-            </Botao>
-            <Botao variante="secundario" onClick={() => definirPerspectiva('espaco')}>
-              <Globe2 className="h-4 w-4" /> Entrar como Espaço
-            </Botao>
+            <Link to="/">
+              <Botao>
+                <Users className="h-4 w-4" /> Abrir Orbifeed
+              </Botao>
+            </Link>
             <Link to="/dualview-ar">
               <Botao variante="fantasma">
                 Explorar AR <ArrowRight className="h-4 w-4" />
@@ -48,7 +47,7 @@ export function HomePage() {
 
       <section className="grid gap-4 md:grid-cols-4">
         {[
-          { icon: Users, titulo: 'Feed social', valor: posts.length, texto: 'publicações entre Terra e espaço' },
+          { icon: Users, titulo: 'Feed social', valor: posts.length, texto: 'publicações da Terra e do céu' },
           { icon: Camera, titulo: 'Status 24h', valor: statusOrbitais.length, texto: 'câmeras e registros orbitais' },
           { icon: Satellite, titulo: 'Marks AR', valor: pontosAr.length, texto: 'pontos clicáveis no DualView' },
           { icon: DatabaseZap, titulo: 'APIs NASA', valor: '3', texto: 'EONET, EPIC e Image Library' },
@@ -64,9 +63,9 @@ export function HomePage() {
 
       <section className="grid gap-5 lg:grid-cols-3">
         {[
-          { titulo: 'Modo Terra', texto: 'Planetas, Lua, estações, satélites, colônias e posts orbitais aparecem como pontos sociais no céu.', icon: Orbit },
-          { titulo: 'Modo Espaço', texto: 'A Terra vira um globo social com países, cidades, pontos turísticos, comunidades e alertas ambientais.', icon: Globe2 },
-          { titulo: 'Status Orbital 24h', texto: 'Stories espaciais com texto, imagem, câmera orbital simulada e expiração automática em 24 horas.', icon: Rocket },
+          { titulo: 'Postagem por local', texto: 'Ao publicar, o usuário informa se está na Terra ou no céu. Essa informação aparece no card do post.', icon: MapPin },
+          { titulo: 'Feed único', texto: 'Não existe alternância global. A rede mostra publicações de todos os lugares em uma experiência contínua.', icon: Users },
+          { titulo: 'Status Orbitlink 24h', texto: 'Stories espaciais com texto, imagem, câmera orbital simulada e expiração automática em 24 horas.', icon: Rocket },
         ].map((item) => (
           <CardBase key={item.titulo}>
             <item.icon className="h-9 w-9 text-blue-300" />
@@ -75,16 +74,6 @@ export function HomePage() {
           </CardBase>
         ))}
       </section>
-
-      <CardBase>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perspectiva atual</p>
-            <h2 className="mt-2 text-3xl font-black uppercase text-white light-theme:text-sky-950">{perspectiva === 'terra' ? 'Terra olhando para o espaço' : 'Espaço olhando para a Terra'}</h2>
-          </div>
-          <Link to="/feed"><Botao>Ir para o Feed <ArrowRight className="h-4 w-4" /></Botao></Link>
-        </div>
-      </CardBase>
     </div>
   );
 }

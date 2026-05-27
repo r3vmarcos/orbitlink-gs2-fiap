@@ -28,7 +28,7 @@ export function AcessoUsuario() {
     <main className="min-h-[100dvh] overflow-x-hidden bg-[var(--bg-background)] px-4 py-6 font-orbit text-[var(--text-text)] sm:px-6">
       <div className="mx-auto grid min-h-[calc(100dvh-3rem)] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1fr_420px]">
         <section className="space-y-5">
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">OrbitLink social</p>
+          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Orbitlink social</p>
           <h1 className="max-w-3xl text-4xl font-black uppercase leading-tight text-[var(--text-text)] md:text-6xl">
             Entre na rede social entre Terra e espaço.
           </h1>
@@ -59,7 +59,7 @@ export function AcessoUsuario() {
               <>
                 <label className="block">
                   <span className="label-form">Nome</span>
-                  <input value={nome} onChange={(evento) => setNome(evento.target.value)} className="input-form" placeholder="Seu nome no OrbitLink" />
+                  <input value={nome} onChange={(evento) => setNome(evento.target.value)} className="input-form" placeholder="Seu nome na Orbitlink" />
                 </label>
                 <label className="block">
                   <span className="label-form">Usuário</span>

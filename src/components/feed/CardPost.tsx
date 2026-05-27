@@ -21,6 +21,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   const ponto = pontosAr.find((pontoAr) => pontoAr.id === post.pontoArId);
   const curtido = postsCurtidos.includes(post.id);
   const salvo = postsSalvos.includes(post.id);
+  const localPostagem = post.perspectiva === 'terra' ? 'Postado da Terra' : 'Postado do céu';
 
   function handleComentario() {
     comentarPost(post.id, comentario);
@@ -57,6 +58,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Badge tom="laranja">{localPostagem}</Badge>
           <Badge>{post.categoria.replaceAll('_', ' ')}</Badge>
           {post.ods.map((ods) => (
             <Badge key={ods} tom="verde">{ods}</Badge>

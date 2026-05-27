@@ -1,4 +1,4 @@
-# Info Project Files — OrbitLink
+# Info Project Files - Orbitlink
 
 ## Páginas
 
@@ -17,7 +17,7 @@ Esta seção documenta as telas principais do sistema.
 
 Esta seção documenta componentes reutilizáveis da interface.
 
-- [`src/components/layout/Cabecalho.tsx`](../src/components/layout/Cabecalho.tsx) -> componente de navegação desktop, troca de perspectiva, tema e ações; usado globalmente; crítico para navegação.
+- [`src/components/layout/Cabecalho.tsx`](../src/components/layout/Cabecalho.tsx) -> componente de navegação desktop, tema e ações; usado globalmente; crítico para navegação.
 - [`src/components/layout/MenuMobile.tsx`](../src/components/layout/MenuMobile.tsx) -> menu inferior mobile; usado para tela cheia no celular.
 - [`src/components/layout/LayoutPrincipal.tsx`](../src/components/layout/LayoutPrincipal.tsx) -> layout global com fundo, header e menu mobile; usado por todo o app.
 - [`src/components/feed/CardPost.tsx`](../src/components/feed/CardPost.tsx) -> card social de publicação; usado no feed.

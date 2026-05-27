@@ -41,7 +41,7 @@ export const galeriaData: ItemGaleria[] = [
   {
     id: 'gal_rio',
     titulo: 'Rio de Janeiro turístico',
-    descricao: 'Camada de turismo orbital no Modo Espaço.',
+    descricao: 'Camada de turismo orbital na Orbitlink.',
     imagem: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?auto=format&fit=crop&w=1200&q=80',
     categoria: 'turismo',
     pontoArId: 'rio_cristo',

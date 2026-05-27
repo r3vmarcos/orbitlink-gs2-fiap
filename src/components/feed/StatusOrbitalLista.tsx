@@ -11,28 +11,27 @@ interface StatusOrbitalListaProps {
 }
 
 export function StatusOrbitalLista({ onAbrirStatus, onCriarStatus }: StatusOrbitalListaProps) {
-  const { statusOrbitais, usuarios, perspectiva } = useOrbitLink();
-  const statusFiltrados = statusOrbitais.filter((status) => status.perspectiva === perspectiva);
+  const { statusOrbitais, usuarios } = useOrbitLink();
 
   return (
-    <section className="rounded-[2rem] border border-blue-500/35 bg-slate-950/68 p-4 backdrop-blur-xl light-theme:border-sky-200 light-theme:bg-white/76">
+    <section className="rounded-[2rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-4 backdrop-blur-xl">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300 light-theme:text-sky-700">Status Orbitais 24h</h2>
-        <button onClick={onCriarStatus} className="rounded-xl bg-blue-500 px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.12em] text-slate-950">
+        <h2 className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Status Orbitlink 24h</h2>
+        <button onClick={onCriarStatus} className="rounded-xl bg-[var(--bg-primary)] px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.12em] text-[var(--text-primary)]">
           Criar
         </button>
       </div>
       <div className="flex gap-3 overflow-x-auto pb-1">
-        <button onClick={onCriarStatus} className="flex w-24 shrink-0 flex-col items-center gap-2 rounded-3xl border border-dashed border-blue-400/50 p-3 text-blue-200 light-theme:text-sky-800">
-          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500 text-slate-950">
+        <button onClick={onCriarStatus} className="flex w-24 shrink-0 flex-col items-center gap-2 rounded-3xl border border-dashed border-[var(--border-border)] p-3 text-[var(--text-muted)]">
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--bg-primary)] text-[var(--text-primary)]">
             <Plus className="h-6 w-6" />
           </span>
           <span className="text-center font-monoapp text-[10px] font-black uppercase">Seu status</span>
         </button>
-        {statusFiltrados.map((status) => {
+        {statusOrbitais.map((status) => {
           const autor = usuarios.find((usuario) => usuario.id === status.autorId) ?? usuarios[0];
           return (
-            <button key={status.id} onClick={() => onAbrirStatus(status)} className="w-28 shrink-0 rounded-3xl border border-blue-500/35 bg-blue-500/8 p-3 text-left transition hover:bg-blue-500/15">
+            <button key={status.id} onClick={() => onAbrirStatus(status)} className="w-28 shrink-0 rounded-3xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3 text-left transition hover:bg-[var(--bg-surface-hover)]">
               <div className="relative mb-2">
                 <AvatarOrbital gradiente={autor.avatarGradiente} nome={autor.nome} tamanho="lg" />
                 {status.tipo === 'camera_orbital' ? (
@@ -41,8 +40,8 @@ export function StatusOrbitalLista({ onAbrirStatus, onCriarStatus }: StatusOrbit
                   </span>
                 ) : null}
               </div>
-              <p className="line-clamp-2 text-xs font-black text-slate-100 light-theme:text-sky-950">{status.titulo}</p>
-              <p className="mt-1 font-monoapp text-[9px] uppercase text-blue-200/80 light-theme:text-sky-700">{calcularHorasRestantes(status.expiraEm)}h restantes</p>
+              <p className="line-clamp-2 text-xs font-black text-[var(--text-text)]">{status.titulo}</p>
+              <p className="mt-1 font-monoapp text-[9px] uppercase text-[var(--text-muted)]">{calcularHorasRestantes(status.expiraEm)}h restantes</p>
             </button>
           );
         })}

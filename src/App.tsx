@@ -57,7 +57,7 @@ function AppInterno() {
             {postDetalhe.imagem ? <img src={postDetalhe.imagem} alt={postDetalhe.titulo} className="max-h-[62dvh] w-full rounded-[2rem] object-cover" /> : null}
             <div>
               <p className="font-monoapp text-xs font-black uppercase tracking-[0.16em] text-blue-300">
-                {autorPost?.nome ?? 'OrbitLink'} · {pontoPost?.nome ?? 'Sem ponto AR'}
+                {autorPost?.nome ?? 'Orbitlink'} · {pontoPost?.nome ?? 'Sem ponto AR'}
               </p>
               <h2 className="mt-2 text-3xl font-black uppercase text-white light-theme:text-sky-950">{postDetalhe.titulo}</h2>
               <p className="mt-4 text-base leading-8 text-slate-300 light-theme:text-slate-700">{postDetalhe.texto}</p>

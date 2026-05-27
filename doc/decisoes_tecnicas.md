@@ -1,21 +1,19 @@
-# Decisões técnicas — OrbitLink
+# Decisoes tecnicas - Orbitlink
 
-## 01 - MVP com fallback
+## 01 - Feed unico
 
-A Fase 01 usa dados simulados e localStorage para garantir funcionamento mesmo sem internet.
+A Orbitlink nao usa alternancia global entre Terra e Espaco. O Orbifeed lista publicacoes de todos os usuarios, e cada post informa o local de origem da postagem.
 
-## 02 - APIs NASA
+## 02 - Local da postagem
 
-Foram integradas funções para:
+O campo interno `perspectiva` continua existindo como dado do post/status, mas agora representa de onde o usuario esta postando: Terra ou ceu.
 
-01 - NASA EONET: eventos naturais convertidos em marks no Modo Espaço.  
-02 - NASA EPIC: imagem da Terra usada no status/câmera orbital e globo.  
+## 03 - APIs NASA
+
+01 - NASA EONET: eventos naturais viram marks na camada unica da Orbitlink.  
+02 - NASA EPIC: imagem da Terra pode enriquecer status e visualizacoes.  
 03 - NASA Image and Video Library: imagens para galeria.
 
-## 03 - Tela cheia no celular
+## 04 - Fallback local
 
-Modais, Status Orbital e DualView AR usam `100dvh` para melhor adaptação em celulares.
-
-## 04 - Tema visual
-
-O visual segue a referência dark/light enviada pelo usuário: grid técnico, cards arredondados, tipografia forte, azul/ciano, bordas neon e layout mobile-first.
+O app precisa continuar funcional mesmo se APIs externas falharem, usando dados simulados e `localStorage`.

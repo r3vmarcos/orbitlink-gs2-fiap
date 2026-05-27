@@ -20,7 +20,7 @@ const links = [
 ];
 
 export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
-  const { perspectiva, definirPerspectiva, tema, alternarTema, usuarioAtual, sairUsuario } = useOrbitLink();
+  const { tema, alternarTema, usuarioAtual, sairUsuario } = useOrbitLink();
 
   return (
     <header className="sticky top-0 z-50 max-w-[100vw] border-b border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_88%,transparent)] backdrop-blur-xl">
@@ -30,7 +30,7 @@ export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
             <Zap className="h-6 w-6" />
           </span>
           <span className="truncate font-monoapp text-lg font-black uppercase tracking-[0.16em] text-[var(--text-text)] sm:text-xl">
-            Orbit<span className="text-[var(--text-link)]">Link</span>
+            Orbit<span className="text-[var(--text-link)]">link</span>
           </span>
         </NavLink>
 
@@ -51,19 +51,6 @@ export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
         </nav>
 
         <div className="ml-auto hidden items-center gap-2 lg:flex">
-          <div className="flex overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-1">
-            {(['terra', 'espaco'] as const).map((item) => (
-              <button
-                key={item}
-                onClick={() => definirPerspectiva(item)}
-                className={`rounded-xl px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.12em] ${
-                  perspectiva === item ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
-                }`}
-              >
-                {item === 'terra' ? 'Terra' : 'Espaço'}
-              </button>
-            ))}
-          </div>
           <Botao variante="secundario" tamanho="sm" onClick={onAbrirStatus}>
             <Camera className="h-4 w-4" /> Status
           </Botao>

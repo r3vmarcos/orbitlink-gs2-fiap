@@ -11,27 +11,35 @@ interface CriarPostModalProps {
   onFechar: () => void;
 }
 
-const categoriasTerra: TipoCategoriaPost[] = ['diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento'];
-const categoriasEspaco: TipoCategoriaPost[] = ['cidade', 'turismo', 'comunidade', 'clima', 'bioma', 'ods'];
+const categoriasPorLocal: Record<TipoPerspectiva, TipoCategoriaPost[]> = {
+  terra: ['diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento', 'cidade', 'comunidade', 'clima', 'ods'],
+  espaco: ['diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento', 'cidade', 'turismo', 'comunidade', 'clima', 'bioma', 'ods'],
+};
 const opcoesOds: TipoOds[] = ['ODS 2', 'ODS 8', 'ODS 9', 'ODS 11', 'ODS 13'];
 
 export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
-  const { perspectiva, pontosAr, criarPost } = useOrbitLink();
+  const { pontosAr, criarPost } = useOrbitLink();
   const [titulo, setTitulo] = useState('');
   const [texto, setTexto] = useState('');
   const [imagem, setImagem] = useState<string | undefined>();
-  const [perspectivaForm, setPerspectivaForm] = useState<TipoPerspectiva>(perspectiva);
-  const [categoria, setCategoria] = useState<TipoCategoriaPost>(perspectiva === 'terra' ? 'diario_orbital' : 'cidade');
+  const [localPostagem, setLocalPostagem] = useState<TipoPerspectiva>('terra');
+  const [categoria, setCategoria] = useState<TipoCategoriaPost>('diario_orbital');
   const [pontoArId, setPontoArId] = useState<string>('');
   const [odsSelecionado, setOdsSelecionado] = useState<TipoOds>('ODS 13');
 
-  const pontosDisponiveis = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === perspectivaForm), [pontosAr, perspectivaForm]);
-  const categorias = perspectivaForm === 'terra' ? categoriasTerra : categoriasEspaco;
+  const pontosDisponiveis = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === localPostagem), [localPostagem, pontosAr]);
+  const categorias = categoriasPorLocal[localPostagem];
 
   function limparFormulario() {
     setTitulo('');
     setTexto('');
     setImagem(undefined);
+    setPontoArId('');
+  }
+
+  function handleLocalPostagem(novoLocal: TipoPerspectiva) {
+    setLocalPostagem(novoLocal);
+    setCategoria(categoriasPorLocal[novoLocal][0]);
     setPontoArId('');
   }
 
@@ -60,7 +68,7 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
       titulo: titulo.trim(),
       texto: texto.trim(),
       imagem,
-      perspectiva: perspectivaForm,
+      perspectiva: localPostagem,
       categoria,
       pontoArId: pontoArId || undefined,
       ods: [odsSelecionado],
@@ -71,7 +79,7 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
   }
 
   return (
-    <Modal aberto={aberto} titulo="Nova publicação OrbitLink" onFechar={onFechar} telaCheiaMobile>
+    <Modal aberto={aberto} titulo="Nova publicação Orbitlink" onFechar={onFechar} telaCheiaMobile>
       <div className="grid gap-5 lg:grid-cols-[1.2fr_.8fr]">
         <div className="space-y-4">
           <label className="block">
@@ -84,22 +92,26 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
           </label>
           <label className="block">
             <span className="label-form">Imagem opcional</span>
-            <div className="flex items-center gap-3 rounded-2xl border border-blue-500/30 bg-blue-500/5 p-3">
-              <ImagePlus className="h-5 w-5 text-blue-300" />
-              <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="w-full text-xs text-blue-200 file:mr-3 file:rounded-xl file:border-0 file:bg-blue-500 file:px-3 file:py-2 file:font-bold file:text-slate-950 light-theme:text-sky-900" />
+            <div className="flex items-center gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
+              <ImagePlus className="h-5 w-5 text-[var(--text-link)]" />
+              <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="w-full text-xs text-[var(--text-muted)] file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--bg-primary)] file:px-3 file:py-2 file:font-bold file:text-[var(--text-primary)]" />
             </div>
           </label>
           {imagem ? <img src={imagem} alt="Preview da publicação" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : null}
         </div>
 
-        <div className="space-y-4 rounded-[1.5rem] border border-blue-500/25 bg-blue-500/5 p-4">
-          <label className="block">
-            <span className="label-form">Perspectiva *</span>
-            <select value={perspectivaForm} onChange={(evento) => setPerspectivaForm(evento.target.value as TipoPerspectiva)} className="input-form">
-              <option value="terra">Terra olhando para o espaço</option>
-              <option value="espaco">Espaço olhando para a Terra</option>
-            </select>
-          </label>
+        <div className="space-y-4 rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-muted)] p-4">
+          <div>
+            <span className="label-form">Onde você está postando?</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => handleLocalPostagem('terra')} className={`rounded-2xl border px-3 py-3 text-xs font-black uppercase tracking-[0.1em] ${localPostagem === 'terra' ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+                Estou na Terra
+              </button>
+              <button onClick={() => handleLocalPostagem('espaco')} className={`rounded-2xl border px-3 py-3 text-xs font-black uppercase tracking-[0.1em] ${localPostagem === 'espaco' ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+                Estou no céu
+              </button>
+            </div>
+          </div>
           <label className="block">
             <span className="label-form">Categoria *</span>
             <select value={categoria} onChange={(evento) => setCategoria(evento.target.value as TipoCategoriaPost)} className="input-form">
@@ -119,8 +131,8 @@ export function CriarPostModal({ aberto, onFechar }: CriarPostModalProps) {
               {opcoesOds.map((opcao) => <option key={opcao} value={opcao}>{opcao}</option>)}
             </select>
           </label>
-          <div className="rounded-2xl border border-blue-500/25 bg-slate-900/50 p-4 text-sm leading-6 text-slate-300 light-theme:bg-white/70 light-theme:text-slate-700">
-            O post será salvo localmente no navegador, exibido no Feed, vinculado ao ponto AR escolhido e enviado para a Galeria quando tiver imagem.
+          <div className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 text-sm leading-6 text-[var(--text-muted)]">
+            A publicação será exibida para todos no Orbifeed. O local escolhido aparece no post como “postado da Terra” ou “postado do céu”.
           </div>
           <div className="flex gap-3">
             <Botao variante="fantasma" onClick={onFechar} className="flex-1">Cancelar</Botao>

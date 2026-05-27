@@ -1,4 +1,4 @@
-# Validação final — OrbitLink v1
+# Validacao final - Orbitlink v1
 
 ## 01 - Ambiente do assistente
 

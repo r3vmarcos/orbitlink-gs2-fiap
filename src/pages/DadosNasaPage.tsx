@@ -69,7 +69,7 @@ export function DadosNasaPage() {
 
       <div className="grid gap-5 lg:grid-cols-2">
         <CardBase>
-          <h2 className="text-2xl font-black uppercase text-white light-theme:text-sky-950">Marks EONET no Modo Espaço</h2>
+          <h2 className="text-2xl font-black uppercase text-white light-theme:text-sky-950">Marks EONET na Orbitlink</h2>
           <div className="mt-4 space-y-3">
             {pontosNasa.slice(0, 6).map((ponto) => (
               <div key={ponto.id} className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-3 text-sm text-slate-300 light-theme:text-slate-700">

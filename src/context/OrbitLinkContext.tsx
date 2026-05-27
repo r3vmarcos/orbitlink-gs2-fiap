@@ -49,7 +49,6 @@ interface NovoStatusEntrada {
 }
 
 interface OrbitLinkContextValue {
-  perspectiva: TipoPerspectiva;
   tema: TipoTema;
   usuarios: UsuarioOrbitLink[];
   posts: PostOrbitLink[];
@@ -70,7 +69,6 @@ interface OrbitLinkContextValue {
   cadastrarUsuario: (entrada: CadastroUsuarioEntrada) => { sucesso: boolean; mensagem?: string };
   entrarUsuario: (email: string, senha: string) => { sucesso: boolean; mensagem?: string };
   sairUsuario: () => void;
-  definirPerspectiva: (perspectiva: TipoPerspectiva) => void;
   alternarTema: () => void;
   criarPost: (entrada: NovoPostEntrada) => void;
   criarStatus: (entrada: NovoStatusEntrada) => void;
@@ -96,9 +94,6 @@ const OrbitLinkContext = createContext<OrbitLinkContextValue | null>(null);
 
 /* === PROVIDER ORBITLINK | inicio === */
 export function OrbitLinkProvider({ children }: { children: ReactNode }) {
-  const [perspectiva, setPerspectiva] = useState<TipoPerspectiva>(() =>
-    lerLocalStorage<TipoPerspectiva>('orbitlink_perspectiva_atual', 'terra'),
-  );
   const [tema, setTema] = useState<TipoTema>(() => lerLocalStorage<TipoTema>('orbitlink_tema', 'dark'));
   const [postsUsuario, setPostsUsuario] = useState<PostOrbitLink[]>(() =>
     lerLocalStorage<PostOrbitLink[]>('orbitlink_posts_usuario', []),
@@ -142,7 +137,6 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     lerLocalStorage<string | undefined>('orbitlink_ultima_sinc_api', undefined),
   );
 
-  useEffect(() => salvarLocalStorage('orbitlink_perspectiva_atual', perspectiva), [perspectiva]);
   useEffect(() => salvarLocalStorage('orbitlink_tema', tema), [tema]);
   useEffect(() => salvarLocalStorage('orbitlink_posts_usuario', postsUsuario), [postsUsuario]);
   useEffect(() => salvarLocalStorage('orbitlink_status_usuario', statusUsuario), [statusUsuario]);
@@ -191,10 +185,6 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   const galeria = useMemo(() => [...galeriaUsuario, ...galeriaApi, ...galeriaData], [galeriaApi, galeriaUsuario]);
   const pontosAr = useMemo(() => [...pontosApi, ...pontosArData], [pontosApi]);
 
-  const definirPerspectiva = useCallback((novaPerspectiva: TipoPerspectiva) => {
-    setPerspectiva(novaPerspectiva);
-  }, []);
-
   const alternarTema = useCallback(() => {
     setTema((temaAtual) => (temaAtual === 'dark' ? 'light' : 'dark'));
   }, []);
@@ -223,11 +213,11 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
       senha: entrada.senha,
       tipo: 'observador_terra',
       avatarGradiente: 'from-cyan-300 to-orange-500',
-      cargo: 'Explorador OrbitLink',
-      localizacaoAtual: entrada.localizacaoAtual.trim() || 'Base local OrbitLink',
+      cargo: 'Explorador Orbitlink',
+      localizacaoAtual: entrada.localizacaoAtual.trim() || 'Base local Orbitlink',
       seguidores: 0,
       publicacoes: 0,
-      conquistas: ['Conta criada no banco local', 'Primeiro acesso OrbitLink'],
+      conquistas: ['Conta criada no banco local', 'Primeiro acesso Orbitlink'],
       criadoLocalmente: true,
     };
 
@@ -313,7 +303,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
 
     const comentario: ComentarioPost = {
       id: gerarId('comentario'),
-      autor: usuarioAtual?.nome ?? 'Visitante OrbitLink',
+      autor: usuarioAtual?.nome ?? 'Visitante Orbitlink',
       texto: textoLimpo,
       criadoEm: new Date().toISOString(),
     };
@@ -346,7 +336,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     try {
       const [eventos, imagens, epic] = await Promise.allSettled([
         buscarEventosNaturaisNasa(),
-        buscarImagensNasa(perspectiva === 'terra' ? 'space station earth orbit' : 'earth from space'),
+        buscarImagensNasa('earth from space satellite orbit'),
         buscarImagemEpicMaisRecente(),
       ]);
 
@@ -372,10 +362,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     } finally {
       setCarregandoApi(false);
     }
-  }, [perspectiva]);
+  }, []);
 
   const valor = useMemo<OrbitLinkContextValue>(() => ({
-    perspectiva,
     tema,
     usuarios,
     posts,
@@ -396,7 +385,6 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     cadastrarUsuario,
     entrarUsuario,
     sairUsuario,
-    definirPerspectiva,
     alternarTema,
     criarPost,
     criarStatus,
@@ -408,7 +396,6 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     seguirPonto,
     sincronizarApisNasa,
   }), [
-    perspectiva,
     tema,
     usuarios,
     posts,
@@ -426,7 +413,6 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     cadastrarUsuario,
     entrarUsuario,
     sairUsuario,
-    definirPerspectiva,
     alternarTema,
     criarPost,
     criarStatus,

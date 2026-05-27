@@ -13,7 +13,7 @@ export function ImpactoPage() {
         <Badge>Justificativa acadêmica</Badge>
         <h1 className="mt-4 text-4xl font-black uppercase text-white light-theme:text-sky-950">Impacto, ODS e experiência de usuário</h1>
         <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-300 light-theme:text-slate-700">
-          O OrbitLink foi desenhado para responder ao desafio de uma rede social espacial com uma proposta de dupla perspectiva: da Terra para o espaço e do espaço para a Terra. O projeto combina feed, status 24h, imagens, perfis, missões e marks AR para demonstrar como geolocalização, dados satelitais e comunidade podem se transformar em experiência social.
+          A Orbitlink foi desenhada como uma rede social espacial em feed único: todos veem as publicações de todos, e cada post registra se foi criado da Terra ou do céu. O projeto combina feed, status 24h, imagens, perfis, missões e marks AR para demonstrar como geolocalização, dados satelitais e comunidade podem se transformar em experiência social.
         </p>
       </CardBase>
 
