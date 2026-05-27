@@ -25,6 +25,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   const [camadasAtivas, setCamadasAtivas] = useState<TipoCamadaAr[]>(camadasOrbitlink);
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
+  const [cameraAtiva, setCameraAtiva] = useState(false);
   const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
   const [calibracaoInclinacao, setCalibracaoInclinacao] = useState(0);
   const [calibracaoAzimute, setCalibracaoAzimute] = useState(0);
@@ -49,17 +50,33 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
     async function iniciarCamera() {
       try {
         setErroCamera(undefined);
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' } },
+        const constraints: MediaStreamConstraints = {
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
           audio: false,
-        });
+        };
+        let stream: MediaStream;
+
+        try {
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        }
+
         streamAtual = stream;
 
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
+          videoRef.current.muted = true;
+          videoRef.current.playsInline = true;
           await videoRef.current.play();
+          setCameraAtiva(true);
         }
       } catch {
+        setCameraAtiva(false);
         setErroCamera('Camera indisponivel neste contexto. Use HTTPS, localhost ou mantenha a simulacao por arraste.');
       }
     }
@@ -185,8 +202,9 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             toquePinchRef.current = undefined;
           }}
         >
-          <video ref={videoRef} className="pointer-events-none absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
+          <video ref={videoRef} className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover" playsInline muted autoPlay />
+          {!cameraAtiva ? <div className="pointer-events-none absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=82')] bg-cover bg-center" /> : null}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.08)_42%,rgba(2,6,23,.38)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.04)_40%,rgba(255,69,0,.12)_100%)]" />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" />
           {pontosVisiveis.map((ponto) => (
             <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} zoomCamera={zoomCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} onAbrir={() => onVerPosts(ponto.id)} />
@@ -213,7 +231,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           </div>
           <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
-            <Badge tom="verde">Camera ativa</Badge>
+            <Badge tom="verde">{cameraAtiva ? 'Camera ativa' : 'Camera abrindo'}</Badge>
             <Badge tom="roxo">AR Terra</Badge>
           </div>
           {erroCamera ? <div className="absolute left-3 right-3 top-16 z-30 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-xs font-bold leading-5 text-amber-100 light-theme:text-amber-800 sm:left-4 sm:right-4 sm:text-sm">{erroCamera}</div> : null}

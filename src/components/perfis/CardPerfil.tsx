@@ -55,7 +55,7 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
           <p>Light [Tema] [Paleta]</p>
         </div>
       ) : null}
-      <Botao className="mt-4 w-full" variante="secundario"><UserPlus className="h-4 w-4" /> Seguir</Botao>
+      {!destaque ? <Botao className="mt-4 w-full" variante="secundario"><UserPlus className="h-4 w-4" /> Seguir</Botao> : null}
     </article>
   );
 }
