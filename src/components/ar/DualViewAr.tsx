@@ -1,4 +1,4 @@
-import { ZoomIn, ZoomOut } from 'lucide-react';
+import { Compass, Layers3, Map, ZoomIn, ZoomOut } from 'lucide-react';
 import type { PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
@@ -17,23 +17,28 @@ const camadasOrbitlink: TipoCamadaAr[] = ['social', 'planetas', 'lua', 'estacoes
 const campoVisaoHorizontalBase = 72;
 const campoVisaoVerticalBase = 58;
 const intensidadeArrasteCamera = 0.32;
+const perspectivaCamera = 'terra';
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
   const [camadasAtivas, setCamadasAtivas] = useState<TipoCamadaAr[]>(camadasOrbitlink);
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
-  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: 42 });
+  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: 70 });
+  const [calibracaoInclinacao, setCalibracaoInclinacao] = useState(0);
   const [zoomCamera, setZoomCamera] = useState(1);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const arrasteRef = useRef<{ ativo: boolean; x: number; y: number }>({ ativo: false, x: 0, y: 0 });
   const toquePinchRef = useRef<{ distancia: number; zoom: number } | undefined>(undefined);
-  const perspectivaCamera = 'terra';
+  const ultimaInclinacaoSensorRef = useRef(70);
 
   const pontosVisiveis = useMemo(() => {
-    return pontosAr.filter((ponto) => ponto.perspectiva !== perspectivaCamera && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
+    return pontosAr.filter((ponto) => ponto.perspectiva === perspectivaCamera && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
   }, [camadasAtivas, pontosAr]);
-  const pontoSelecionado = pontosAr.find((ponto) => ponto.id === pontoSelecionadoId) ?? pontosVisiveis[0];
+  const pontosMapa = useMemo(() => {
+    return pontosAr.filter((ponto) => ponto.perspectiva === 'espaco' && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
+  }, [camadasAtivas, pontosAr]);
+  const pontoSelecionado = pontosAr.find((ponto) => ponto.id === pontoSelecionadoId);
 
   useEffect(() => {
     let streamAtual: MediaStream | undefined;
@@ -82,6 +87,10 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   }
 
   function iniciarArrasteCamera(evento: PointerEvent<HTMLDivElement>) {
+    if (evento.target === evento.currentTarget) {
+      setPontoSelecionadoId(undefined);
+    }
+
     arrasteRef.current = { ativo: true, x: evento.clientX, y: evento.clientY };
     evento.currentTarget.setPointerCapture(evento.pointerId);
   }
@@ -111,16 +120,25 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
         return;
       }
 
+      const inclinacaoBruta = limitar(90 - (evento.beta ?? 90), -12, 88);
+      ultimaInclinacaoSensorRef.current = inclinacaoBruta;
+
       setVisaoCamera({
         azimute: normalizarGraus(360 - (evento.alpha ?? 0)),
-        inclinacao: limitar(90 - (evento.beta ?? 90), -12, 88),
+        inclinacao: limitar(inclinacaoBruta + calibracaoInclinacao, -12, 88),
       });
     }
 
     void solicitarPermissaoMovimento();
     window.addEventListener('deviceorientation', atualizarOrientacaoCamera);
     return () => window.removeEventListener('deviceorientation', atualizarOrientacaoCamera);
-  }, []);
+  }, [calibracaoInclinacao]);
+
+  function calibrarCeu() {
+    const deslocamento = 72 - ultimaInclinacaoSensorRef.current;
+    setCalibracaoInclinacao(deslocamento);
+    setVisaoCamera((atual) => ({ ...atual, inclinacao: 72 }));
+  }
 
   function handleToquePinch(evento: TouchEvent<HTMLDivElement>) {
     if (evento.touches.length !== 2) {
@@ -142,31 +160,8 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   }
 
   return (
-    <div className="fixed inset-0 z-[49] h-[100dvh] w-[100vw] overflow-hidden bg-slate-950">
-      <section className="h-full w-full overflow-hidden bg-[var(--bg-surface)] shadow-neon">
-        <div className="hidden flex-col gap-3 border-b border-[var(--border-border)] p-3 sm:flex sm:flex-row sm:items-center sm:justify-between sm:p-4">
-          <div className="min-w-0">
-            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">DualView AR</p>
-            <h1 className="mt-1 text-2xl font-black uppercase leading-tight text-[var(--text-text)]">Camada unica da Orbitlink</h1>
-            <p className="mt-1 text-sm text-[var(--text-muted)]">Pontos da Terra e do ceu aparecem juntos, sem troca de modo.</p>
-          </div>
-          <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sincronizando' : 'APIs NASA'}</Botao>
-        </div>
-
-        <div className="flex max-w-full gap-2 overflow-x-auto border-b border-[var(--border-border)] p-3">
-          {camadasOrbitlink.map((camada) => (
-            <button
-              key={camada}
-              onClick={() => alternarCamada(camada)}
-              className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] ${
-                camadasAtivas.includes(camada) ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'
-              }`}
-            >
-              {camada}
-            </button>
-          ))}
-        </div>
-
+    <>
+      <div className="fixed inset-0 z-[49] h-[100dvh] w-[100vw] overflow-hidden bg-slate-950 lg:hidden">
         <div
           className="relative h-[100dvh] w-[100vw] touch-none overflow-hidden bg-slate-950 light-theme:bg-sky-50"
           onPointerDown={iniciarArrasteCamera}
@@ -180,15 +175,19 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           }}
         >
           <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" playsInline muted autoPlay />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" />
           {pontosVisiveis.map((ponto) => (
             <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} zoomCamera={zoomCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} onAbrir={() => onVerPosts(ponto.id)} />
           ))}
           <div className="pointer-events-none absolute left-2 top-2 z-10 rounded-full border border-cyan-300/25 bg-slate-950/35 px-2 py-0.5 font-monoapp text-[9px] font-black text-cyan-100 backdrop-blur-md light-theme:bg-white/55 light-theme:text-sky-900">
             {zoomCamera.toFixed(1)}x
           </div>
-          <div className="absolute right-3 top-3 z-30 flex gap-2 sm:right-4 sm:top-4">
+          <div className="absolute right-3 top-3 z-30 flex gap-2">
+            <button aria-label="Calibrar ceu" onClick={calibrarCeu} className="flex h-10 items-center gap-1 rounded-full border border-cyan-300/35 bg-slate-950/55 px-3 font-monoapp text-[9px] font-black uppercase text-cyan-100 backdrop-blur-md light-theme:bg-white/65 light-theme:text-sky-900">
+              <Compass className="h-4 w-4" />
+              Calibrar
+            </button>
             <button aria-label="Diminuir zoom" onClick={() => setZoomCamera((atual) => limitar(atual - 0.2, 0.8, 2.4))} className="flex h-10 w-10 items-center justify-center rounded-full border border-cyan-300/35 bg-slate-950/55 text-cyan-100 backdrop-blur-md light-theme:bg-white/65 light-theme:text-sky-900">
               <ZoomOut className="h-4 w-4" />
             </button>
@@ -196,20 +195,35 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
               <ZoomIn className="h-4 w-4" />
             </button>
           </div>
-          <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
+          <div className="absolute left-3 right-3 top-14 z-30">
+            <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
+          </div>
+          <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
             <Badge tom="verde">Camera ativa</Badge>
-            <Badge tom="roxo">Terra + ceu</Badge>
+            <Badge tom="roxo">AR Terra</Badge>
           </div>
           {erroCamera ? <div className="absolute left-3 right-3 top-16 z-30 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-xs font-bold leading-5 text-amber-100 light-theme:text-amber-800 sm:left-4 sm:right-4 sm:text-sm">{erroCamera}</div> : null}
         </div>
+      </div>
+
+      <section className="hidden lg:block">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Mapa</p>
+            <h1 className="text-lg font-black uppercase text-[var(--text-text)]">Mapa Orbitlink</h1>
+          </div>
+          <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sincronizando' : 'NASA'}</Botao>
+        </div>
+        <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
+        <MapaMarks pontos={pontosMapa} pontoSelecionadoId={pontoSelecionadoId} onSelecionar={setPontoSelecionadoId} onAbrir={onVerPosts} />
       </section>
-    </div>
+    </>
   );
 }
 
 function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, onAbrir }: { ponto: PontoAr; ativo: boolean; visaoCamera: { azimute: number; inclinacao: number }; zoomCamera: number; onSelecionar: () => void; onAbrir: () => void }) {
-  const cor = ponto.perspectiva === 'espaco' ? 'bg-orange-400' : ponto.origemDados === 'nasa_eonet' ? 'bg-emerald-400' : ponto.statusAtivo ? 'bg-cyan-300' : 'bg-blue-400';
+  const cor = corCamada(ponto.camada[0]);
   const campoVisaoHorizontal = campoVisaoHorizontalBase / zoomCamera;
   const campoVisaoVertical = campoVisaoVerticalBase / zoomCamera;
   const direcaoPonto = ponto.x * 3.6;
@@ -226,14 +240,14 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, on
 
   return (
     <div className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-left" style={{ left: `${esquerda}%`, top: `${topo}%` }}>
-      <button onClick={onSelecionar}>
-        <span className={`relative flex h-6 w-6 items-center justify-center rounded-full ${cor} text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''} ${ativo ? 'ring-4 ring-white/70' : ''}`}>
+      <button onPointerDown={(evento) => evento.stopPropagation()} onClick={onSelecionar}>
+        <span className={`relative flex h-6 w-6 items-center justify-center rounded-full text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''} ${ativo ? 'ring-4 ring-white/70' : ''}`} style={{ backgroundColor: cor }}>
           <span className="absolute h-10 w-10 rounded-full border border-current opacity-35 sm:h-12 sm:w-12" />
           <span className="h-2 w-2 rounded-full bg-slate-950" />
         </span>
       </button>
       {ativo ? (
-        <button onClick={onAbrir} className="mt-2 w-44 rounded-2xl border border-cyan-300/35 bg-slate-950/78 p-2 text-left shadow-neon backdrop-blur-md light-theme:bg-white/85">
+        <button onPointerDown={(evento) => evento.stopPropagation()} onClick={onAbrir} className="mt-2 w-44 rounded-2xl border border-cyan-300/35 bg-slate-950/78 p-2 text-left shadow-neon backdrop-blur-md light-theme:bg-white/85">
           <p className="font-monoapp text-[9px] font-black uppercase tracking-[0.08em] text-cyan-200 light-theme:text-sky-800">{ponto.tipo.replaceAll('_', ' ')}</p>
           <h3 className="mt-0.5 line-clamp-1 text-xs font-black uppercase text-white light-theme:text-sky-950">{ponto.nome}</h3>
           <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-300 light-theme:text-slate-700">{ponto.descricao}</p>
@@ -243,9 +257,76 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, on
   );
 }
 
+function MenuCamadas({ camadasAtivas, onAlternarCamada }: { camadasAtivas: TipoCamadaAr[]; onAlternarCamada: (camada: TipoCamadaAr) => void }) {
+  return (
+    <div className="rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_78%,transparent)] p-2 backdrop-blur-xl">
+      <div className="mb-2 flex items-center gap-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
+        <Layers3 className="h-3.5 w-3.5" />
+        Camadas
+      </div>
+      <div className="flex max-w-full gap-2 overflow-x-auto">
+        {camadasOrbitlink.map((camada) => {
+          const ativa = camadasAtivas.includes(camada);
+
+          return (
+            <button
+              key={camada}
+              onClick={() => onAlternarCamada(camada)}
+              className={`shrink-0 rounded-full border px-3 py-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] ${ativa ? 'text-slate-950' : 'text-[var(--text-muted)]'}`}
+              style={{ backgroundColor: ativa ? corCamada(camada) : 'transparent', borderColor: corCamada(camada) }}
+            >
+              {camada}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MapaMarks({ pontos, pontoSelecionadoId, onSelecionar, onAbrir }: { pontos: PontoAr[]; pontoSelecionadoId?: string; onSelecionar: (id?: string) => void; onAbrir: (id: string) => void }) {
+  return (
+    <div onClick={() => onSelecionar(undefined)} className="relative mt-3 h-[calc(100dvh-15rem)] min-h-[620px] overflow-hidden rounded-[2rem] border border-[var(--border-border)] bg-[radial-gradient(circle_at_50%_45%,rgba(34,211,238,.18),transparent_18rem),linear-gradient(135deg,rgba(15,23,42,.96),rgba(2,6,23,.98))] shadow-neon light-theme:bg-[linear-gradient(135deg,#e0f2fe,#f8fafc)]">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(34,211,238,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(34,211,238,.12)_1px,transparent_1px)] bg-[length:44px_44px]" />
+      <Map className="pointer-events-none absolute right-5 top-5 h-6 w-6 text-cyan-200/70 light-theme:text-sky-900/70" />
+      {pontos.map((ponto) => {
+        const ativo = ponto.id === pontoSelecionadoId;
+
+        return (
+          <div key={ponto.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${ponto.x}%`, top: `${ponto.y}%` }}>
+            <button
+              onClick={(evento) => {
+                evento.stopPropagation();
+                onSelecionar(ponto.id);
+              }}
+              className={`flex h-5 w-5 items-center justify-center rounded-full text-slate-950 shadow-neon ${ativo ? 'ring-4 ring-white/70' : ''}`}
+              style={{ backgroundColor: corCamada(ponto.camada[0]) }}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-950" />
+            </button>
+            {ativo ? (
+              <button
+                onClick={(evento) => {
+                  evento.stopPropagation();
+                  onAbrir(ponto.id);
+                }}
+                className="absolute left-6 top-0 z-20 w-48 rounded-2xl border border-cyan-300/30 bg-slate-950/85 p-2 text-left shadow-neon backdrop-blur-md light-theme:bg-white/90"
+              >
+                <p className="font-monoapp text-[9px] font-black uppercase text-cyan-200 light-theme:text-sky-800">{ponto.camada[0]}</p>
+                <h3 className="line-clamp-1 text-xs font-black uppercase text-white light-theme:text-sky-950">{ponto.nome}</h3>
+                <p className="line-clamp-2 text-[10px] leading-4 text-slate-300 light-theme:text-slate-700">{ponto.descricao}</p>
+              </button>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function calcularAltitudePonto(ponto: PontoAr) {
   if (ponto.perspectiva === 'terra') {
-    return limitar(96 - ponto.y, 18, 84);
+    return limitar(56 + ((100 - ponto.y) / 100) * 32, 54, 88);
   }
 
   return limitar(78 - ponto.y * 0.72, 10, 62);
@@ -262,5 +343,24 @@ function menorDiferencaGraus(destino: number, origem: number) {
 
 function limitar(valor: number, minimo: number, maximo: number) {
   return Math.min(Math.max(valor, minimo), maximo);
+}
+
+function corCamada(camada?: TipoCamadaAr) {
+  const cores: Record<TipoCamadaAr, string> = {
+    social: '#22d3ee',
+    planetas: '#818cf8',
+    lua: '#e5e7eb',
+    estacoes: '#38bdf8',
+    satelites: '#f97316',
+    missoes: '#facc15',
+    eventos: '#fb7185',
+    cidades: '#34d399',
+    turismo: '#a78bfa',
+    clima: '#60a5fa',
+    biomas: '#4ade80',
+    ods: '#2dd4bf',
+  };
+
+  return camada ? cores[camada] : '#22d3ee';
 }
 /* === DUALVIEW AR | fim === */

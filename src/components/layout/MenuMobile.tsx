@@ -14,7 +14,7 @@ export function MenuMobile({ onAbrirPost, onAbrirStatus }: MenuMobileProps) {
     }`;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 max-w-[100vw] border-t border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_94%,transparent)] px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl lg:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 max-w-[100vw] border-t border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_94%,transparent)] px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl">
       <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
         <NavLink to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className={itemClasse}>
           <RadioTower className="h-5 w-5" />
