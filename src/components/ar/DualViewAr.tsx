@@ -18,13 +18,14 @@ const campoVisaoHorizontalBase = 72;
 const campoVisaoVerticalBase = 58;
 const intensidadeArrasteCamera = 0.32;
 const perspectivaCamera = 'terra';
+const inclinacaoCeuPadrao = 72;
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
   const [camadasAtivas, setCamadasAtivas] = useState<TipoCamadaAr[]>(camadasOrbitlink);
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
-  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: 70 });
+  const [visaoCamera, setVisaoCamera] = useState({ azimute: 0, inclinacao: inclinacaoCeuPadrao });
   const [calibracaoInclinacao, setCalibracaoInclinacao] = useState(0);
   const [zoomCamera, setZoomCamera] = useState(1);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -120,12 +121,13 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
         return;
       }
 
-      const inclinacaoBruta = limitar(90 - (evento.beta ?? 90), -12, 88);
+      const inclinacaoBruta = 90 - (evento.beta ?? 90);
+      const inclinacaoBase = inclinacaoCeuPadrao + inclinacaoBruta;
       ultimaInclinacaoSensorRef.current = inclinacaoBruta;
 
       setVisaoCamera({
         azimute: normalizarGraus(360 - (evento.alpha ?? 0)),
-        inclinacao: limitar(inclinacaoBruta + calibracaoInclinacao, -12, 88),
+        inclinacao: limitar(inclinacaoBase + calibracaoInclinacao, -12, 88),
       });
     }
 
@@ -135,9 +137,9 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   }, [calibracaoInclinacao]);
 
   function calibrarCeu() {
-    const deslocamento = 72 - ultimaInclinacaoSensorRef.current;
+    const deslocamento = inclinacaoCeuPadrao - (inclinacaoCeuPadrao + ultimaInclinacaoSensorRef.current);
     setCalibracaoInclinacao(deslocamento);
-    setVisaoCamera((atual) => ({ ...atual, inclinacao: 72 }));
+    setVisaoCamera((atual) => ({ ...atual, inclinacao: inclinacaoCeuPadrao }));
   }
 
   function handleToquePinch(evento: TouchEvent<HTMLDivElement>) {
