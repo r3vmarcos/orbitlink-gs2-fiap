@@ -270,10 +270,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     if ('imagemEpic' in remoto) setImagemEpic(remoto.imagemEpic);
     if ('ultimaSincronizacaoApi' in remoto) setUltimaSincronizacaoApi(remoto.ultimaSincronizacaoApi);
     if (remoto.usuariosBase) setUsuariosBase(remoto.usuariosBase);
-    if (remoto.postsBase) setPostsBase(remoto.postsBase);
+    // Mantem as sementes locais versionadas para que ajustes de feed/galeria entrem no deploy.
     if (remoto.statusBase) setStatusBase(remoto.statusBase);
     if (remoto.pontosArBase) setPontosArBase(remoto.pontosArBase);
-    if (remoto.galeriaBase) setGaleriaBase(remoto.galeriaBase);
     if (remoto.missoesBase) setMissoesBase(remoto.missoesBase);
     if (remoto.odsBase) setOdsBase(remoto.odsBase);
   }

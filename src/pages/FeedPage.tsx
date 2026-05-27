@@ -15,6 +15,20 @@ interface FeedPageProps {
 }
 
 const filtrosFeed: Array<TipoCategoriaPost | 'todos'> = ['todos', 'diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento', 'cidade', 'turismo', 'comunidade', 'clima', 'bioma', 'ods'];
+const anunciosPatrocinio = [
+  ['Smartphone Astro X', 'Camera noturna, giroscopio preciso e tela de alto brilho.', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=82'],
+  ['Telescopio Nebula 90', 'Lente compacta para observacao lunar e planetaria.', 'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=700&q=82'],
+  ['Tripe SkyLock', 'Estabilizacao para fotos do ceu e transmissao ao vivo.', 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=82'],
+  ['Binoculo Cosmos 12x', 'Leve para observacao de constelacoes, Lua e passagens orbitais.', 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=82'],
+  ['Camera Aurora Mini', 'Sensor amplo para timelapse noturno e registros de meteoros.', 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=82'],
+  ['Mochila Orbital Pro', 'Compartimentos para lente, power bank e suporte de campo.', 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=700&q=82'],
+  ['Power Bank Gaia', 'Energia extra para noites longas de observacao e transmissao.', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=700&q=82'],
+  ['Notebook Mission 14', 'Tela calibrada e GPU leve para mapas, fotos e simulacoes.', 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=82'],
+  ['Lente Lunar Clip', 'Acessorio para aproximar fotos da Lua direto no smartphone.', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=82'],
+  ['Cadeira Campo Zero-G', 'Conforto para observar o ceu por horas sem cansar.', 'https://images.unsplash.com/photo-1470145318698-cb03732f5ddf?auto=format&fit=crop&w=700&q=82'],
+  ['Kit Limpeza Optica', 'Panos, soprador e estojo para lentes e telescopios.', 'https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=700&q=82'],
+  ['Relogio Passagem ISS', 'Alertas de passagem visivel e clima local no pulso.', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=82'],
+];
 
 export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPost }: FeedPageProps) {
   const { posts, pontosAr, usuarios } = useOrbitLink();
@@ -43,6 +57,10 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
   }
 
   const marksRecomendados = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === 'terra').slice(0, 10), [pontosAr]);
+  const anunciosVisiveis = useMemo(() => {
+    const inicio = Math.floor(Math.random() * anunciosPatrocinio.length);
+    return Array.from({ length: 3 }, (_, indice) => anunciosPatrocinio[(inicio + indice) % anunciosPatrocinio.length]);
+  }, []);
 
   return (
     <div className="grid w-full min-w-0 gap-5 lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
@@ -74,14 +92,13 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
         <CardBase>
           <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocinio</p>
           <div className="mt-4 space-y-3">
-            {[
-              ['Smartphone Astro X', 'Camera noturna, giroscopio preciso e tela de alto brilho.'],
-              ['Telescopio Nebula 90', 'Lente compacta para observacao lunar e planetaria.'],
-              ['Tripé SkyLock', 'Estabilizacao para fotos do ceu e transmissao ao vivo.'],
-            ].map(([produto, texto]) => (
-              <div key={produto} className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] px-4 py-3">
-                <p className="text-sm font-black text-[var(--text-text)]">{produto}</p>
-                <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">{texto}</p>
+            {anunciosVisiveis.map(([produto, texto, imagem]) => (
+              <div key={produto} className="overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)]">
+                <img src={imagem} alt={produto} className="h-24 w-full object-cover" />
+                <div className="px-4 py-3">
+                  <p className="text-sm font-black text-[var(--text-text)]">{produto}</p>
+                  <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">{texto}</p>
+                </div>
               </div>
             ))}
           </div>

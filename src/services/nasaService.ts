@@ -100,7 +100,7 @@ export async function buscarImagensNasa(termo = 'earth from space'): Promise<Ima
   const url = new URL('https://images-api.nasa.gov/search');
   url.searchParams.set('q', termo);
   url.searchParams.set('media_type', 'image');
-  url.searchParams.set('page_size', '18');
+  url.searchParams.set('page_size', '30');
 
   const resposta = await fetch(url.toString());
 
@@ -181,13 +181,40 @@ export function converterEventosNasaParaPontos(eventos: EventoNaturalNasa[]): Po
 }
 
 export function converterImagensNasaParaGaleria(imagens: ImagemNasaApi[]): ItemGaleria[] {
-  return imagens.slice(0, 12).map((imagem) => ({
+  return imagens.slice(0, 30).map((imagem) => ({
     id: `galeria_${imagem.id}`,
-    titulo: imagem.titulo,
-    descricao: imagem.descricao,
+    titulo: traduzirTituloNasa(imagem.titulo),
+    descricao: traduzirDescricaoNasa(imagem.descricao),
     imagem: imagem.imagem,
     categoria: 'espaco',
     origemDados: 'nasa_images',
   }));
+}
+
+function traduzirTituloNasa(titulo: string) {
+  return titulo
+    .replace(/Earth/gi, 'Terra')
+    .replace(/Moon/gi, 'Lua')
+    .replace(/Mars/gi, 'Marte')
+    .replace(/Galaxy/gi, 'Galaxia')
+    .replace(/Nebula/gi, 'Nebulosa')
+    .replace(/Space/gi, 'Espaco')
+    .replace(/Satellite/gi, 'Satelite')
+    .replace(/Launch/gi, 'Lancamento')
+    .replace(/Mission/gi, 'Missao');
+}
+
+function traduzirDescricaoNasa(descricao: string) {
+  const resumo = descricao
+    .replace(/Earth/gi, 'Terra')
+    .replace(/Moon/gi, 'Lua')
+    .replace(/Mars/gi, 'Marte')
+    .replace(/spacecraft/gi, 'nave espacial')
+    .replace(/space/gi, 'espaco')
+    .replace(/image/gi, 'imagem')
+    .replace(/mission/gi, 'missao')
+    .slice(0, 260);
+
+  return `Conteudo da NASA traduzido para a Orbitlink. ${resumo}`;
 }
 /* === SERVICO NASA | fim === */
