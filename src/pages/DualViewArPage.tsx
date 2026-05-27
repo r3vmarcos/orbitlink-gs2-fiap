@@ -10,7 +10,7 @@ export function DualViewArPage() {
   return (
     <DualViewAr
       pontoInicialId={pontoInicialId}
-      onVerPosts={(pontoId) => navigate(`/feed?ponto=${pontoId}`)}
+      onVerPosts={(pontoId) => navigate(`/mark/${pontoId}`)}
       onVerStatus={(pontoId) => navigate(`/feed?status=${pontoId}`)}
     />
   );

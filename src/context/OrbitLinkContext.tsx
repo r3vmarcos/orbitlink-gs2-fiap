@@ -285,13 +285,34 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
 
   const usuarios = useMemo(() => [...usuariosLocais, ...usuariosBase], [usuariosBase, usuariosLocais]);
   const usuarioAtual = useMemo(() => usuarios.find((usuario) => usuario.id === usuarioAtualId), [usuarioAtualId, usuarios]);
+  const pontosAr = useMemo(() => [...pontosApi, ...pontosArBase], [pontosApi, pontosArBase]);
   const posts = useMemo(() => {
-    return [...postsUsuario, ...postsBase].map((post) => ({
+    const postsExistentes = [...postsUsuario, ...postsBase];
+    const idsComPost = new Set(postsExistentes.map((post) => post.pontoArId).filter(Boolean));
+    const postsGerados: PostOrbitLink[] = pontosAr
+      .filter((ponto) => !idsComPost.has(ponto.id))
+      .map((ponto) => ({
+        id: `post_mark_${ponto.id}`,
+        autorId: ponto.perspectiva === 'terra' ? 'lia_novaes' : 'helena_duarte',
+        perspectiva: ponto.perspectiva,
+        titulo: ponto.titulo,
+        texto: ponto.descricao,
+        categoria: ponto.camada.includes('satelites') ? 'satelite' : ponto.camada.includes('turismo') ? 'turismo' : ponto.camada.includes('clima') ? 'clima' : 'evento',
+        pontoArId: ponto.id,
+        ods: ponto.ods,
+        curtidas: 42,
+        comentarios: [],
+        compartilhamentos: 0,
+        criadoEm: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+        origemDados: 'simulado',
+      }));
+
+    return [...postsExistentes, ...postsGerados].map((post) => ({
       ...post,
       comentarios: [...post.comentarios, ...(comentariosLocais[post.id] ?? [])],
       compartilhamentos: post.compartilhamentos + (compartilhamentosExtras[post.id] ?? 0),
     }));
-  }, [comentariosLocais, compartilhamentosExtras, postsBase, postsUsuario]);
+  }, [comentariosLocais, compartilhamentosExtras, pontosAr, postsBase, postsUsuario]);
   const galeriaUsuario = useMemo<ItemGaleria[]>(() => {
     return postsUsuario
       .filter((post) => Boolean(post.imagem))
@@ -309,7 +330,6 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   }, [postsUsuario]);
 
   const galeria = useMemo(() => [...galeriaUsuario, ...galeriaApi, ...galeriaBase], [galeriaApi, galeriaBase, galeriaUsuario]);
-  const pontosAr = useMemo(() => [...pontosApi, ...pontosArBase], [pontosApi, pontosArBase]);
 
   const alternarTema = useCallback(() => {
     setTema((temaAtual) => (temaAtual === 'dark' ? 'light' : 'dark'));

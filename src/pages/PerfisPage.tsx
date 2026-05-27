@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { CardPerfil } from '@/components/perfis/CardPerfil';
 import { CardBase } from '@/components/ui/CardBase';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
@@ -8,9 +8,10 @@ import { lerLocalStorage, salvarLocalStorage } from '@/services/localStorageServ
 /* === PERFIS PAGE | inicio === */
 export function PerfisPage() {
   const { usuarios, usuarioAtual } = useOrbitLink();
+  const { usuarioId } = useParams();
   const [params] = useSearchParams();
   const [fotosLocais, setFotosLocais] = useState<Record<string, string>>(() => lerLocalStorage('orbitlink_fotos_perfil', {}));
-  const usuarioFocoId = params.get('usuario') ?? usuarioAtual?.id;
+  const usuarioFocoId = usuarioId ?? params.get('usuario') ?? usuarioAtual?.id;
 
   const usuariosComFoto = useMemo(() => usuarios.map((usuario) => ({
     ...usuario,
@@ -18,8 +19,9 @@ export function PerfisPage() {
   })), [fotosLocais, usuarios]);
 
   const usuariosOrdenados = useMemo(() => {
-    return [...usuariosComFoto].sort((a, b) => (a.id === usuarioFocoId ? -1 : b.id === usuarioFocoId ? 1 : 0));
-  }, [usuarioFocoId, usuariosComFoto]);
+    const lista = usuarioId ? usuariosComFoto.filter((usuario) => usuario.id === usuarioId) : usuariosComFoto;
+    return [...lista].sort((a, b) => (a.id === usuarioFocoId ? -1 : b.id === usuarioFocoId ? 1 : 0));
+  }, [usuarioFocoId, usuarioId, usuariosComFoto]);
 
   function alterarFoto(usuarioId: string, foto: string) {
     const proximo = { ...fotosLocais, [usuarioId]: foto };

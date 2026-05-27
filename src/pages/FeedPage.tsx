@@ -64,11 +64,6 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
 
         <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
 
-        <button onClick={onAbrirPost} className="w-full rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-surface)] p-4 text-left text-[var(--text-muted)] transition hover:bg-[var(--bg-surface-hover)] sm:p-5">
-          <span className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Criar publicacao rapida</span>
-          <span className="mt-2 block text-base font-bold text-[var(--text-text)] sm:text-lg">Qual local esta conectado ao seu post?</span>
-        </button>
-
         <div className="space-y-5">
           {postsFiltrados.map((post) => <CardPost key={post.id} post={post} onVerAr={handleVerAr} onAbrirDetalhes={onAbrirDetalhesPost} />)}
           {postsFiltrados.length === 0 ? <CardBase>Nenhuma publicacao encontrada para a busca atual.</CardBase> : null}

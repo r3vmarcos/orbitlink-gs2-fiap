@@ -35,7 +35,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
       <header className="flex items-center gap-3 p-3 sm:p-4">
         <AvatarOrbital gradiente={autor.avatarGradiente} nome={autor.nome} />
         <div className="min-w-0 flex-1">
-          <button onClick={() => navigate(`/perfis?usuario=${autor.id}`)} className="block max-w-full truncate text-left text-sm font-black text-[var(--text-text)] hover:text-[var(--text-link)]">{autor.nome}</button>
+          <button onClick={() => navigate(`/perfis/${autor.id}`)} className="block max-w-full truncate text-left text-sm font-black text-[var(--text-text)] hover:text-[var(--text-link)]">{autor.nome}</button>
           <p className="truncate font-monoapp text-[9px] uppercase tracking-[0.04em] text-[var(--text-muted)] min-[380px]:text-[10px] min-[380px]:tracking-[0.08em]">
             {autor.usuario} - {formatarTempoRelativo(post.criadoEm)}
           </p>

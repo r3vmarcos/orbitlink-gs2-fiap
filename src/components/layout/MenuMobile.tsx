@@ -24,7 +24,7 @@ export function MenuMobile({ onAbrirPost, onAbrirStatus }: MenuMobileProps) {
           <Rocket className="h-5 w-5" />
           <span className="truncate">AR</span>
         </NavLink>
-        <button onClick={onAbrirPost} className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl bg-[var(--bg-primary)] px-1 py-2 text-[8px] font-black uppercase tracking-normal text-[var(--text-primary)] min-[380px]:text-[9px]">
+        <button onClick={onAbrirPost} className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl bg-[color-mix(in_srgb,var(--bg-primary)_70%,transparent)] px-1 py-2 text-[8px] font-black uppercase tracking-normal text-[var(--text-primary)] min-[380px]:text-[9px]">
           <Plus className="h-5 w-5" />
           <span className="truncate">Post</span>
         </button>

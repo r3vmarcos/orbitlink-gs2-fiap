@@ -183,7 +183,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0,rgba(2,6,23,.18)_40%,rgba(2,6,23,.65)_100%)] light-theme:bg-[radial-gradient(circle_at_center,transparent_0,rgba(255,247,237,.08)_40%,rgba(255,69,0,.18)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,229,255,.12)_1px,transparent_1px),linear-gradient(90deg,rgba(0,229,255,.12)_1px,transparent_1px)] bg-[length:42px_42px]" />
           {pontosVisiveis.map((ponto) => (
-            <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} zoomCamera={zoomCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} />
+            <PontoArVisual key={ponto.id} ponto={ponto} ativo={ponto.id === pontoSelecionado?.id} visaoCamera={visaoCamera} zoomCamera={zoomCamera} onSelecionar={() => setPontoSelecionadoId(ponto.id)} onAbrir={() => onVerPosts(ponto.id)} />
           ))}
           <div className="pointer-events-none absolute left-2 top-2 z-10 rounded-full border border-cyan-300/25 bg-slate-950/35 px-2 py-0.5 font-monoapp text-[9px] font-black text-cyan-100 backdrop-blur-md light-theme:bg-white/55 light-theme:text-sky-900">
             {zoomCamera.toFixed(1)}x
@@ -196,7 +196,6 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
               <ZoomIn className="h-4 w-4" />
             </button>
           </div>
-          {pontoSelecionado ? <CaixaMark ponto={pontoSelecionado} onAbrir={() => onVerPosts(pontoSelecionado.id)} /> : null}
           <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2 sm:bottom-4 sm:left-4 sm:right-4">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
             <Badge tom="verde">Camera ativa</Badge>
@@ -209,17 +208,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
   );
 }
 
-function CaixaMark({ ponto, onAbrir }: { ponto: PontoAr; onAbrir: () => void }) {
-  return (
-    <button onClick={onAbrir} className="absolute bottom-16 left-3 right-3 z-30 rounded-2xl border border-cyan-300/35 bg-slate-950/78 p-3 text-left shadow-neon backdrop-blur-md light-theme:bg-white/85 sm:bottom-20 sm:left-4 sm:right-auto sm:w-80">
-      <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.12em] text-cyan-200 light-theme:text-sky-800">{ponto.tipo.replaceAll('_', ' ')}</p>
-      <h3 className="mt-1 text-sm font-black uppercase text-white light-theme:text-sky-950">{ponto.nome}</h3>
-      <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-300 light-theme:text-slate-700">{ponto.descricao}</p>
-    </button>
-  );
-}
-
-function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar }: { ponto: PontoAr; ativo: boolean; visaoCamera: { azimute: number; inclinacao: number }; zoomCamera: number; onSelecionar: () => void }) {
+function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, onAbrir }: { ponto: PontoAr; ativo: boolean; visaoCamera: { azimute: number; inclinacao: number }; zoomCamera: number; onSelecionar: () => void; onAbrir: () => void }) {
   const cor = ponto.perspectiva === 'espaco' ? 'bg-orange-400' : ponto.origemDados === 'nasa_eonet' ? 'bg-emerald-400' : ponto.statusAtivo ? 'bg-cyan-300' : 'bg-blue-400';
   const campoVisaoHorizontal = campoVisaoHorizontalBase / zoomCamera;
   const campoVisaoVertical = campoVisaoVerticalBase / zoomCamera;
@@ -236,15 +225,21 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar }: 
   }
 
   return (
-    <button onClick={onSelecionar} className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-left" style={{ left: `${esquerda}%`, top: `${topo}%` }}>
-      <span className={`relative flex h-6 w-6 items-center justify-center rounded-full ${cor} text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''} ${ativo ? 'ring-4 ring-white/70' : ''}`}>
-        <span className="absolute h-10 w-10 rounded-full border border-current opacity-35 sm:h-12 sm:w-12" />
-        <span className="h-2 w-2 rounded-full bg-slate-950" />
-      </span>
-      <span className={`mt-2 hidden rounded-xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_82%,transparent)] px-3 py-2 text-xs font-bold text-[var(--text-text)] backdrop-blur-md md:block ${ativo ? 'ring-2 ring-[var(--border-focus)]' : ''}`}>
-        {ponto.nome}
-      </span>
-    </button>
+    <div className="absolute z-20 -translate-x-1/2 -translate-y-1/2 text-left" style={{ left: `${esquerda}%`, top: `${topo}%` }}>
+      <button onClick={onSelecionar}>
+        <span className={`relative flex h-6 w-6 items-center justify-center rounded-full ${cor} text-slate-950 shadow-neon ${ponto.statusAtivo ? 'animate-pulsar' : ''} ${ativo ? 'ring-4 ring-white/70' : ''}`}>
+          <span className="absolute h-10 w-10 rounded-full border border-current opacity-35 sm:h-12 sm:w-12" />
+          <span className="h-2 w-2 rounded-full bg-slate-950" />
+        </span>
+      </button>
+      {ativo ? (
+        <button onClick={onAbrir} className="mt-2 w-44 rounded-2xl border border-cyan-300/35 bg-slate-950/78 p-2 text-left shadow-neon backdrop-blur-md light-theme:bg-white/85">
+          <p className="font-monoapp text-[9px] font-black uppercase tracking-[0.08em] text-cyan-200 light-theme:text-sky-800">{ponto.tipo.replaceAll('_', ' ')}</p>
+          <h3 className="mt-0.5 line-clamp-1 text-xs font-black uppercase text-white light-theme:text-sky-950">{ponto.nome}</h3>
+          <p className="mt-1 line-clamp-2 text-[10px] leading-4 text-slate-300 light-theme:text-slate-700">{ponto.descricao}</p>
+        </button>
+      ) : null}
+    </div>
   );
 }
 

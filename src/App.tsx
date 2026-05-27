@@ -67,6 +67,16 @@ function AppInterno() {
       onAlternarTemaVisual={() => tema === 'dark' ? setIndiceTemaDark((valor) => valor + 1) : setIndiceTemaLight((valor) => valor + 1)}
       onAlternarPaleta={() => setIndicePaleta((valor) => valor + 1)}
       onAlternarClaroEscuro={alternarTema}
+      categoriasTema={categoriasDoModo}
+      paletasTema={paletasAtivas}
+      categoriaAtivaId={categoriaAtiva}
+      paletaAtivaNome={temaAtivo.name}
+      onSelecionarCategoria={(id) => {
+        const indice = categoriasDoModo.findIndex((categoria) => categoria.id === id);
+        if (tema === 'dark') setIndiceTemaDark(indice);
+        else setIndiceTemaLight(indice);
+      }}
+      onSelecionarPaleta={(indice) => setIndicePaleta(indice)}
     >
       <AppRoutes
         onAbrirPost={() => abrirPublicacao('post')}
