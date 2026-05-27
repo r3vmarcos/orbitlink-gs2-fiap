@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AcessoUsuario } from '@/components/auth/AcessoUsuario';
 import { CriarPostModal } from '@/components/feed/CriarPostModal';
-import { CriarStatusModal } from '@/components/feed/CriarStatusModal';
 import { VisualizadorStatus } from '@/components/feed/VisualizadorStatus';
 import { LayoutPrincipal } from '@/components/layout/LayoutPrincipal';
 import { Modal } from '@/components/ui/Modal';
@@ -16,7 +15,7 @@ import { aplicarTokensTema, gerarTokensTema } from '@/utils/tema';
 /* === APP INTERNO | inicio === */
 function AppInterno() {
   const [modalPostAberto, setModalPostAberto] = useState(false);
-  const [modalStatusAberto, setModalStatusAberto] = useState(false);
+  const [abaPublicacao, setAbaPublicacao] = useState<'post' | 'status'>('post');
   const [statusAberto, setStatusAberto] = useState<StatusOrbital | undefined>();
   const [postDetalhe, setPostDetalhe] = useState<PostOrbitLink | undefined>();
   const navigate = useNavigate();
@@ -37,19 +36,23 @@ function AppInterno() {
     navigate(`/dualview-ar${pontoId ? `?ponto=${pontoId}` : ''}`);
   }
 
+  function abrirPublicacao(aba: 'post' | 'status') {
+    setAbaPublicacao(aba);
+    setModalPostAberto(true);
+  }
+
   const autorPost = postDetalhe ? usuarios.find((usuario) => usuario.id === postDetalhe.autorId) : undefined;
   const pontoPost = postDetalhe ? pontosAr.find((ponto) => ponto.id === postDetalhe.pontoArId) : undefined;
 
   return (
-    <LayoutPrincipal onAbrirPost={() => setModalPostAberto(true)} onAbrirStatus={() => setModalStatusAberto(true)}>
+    <LayoutPrincipal onAbrirPost={() => abrirPublicacao('post')} onAbrirStatus={() => abrirPublicacao('status')}>
       <AppRoutes
-        onAbrirPost={() => setModalPostAberto(true)}
-        onAbrirStatus={() => setModalStatusAberto(true)}
+        onAbrirPost={() => abrirPublicacao('post')}
+        onAbrirStatus={() => abrirPublicacao('status')}
         onVisualizarStatus={setStatusAberto}
         onAbrirDetalhesPost={setPostDetalhe}
       />
-      <CriarPostModal aberto={modalPostAberto} onFechar={() => setModalPostAberto(false)} />
-      <CriarStatusModal aberto={modalStatusAberto} onFechar={() => setModalStatusAberto(false)} />
+      <CriarPostModal aberto={modalPostAberto} abaInicial={abaPublicacao} onFechar={() => setModalPostAberto(false)} />
       <VisualizadorStatus status={statusAberto} onFechar={() => setStatusAberto(undefined)} onVerAr={handleVerAr} />
       <Modal aberto={Boolean(postDetalhe)} titulo={postDetalhe?.titulo ?? 'Publicação'} onFechar={() => setPostDetalhe(undefined)} telaCheiaMobile>
         {postDetalhe ? (

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CardPost } from '@/components/feed/CardPost';
 import { StatusOrbitalLista } from '@/components/feed/StatusOrbitalLista';
 import { Botao } from '@/components/ui/Botao';
@@ -35,10 +35,13 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
   const { posts, pontosAr, usuarioAtual } = useOrbitLink();
   const [filtro, setFiltro] = useState<TipoCategoriaPost | 'todos'>('todos');
   const [busca, setBusca] = useState('');
+  const [params] = useSearchParams();
   const navigate = useNavigate();
+  const pontoFiltro = params.get('ponto');
 
   const postsFiltrados = useMemo(() => {
     return posts
+      .filter((post) => !pontoFiltro || post.pontoArId === pontoFiltro)
       .filter((post) => filtro === 'todos' || post.categoria === filtro)
       .filter((post) => {
         const local = post.perspectiva === 'terra' ? 'terra' : 'ceu espaço céu orbital';
@@ -46,7 +49,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
         return alvo.includes(busca.toLowerCase());
       })
       .sort((a, b) => new Date(b.criadoEm).getTime() - new Date(a.criadoEm).getTime());
-  }, [busca, filtro, posts]);
+  }, [busca, filtro, pontoFiltro, posts]);
 
   function handleVerAr(pontoId?: string) {
     const query = pontoId ? `?ponto=${pontoId}` : '';

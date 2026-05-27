@@ -1,7 +1,9 @@
-import { Camera, LogOut, Moon, Rocket, Sun, Zap } from 'lucide-react';
+import { Camera, LogOut, Moon, Rocket, Sun } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Botao } from '@/components/ui/Botao';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
+import logoBlack from '@/assets/logo_black.png';
+import logoWhite from '@/assets/logo_white.png';
 
 /* === CABECALHO | inicio === */
 interface CabecalhoProps {
@@ -21,17 +23,13 @@ const links = [
 
 export function Cabecalho({ onAbrirPost, onAbrirStatus }: CabecalhoProps) {
   const { tema, alternarTema, usuarioAtual, sairUsuario } = useOrbitLink();
+  const logo = tema === 'dark' ? logoWhite : logoBlack;
 
   return (
     <header className="sticky top-0 z-50 max-w-[100vw] border-b border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_88%,transparent)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center gap-2 px-2.5 py-2.5 min-[380px]:px-3 sm:gap-3 sm:px-6 sm:py-3">
         <NavLink to="/" className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--bg-primary)] text-[var(--text-primary)] shadow-neon sm:h-11 sm:w-11">
-            <Zap className="h-5 w-5 sm:h-6 sm:w-6" />
-          </span>
-          <span className="truncate font-monoapp text-base font-black uppercase tracking-[0.08em] text-[var(--text-text)] min-[380px]:text-lg sm:text-xl sm:tracking-[0.16em]">
-            Orbit<span className="text-[var(--text-link)]">link</span>
-          </span>
+          <img src={logo} alt="Orbitlink" className="h-10 w-auto max-w-[155px] object-contain sm:h-11 sm:max-w-[190px]" />
         </NavLink>
 
         <nav className="ml-2 hidden flex-1 items-center gap-2 xl:flex">
