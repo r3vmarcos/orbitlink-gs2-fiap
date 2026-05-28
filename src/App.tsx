@@ -25,6 +25,7 @@ function AppInterno() {
   const navigate = useNavigate();
   const location = useLocation();
   const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
+  const rotaAdmin = location.pathname === '/adm-orbitlink';
   const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
   const categoriaAtiva = categoriasDoModo[tema === 'dark' ? indiceTemaDark % categoriasDoModo.length : indiceTemaLight % categoriasDoModo.length]?.id as CategoriaTemaId;
   const paletasAtivas = temasPorCategoria[categoriaAtiva];
@@ -45,15 +46,15 @@ function AppInterno() {
 
   useEffect(() => {
     const chaveInicio = 'orbitlink_inicio_feed';
-    if (usuarioAutenticado && !sessionStorage.getItem(chaveInicio)) {
+    if (usuarioAutenticado && !rotaAdmin && !sessionStorage.getItem(chaveInicio)) {
       sessionStorage.setItem(chaveInicio, '1');
       if (location.pathname !== '/') {
         navigate('/', { replace: true });
       }
     }
-  }, [location.pathname, navigate, usuarioAutenticado]);
+  }, [location.pathname, navigate, rotaAdmin, usuarioAutenticado]);
 
-  if (!usuarioAutenticado) {
+  if (!usuarioAutenticado && !rotaAdmin) {
     return <AcessoUsuario />;
   }
 

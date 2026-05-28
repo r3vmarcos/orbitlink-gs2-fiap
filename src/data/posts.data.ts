@@ -77,23 +77,64 @@ function categoriaPorCamada(camada: string): TipoCategoriaPost {
   return mapa[camada] ?? 'diario_orbital';
 }
 
+function criarTituloPost(nomePonto: string, categoria: TipoCategoriaPost, perspectiva: 'terra' | 'espaco', indice: number) {
+  const titulosTerra: Record<TipoCategoriaPost, string[]> = {
+    diario_orbital: [`${nomePonto} entrou na janela de observação`, `Registro aberto de ${nomePonto}`],
+    missao: [`Missão em foco: ${nomePonto}`, `${nomePonto} atualiza a rota da equipe`],
+    estacao: [`Sinal ativo em ${nomePonto}`, `${nomePonto} aparece na passagem de hoje`],
+    lua: [`${nomePonto} no radar lunar`, `Detalhe lunar em ${nomePonto}`],
+    satelite: [`Telemetria visível: ${nomePonto}`, `${nomePonto} cruzou o céu agora`],
+    evento: [`Evento celeste em ${nomePonto}`, `${nomePonto} chamou atenção no céu`],
+    cidade: [`${nomePonto} conectada ao céu`, `Olhar urbano para ${nomePonto}`],
+    turismo: [`Rota visual por ${nomePonto}`, `${nomePonto} virou ponto de observação`],
+    comunidade: [`Comunidade acompanhando ${nomePonto}`, `${nomePonto} no mural social`],
+    clima: [`Clima espacial perto de ${nomePonto}`, `${nomePonto} acende alerta de observação`],
+    bioma: [`${nomePonto} visto como paisagem viva`, `Leitura ambiental de ${nomePonto}`],
+    ods: [`${nomePonto} conectado aos ODS`, `Indicador social em ${nomePonto}`],
+  };
+
+  const titulosEspaco: Record<TipoCategoriaPost, string[]> = {
+    diario_orbital: [`${nomePonto} visto da órbita`, `Registro orbital de ${nomePonto}`],
+    missao: [`Missão terrestre em ${nomePonto}`, `${nomePonto} no painel de missão`],
+    estacao: [`Base de leitura sobre ${nomePonto}`, `${nomePonto} na rota de monitoramento`],
+    lua: [`Referência lunar sobre ${nomePonto}`, `${nomePonto} em paralelo com a Lua`],
+    satelite: [`Satélite acompanhando ${nomePonto}`, `${nomePonto} sob leitura de sensores`],
+    evento: [`Evento observado em ${nomePonto}`, `${nomePonto} ganhou destaque orbital`],
+    cidade: [`Cidade em foco: ${nomePonto}`, `${nomePonto} em luzes e mapas`],
+    turismo: [`Rota orbital por ${nomePonto}`, `${nomePonto} no mapa de viagem`],
+    comunidade: [`Vozes locais em ${nomePonto}`, `${nomePonto} no radar da comunidade`],
+    clima: [`Alerta climático em ${nomePonto}`, `${nomePonto} sob monitoramento ambiental`],
+    bioma: [`Bioma em foco: ${nomePonto}`, `${nomePonto} como leitura de vida`],
+    ods: [`ODS em campo: ${nomePonto}`, `${nomePonto} como indicador social`],
+  };
+
+  const lista = perspectiva === 'terra' ? titulosTerra[categoria] : titulosEspaco[categoria];
+  return lista[indice % lista.length];
+}
+
+function criarTextoPost(nomePonto: string, camada: string, local: string, temaFoto: string, detalheFoto: string, perspectiva: 'terra' | 'espaco') {
+  if (perspectiva === 'terra') {
+    return `A foto de ${temaFoto} ajuda a contar o que está acontecendo em ${nomePonto}: ${detalheFoto}. O registro nasce na camada ${camada} e transforma o ${local} em uma conversa rápida para quem acompanha o céu pelo Orbifeed.`;
+  }
+
+  return `Em ${nomePonto}, a foto de ${temaFoto} abre uma leitura sobre ${detalheFoto}. A camada ${camada} mistura mapa orbital, dados simulados e relato local para aproximar a superfície de quem acompanha o planeta de cima.`;
+}
+
 export const postsData: PostOrbitLink[] = pontosArData.map((ponto, indice) => {
   const autores = ponto.perspectiva === 'terra' ? autoresTerra : autoresEspaco;
   const camadaPrincipal = ponto.camada[0] ?? 'social';
   const foto = imagensPostagens[indice % imagensPostagens.length];
   const local = ponto.perspectiva === 'terra' ? 'céu observado da Terra' : 'superfície da Terra vista do espaço';
-  const contexto = ponto.perspectiva === 'terra'
-    ? `O mark aponta para ${ponto.nome} no AR Terra e usa a foto de ${foto.tema} para aproximar ${foto.detalhe} da experiência de observação.`
-    : `O mark destaca ${ponto.nome} no mapa orbital e usa a foto de ${foto.tema} para conversar sobre ${foto.detalhe}.`;
+  const categoria = categoriaPorCamada(camadaPrincipal);
 
   return {
     id: `post_mark_${String(indice + 1).padStart(2, '0')}`,
     autorId: autores[indice % autores.length],
     perspectiva: ponto.perspectiva,
-    titulo: ponto.perspectiva === 'terra' ? `${ponto.nome}: leitura do céu em AR` : `${ponto.nome}: leitura orbital da Terra`,
-    texto: `${contexto} A camada ${camadaPrincipal} conecta o ${local}, dados simulados e relatos da comunidade em uma postagem feita para o Orbifeed.`,
+    titulo: criarTituloPost(ponto.nome, categoria, ponto.perspectiva, indice),
+    texto: criarTextoPost(ponto.nome, camadaPrincipal, local, foto.tema, foto.detalhe, ponto.perspectiva),
     imagem: foto.url,
-    categoria: categoriaPorCamada(camadaPrincipal),
+    categoria,
     pontoArId: ponto.id,
     ods: ponto.ods,
     curtidas: 180 + indice * 17,

@@ -94,7 +94,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
 
       <aside className="hidden min-w-0 space-y-5 lg:sticky lg:top-20 lg:block lg:h-[calc(100dvh-6rem)] lg:overflow-hidden lg:pl-1">
         <CardBase>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocinio</p>
+          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocínio</p>
           <div className="mt-4 space-y-3">
             {anunciosVisiveis.map(([produto, texto, imagem]) => (
               <div key={produto} className="flex gap-3 overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-2">
@@ -127,8 +127,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
 function PainelFiltros({ filtro, onFiltro }: { filtro: TipoCategoriaPost | 'todos'; onFiltro: (valor: TipoCategoriaPost | 'todos') => void }) {
   return (
     <CardBase>
-      <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Orbitlink</p>
-      <h1 className="mt-2 text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl lg:text-4xl">Orbifeed</h1>
+      <h1 className="text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl lg:text-4xl">Orbifeed</h1>
       <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
         {filtrosFeed.map((item) => (
           <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] ${filtro === item ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
@@ -145,7 +144,6 @@ function PainelFeed({ busca, filtro, onBusca, onFiltro }: { busca: string; filtr
     <CardBase className="p-3">
       <div className="flex items-center gap-3">
         <div className="min-w-0">
-          <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.1em] text-[var(--text-link)]">Orbitlink</p>
           <h1 className="text-2xl font-black uppercase leading-tight text-[var(--text-text)]">Orbifeed</h1>
         </div>
         <input value={busca} onChange={(evento) => onBusca(evento.target.value)} className="input-form min-w-0 flex-1 rounded-full px-3 py-2 text-xs" placeholder="Buscar..." />

@@ -97,7 +97,7 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
           {fotosDoPerfil.map((post) => (
             <img key={post.id} src={post.imagem} alt={post.titulo} className="aspect-square w-full rounded-xl object-cover" loading="lazy" />
           ))}
-          {fotosDoPerfil.length === 0 ? <p className="col-span-3 text-sm text-[var(--text-muted)]">Este perfil ainda nao publicou fotos.</p> : null}
+          {fotosDoPerfil.length === 0 ? <p className="col-span-3 text-sm text-[var(--text-muted)]">Este perfil ainda não publicou fotos.</p> : null}
         </div>
       </CardBase>
     </div>

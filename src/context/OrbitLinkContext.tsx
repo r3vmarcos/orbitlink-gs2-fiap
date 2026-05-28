@@ -23,6 +23,7 @@ import type {
   PostOrbitLink,
   StatusOrbital,
   TipoCategoriaPost,
+  TipoPerfil,
   TipoPerspectiva,
   TipoTema,
   UsuarioOrbitLink,
@@ -49,6 +50,17 @@ interface NovoStatusEntrada {
   pontoArId?: string;
 }
 
+interface AdminCriarUsuarioEntrada {
+  nome: string;
+  usuario: string;
+  email: string;
+  senha: string;
+  tipo: TipoPerfil;
+  cargo: string;
+  localizacaoAtual: string;
+  fotoPerfil?: string;
+}
+
 interface OrbitLinkContextValue {
   tema: TipoTema;
   usuarios: UsuarioOrbitLink[];
@@ -68,6 +80,7 @@ interface OrbitLinkContextValue {
   usuarioAtual?: UsuarioOrbitLink;
   usuarioAutenticado: boolean;
   cadastrarUsuario: (entrada: CadastroUsuarioEntrada) => { sucesso: boolean; mensagem?: string };
+  criarUsuarioAdmin: (entrada: AdminCriarUsuarioEntrada) => { sucesso: boolean; mensagem?: string };
   entrarUsuario: (email: string, senha: string) => { sucesso: boolean; mensagem?: string };
   sairUsuario: () => void;
   alternarTema: () => void;
@@ -371,6 +384,43 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     return { sucesso: true };
   }, [usuariosBase, usuariosLocais]);
 
+  const criarUsuarioAdmin = useCallback((entrada: AdminCriarUsuarioEntrada) => {
+    const email = entrada.email.trim().toLowerCase();
+    const usuarioNormalizado = entrada.usuario.trim().replace(/^@/, '').toLowerCase();
+
+    if (!entrada.nome.trim() || !usuarioNormalizado || !email || entrada.senha.length < 6) {
+      return { sucesso: false, mensagem: 'Preencha nome, usuário, e-mail e senha com pelo menos 6 caracteres.' };
+    }
+
+    const usuarioJaExiste = [...usuariosLocais, ...usuariosBase].some(
+      (usuario) => usuario.email?.toLowerCase() === email || usuario.usuario.toLowerCase() === `@${usuarioNormalizado}`,
+    );
+
+    if (usuarioJaExiste) {
+      return { sucesso: false, mensagem: 'Já existe uma conta com este e-mail ou usuário.' };
+    }
+
+    const novoUsuario: UsuarioOrbitLink = {
+      id: gerarId('usuario_admin'),
+      nome: entrada.nome.trim(),
+      usuario: `@${usuarioNormalizado}`,
+      email,
+      senha: entrada.senha,
+      tipo: entrada.tipo,
+      avatarGradiente: 'from-cyan-300 to-fuchsia-500',
+      fotoPerfil: entrada.fotoPerfil?.trim() || undefined,
+      cargo: entrada.cargo.trim() || 'Integrante Orbitlink',
+      localizacaoAtual: entrada.localizacaoAtual.trim() || 'Base remota Orbitlink',
+      seguidores: 0,
+      publicacoes: 0,
+      conquistas: ['Criado pelo portal adm', 'Postagens liberadas'],
+      criadoLocalmente: true,
+    };
+
+    setUsuariosLocais((atuais) => [novoUsuario, ...atuais]);
+    return { sucesso: true };
+  }, [usuariosBase, usuariosLocais]);
+
   const entrarUsuario = useCallback((email: string, senha: string) => {
     const usuarioEncontrado = [...usuariosLocais, ...usuariosBase].find(
       (usuario) => usuario.email?.toLowerCase() === email.trim().toLowerCase() && usuario.senha === senha,
@@ -528,6 +578,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     usuarioAtual,
     usuarioAutenticado: Boolean(usuarioAtual),
     cadastrarUsuario,
+    criarUsuarioAdmin,
     entrarUsuario,
     sairUsuario,
     alternarTema,
@@ -558,6 +609,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     imagemEpic,
     usuarioAtual,
     cadastrarUsuario,
+    criarUsuarioAdmin,
     entrarUsuario,
     sairUsuario,
     alternarTema,

@@ -196,12 +196,12 @@ function traduzirTituloNasa(titulo: string) {
     .replace(/Earth/gi, 'Terra')
     .replace(/Moon/gi, 'Lua')
     .replace(/Mars/gi, 'Marte')
-    .replace(/Galaxy/gi, 'Galaxia')
+    .replace(/Galaxy/gi, 'Galáxia')
     .replace(/Nebula/gi, 'Nebulosa')
-    .replace(/Space/gi, 'Espaco')
-    .replace(/Satellite/gi, 'Satelite')
-    .replace(/Launch/gi, 'Lancamento')
-    .replace(/Mission/gi, 'Missao');
+    .replace(/Space/gi, 'Espaço')
+    .replace(/Satellite/gi, 'Satélite')
+    .replace(/Launch/gi, 'Lançamento')
+    .replace(/Mission/gi, 'Missão');
 }
 
 function traduzirDescricaoNasa(descricao: string) {
@@ -210,11 +210,11 @@ function traduzirDescricaoNasa(descricao: string) {
     .replace(/Moon/gi, 'Lua')
     .replace(/Mars/gi, 'Marte')
     .replace(/spacecraft/gi, 'nave espacial')
-    .replace(/space/gi, 'espaco')
+    .replace(/space/gi, 'espaço')
     .replace(/image/gi, 'imagem')
-    .replace(/mission/gi, 'missao')
+    .replace(/mission/gi, 'missão')
     .slice(0, 260);
 
-  return `Conteudo da NASA traduzido para a Orbitlink. ${resumo}`;
+  return `Conteúdo da NASA traduzido para a Orbitlink. ${resumo}`;
 }
 /* === SERVICO NASA | fim === */

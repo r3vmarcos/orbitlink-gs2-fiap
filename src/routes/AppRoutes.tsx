@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import { AdmOrbitlinkPage } from '@/pages/AdmOrbitlinkPage';
 import { DadosNasaPage } from '@/pages/DadosNasaPage';
 import { DualViewArPage } from '@/pages/DualViewArPage';
 import { FeedPage } from '@/pages/FeedPage';
@@ -98,6 +99,7 @@ export function AppRoutes({
       <Route path="/pessoas" element={<PessoasPage />} />
       <Route path="/impacto" element={<ImpactoPage />} />
       <Route path="/dados-nasa" element={<DadosNasaPage />} />
+      <Route path="/adm-orbitlink" element={<AdmOrbitlinkPage />} />
       <Route
         path="*"
         element={
