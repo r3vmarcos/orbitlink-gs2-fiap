@@ -8,6 +8,7 @@ import { MarkPage } from '@/pages/MarkPage';
 import { MissoesPage } from '@/pages/MissoesPage';
 import { PerfisPage } from '@/pages/PerfisPage';
 import { PessoasPage } from '@/pages/PessoasPage';
+import type { CategoriaTemaId, TemaVisual } from '@/types/tema';
 import type { PostOrbitLink, StatusOrbital } from '@/types/orbitlink.types';
 
 /* === ROTAS DO APP | inicio === */
@@ -16,9 +17,28 @@ interface AppRoutesProps {
   onAbrirStatus: () => void;
   onVisualizarStatus: (status: StatusOrbital) => void;
   onAbrirDetalhesPost: (post: PostOrbitLink) => void;
+  onAlternarClaroEscuro: () => void;
+  categoriasTema: Array<{ id: CategoriaTemaId; nome: string }>;
+  paletasTema: TemaVisual[];
+  categoriaAtivaId: CategoriaTemaId;
+  paletaAtivaNome: string;
+  onSelecionarCategoria: (id: CategoriaTemaId) => void;
+  onSelecionarPaleta: (indice: number) => void;
 }
 
-export function AppRoutes({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPost }: AppRoutesProps) {
+export function AppRoutes({
+  onAbrirPost,
+  onAbrirStatus,
+  onVisualizarStatus,
+  onAbrirDetalhesPost,
+  onAlternarClaroEscuro,
+  categoriasTema,
+  paletasTema,
+  categoriaAtivaId,
+  paletaAtivaNome,
+  onSelecionarCategoria,
+  onSelecionarPaleta,
+}: AppRoutesProps) {
   return (
     <Routes>
       <Route
@@ -47,8 +67,34 @@ export function AppRoutes({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAb
       <Route path="/mark/:pontoId" element={<MarkPage onAbrirDetalhesPost={onAbrirDetalhesPost} />} />
       <Route path="/missoes" element={<MissoesPage />} />
       <Route path="/galeria" element={<GaleriaPage />} />
-      <Route path="/perfis" element={<PerfisPage />} />
-      <Route path="/perfis/:usuarioId" element={<PerfisPage />} />
+      <Route
+        path="/perfis"
+        element={
+          <PerfisPage
+            onAlternarClaroEscuro={onAlternarClaroEscuro}
+            categoriasTema={categoriasTema}
+            paletasTema={paletasTema}
+            categoriaAtivaId={categoriaAtivaId}
+            paletaAtivaNome={paletaAtivaNome}
+            onSelecionarCategoria={onSelecionarCategoria}
+            onSelecionarPaleta={onSelecionarPaleta}
+          />
+        }
+      />
+      <Route
+        path="/perfis/:usuarioId"
+        element={
+          <PerfisPage
+            onAlternarClaroEscuro={onAlternarClaroEscuro}
+            categoriasTema={categoriasTema}
+            paletasTema={paletasTema}
+            categoriaAtivaId={categoriaAtivaId}
+            paletaAtivaNome={paletaAtivaNome}
+            onSelecionarCategoria={onSelecionarCategoria}
+            onSelecionarPaleta={onSelecionarPaleta}
+          />
+        }
+      />
       <Route path="/pessoas" element={<PessoasPage />} />
       <Route path="/impacto" element={<ImpactoPage />} />
       <Route path="/dados-nasa" element={<DadosNasaPage />} />

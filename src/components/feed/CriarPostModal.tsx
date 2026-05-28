@@ -17,6 +17,8 @@ const categoriasPorLocal: Record<TipoPerspectiva, TipoCategoriaPost[]> = {
   espaco: ['diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento', 'cidade', 'turismo', 'comunidade', 'clima', 'bioma', 'ods'],
 };
 const opcoesOds: TipoOds[] = ['ODS 2', 'ODS 8', 'ODS 9', 'ODS 11', 'ODS 13'];
+const tamanhoMaximoImagemMb = 4;
+const tamanhoMaximoImagemBytes = tamanhoMaximoImagemMb * 1024 * 1024;
 
 export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarPostModalProps) {
   const { pontosAr, criarPost, criarStatus, usuarioAtual } = useOrbitLink();
@@ -62,8 +64,8 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
       return;
     }
 
-    if (arquivo.size > 1_600_000) {
-      alert('Imagem muito grande. Use uma imagem com ate 1,6 MB.');
+    if (arquivo.size > tamanhoMaximoImagemBytes) {
+      alert(`Imagem muito grande. Use uma imagem com ate ${tamanhoMaximoImagemMb} MB.`);
       return;
     }
 
@@ -141,6 +143,7 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
               <ImagePlus className="h-5 w-5 shrink-0 text-[var(--text-link)]" />
               <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="min-w-0 w-full text-xs text-[var(--text-muted)] file:mb-2 file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--bg-primary)] file:px-3 file:py-2 file:font-bold file:text-[var(--text-primary)] min-[420px]:file:mb-0" />
             </div>
+            <span className="mt-2 block text-xs leading-5 text-[var(--text-muted)]">PNG, JPG ou WebP ate {tamanhoMaximoImagemMb} MB. Fotos muito grandes precisam ser reduzidas antes do envio.</span>
           </label>
           {imagem ? <img src={imagem} alt="Preview da publicacao" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : aba === 'status' ? <div className="flex min-h-48 items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--border-border)] text-[var(--text-muted)]"><Camera className="mr-2 h-5 w-5" /> Preview do status</div> : null}
         </div>
@@ -149,7 +152,7 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
           <label className="block">
             <span className="label-form">Local da publicacao</span>
             <select value={localId} onChange={(evento) => setLocalId(evento.target.value)} className="input-form">
-              {locais.map((local) => <option key={local.id} value={local.id}>{local.nome}</option>)}
+              {locais.map((local) => <option key={local.id} value={local.id}>{local.id === 'local_usuario' ? `Meu local atual - ${local.nome}` : `${local.nome} - ${local.perspectiva === 'terra' ? 'Terra' : 'Espaco'}`}</option>)}
             </select>
           </label>
           {aba === 'post' ? (
@@ -181,7 +184,8 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
             </label>
           )}
           <div className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-3 text-sm leading-6 text-[var(--text-muted)]">
-            {pontoSelecionado ? pontoSelecionado.descricao : `Publicando de ${usuarioAtual?.localizacaoAtual ?? 'Sao Paulo, Brasil'}.`}
+            <p className="font-bold text-[var(--text-text)]">{pontoSelecionado ? pontoSelecionado.nome : 'Meu local atual'}</p>
+            <p>{pontoSelecionado ? pontoSelecionado.descricao : `Publicando de ${usuarioAtual?.localizacaoAtual ?? 'Sao Paulo, Brasil'}. Use os outros locais quando a publicacao estiver conectada a um mark, missao ou ponto AR.`}</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <Botao variante="fantasma" onClick={onFechar} className="flex-1">Cancelar</Botao>

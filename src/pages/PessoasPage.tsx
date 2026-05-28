@@ -24,12 +24,12 @@ export function PessoasPage() {
   return (
     <div className="space-y-5">
       <CardBase>
-        <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Pessoas</p>
-        <h1 className="mt-2 text-4xl font-black uppercase text-[var(--text-text)]">Comunidade Orbitlink</h1>
-        <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-5" placeholder="Buscar pessoas por nome, usuario, cargo, local ou selo..." />
+        <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Pessoas</p>
+        <h1 className="mt-2 text-2xl font-black uppercase leading-tight text-[var(--text-text)] sm:text-4xl">Comunidade Orbitlink</h1>
+        <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-4 rounded-full px-3 py-2 text-xs sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm" placeholder="Buscar pessoas..." />
       </CardBase>
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {pessoas.map((usuario) => <CardPerfil key={usuario.id} usuario={usuario} />)}
       </div>
     </div>

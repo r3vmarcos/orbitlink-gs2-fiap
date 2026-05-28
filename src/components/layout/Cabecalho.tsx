@@ -80,7 +80,7 @@ export function Cabecalho(props: CabecalhoProps) {
           ))}
         </nav>
 
-        <div className="ml-auto">
+        <div className="ml-auto hidden lg:block">
           <MenuTemas {...props} />
         </div>
       </div>

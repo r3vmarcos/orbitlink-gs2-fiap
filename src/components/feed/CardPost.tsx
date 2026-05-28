@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { Badge } from '@/components/ui/Badge';
-import { Botao } from '@/components/ui/Botao';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
 import type { PostOrbitLink } from '@/types/orbitlink.types';
 import { formatarNumeroCompacto, formatarTempoRelativo } from '@/utils/formatadores';
@@ -19,6 +18,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   const { usuarios, pontosAr, postsCurtidos, postsSalvos, curtirPost, salvarPost, excluirPost, comentarPost, compartilharPost } = useOrbitLink();
   const navigate = useNavigate();
   const [comentario, setComentario] = useState('');
+  const [comentariosAbertos, setComentariosAbertos] = useState(false);
   const autor = usuarios.find((usuario) => usuario.id === post.autorId) ?? usuarios[0];
   const ponto = pontosAr.find((pontoAr) => pontoAr.id === post.pontoArId);
   const curtido = postsCurtidos.includes(post.id);
@@ -26,8 +26,10 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   const localPostagem = ponto?.nome ?? autor.localizacaoAtual;
 
   function handleComentario() {
+    if (!comentario.trim()) return;
     comentarPost(post.id, comentario);
     setComentario('');
+    setComentariosAbertos(true);
   }
 
   return (
@@ -62,34 +64,34 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
 
         <div className="flex flex-wrap gap-2">
           <Badge tom="laranja">{localPostagem}</Badge>
-          <Badge>{post.categoria.replaceAll('_', ' ')}</Badge>
+          <Badge>{`#${post.categoria.replaceAll('_', '')}`}</Badge>
           {post.ods.map((ods) => (
-            <Badge key={ods} tom="verde">{ods}</Badge>
+            <Badge key={ods} tom="verde">{`#${ods.replace(' ', '')}`}</Badge>
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-2 min-[420px]:grid-cols-5">
-          <button onClick={() => curtirPost(post.id)} className={`inline-flex min-w-0 items-center justify-center gap-1 rounded-2xl border px-2 py-2 text-[11px] font-bold transition sm:text-xs ${curtido ? 'border-rose-400 bg-rose-500/15 text-rose-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
-            <Heart className="h-4 w-4" /> <span>{formatarNumeroCompacto(post.curtidas + (curtido ? 1 : 0))}</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <button onClick={() => curtirPost(post.id)} className={`inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-full border px-2.5 text-[10px] font-bold transition ${curtido ? 'border-rose-400 bg-rose-500/15 text-rose-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
+            <Heart className="h-3.5 w-3.5" /> <span>{formatarNumeroCompacto(post.curtidas + (curtido ? 1 : 0))}</span>
           </button>
-          <button className="inline-flex min-w-0 items-center justify-center gap-1 rounded-2xl border border-[var(--border-border)] px-2 py-2 text-[11px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)] sm:text-xs">
-            <MessageCircle className="h-4 w-4" /> <span>{formatarNumeroCompacto(post.comentarios.length)}</span>
+          <button onClick={() => setComentariosAbertos((valor) => !valor)} className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-full border border-[var(--border-border)] px-2.5 text-[10px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]">
+            <MessageCircle className="h-3.5 w-3.5" /> <span>{formatarNumeroCompacto(post.comentarios.length)}</span>
           </button>
-          <button onClick={() => compartilharPost(post.id)} className="inline-flex min-w-0 items-center justify-center gap-1 rounded-2xl border border-[var(--border-border)] px-2 py-2 text-[11px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)] sm:text-xs">
-            <Share2 className="h-4 w-4" /> <span>{formatarNumeroCompacto(post.compartilhamentos)}</span>
+          <button onClick={() => compartilharPost(post.id)} className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-full border border-[var(--border-border)] px-2.5 text-[10px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]">
+            <Share2 className="h-3.5 w-3.5" /> <span>{formatarNumeroCompacto(post.compartilhamentos)}</span>
           </button>
-          <button onClick={() => salvarPost(post.id)} className={`inline-flex min-w-0 items-center justify-center gap-1 rounded-2xl border px-2 py-2 text-[11px] font-bold transition sm:text-xs ${salvo ? 'border-amber-400 bg-amber-500/15 text-amber-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
-            <Bookmark className="h-4 w-4" /> <span>Salvar</span>
+          <button onClick={() => salvarPost(post.id)} className={`inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-full border px-2.5 text-[10px] font-bold transition ${salvo ? 'border-amber-400 bg-amber-500/15 text-amber-300' : 'border-[var(--border-border)] text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
+            <Bookmark className="h-3.5 w-3.5" /> <span>Salvar</span>
           </button>
-          <Botao variante="secundario" tamanho="sm" onClick={() => onVerAr(post.pontoArId)} className="w-full">
-            <MapPin className="h-4 w-4" /> AR
-          </Botao>
+          <button onClick={() => onVerAr(post.pontoArId)} className="inline-flex h-9 shrink-0 items-center justify-center gap-1 rounded-full border border-[var(--border-border)] px-2.5 text-[10px] font-bold text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]">
+            <MapPin className="h-3.5 w-3.5" /> AR
+          </button>
         </div>
 
-        {post.comentarios.length > 0 ? (
+        {comentariosAbertos && post.comentarios.length > 0 ? (
           <div className="space-y-2 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
-            {post.comentarios.slice(-3).map((item) => (
-              <p key={item.id} className="text-sm leading-5 text-[var(--text-muted)]">
+            {post.comentarios.slice(-2).map((item) => (
+              <p key={item.id} className="text-xs leading-5 text-[var(--text-muted)]">
                 <strong className="text-[var(--text-text)]">{item.autor}:</strong> {item.texto}
               </p>
             ))}
@@ -97,8 +99,8 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
         ) : null}
 
         <div className="flex gap-2">
-          <input value={comentario} onChange={(evento) => setComentario(evento.target.value)} className="input-form min-w-0 flex-1" placeholder="Comentar neste post..." />
-          <button onClick={handleComentario} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--bg-primary)] text-[var(--text-primary)]">
+          <input value={comentario} onFocus={() => setComentariosAbertos(true)} onChange={(evento) => setComentario(evento.target.value)} className="input-form min-w-0 flex-1 rounded-full px-3 py-2 text-xs" placeholder="Comentar..." />
+          <button onClick={handleComentario} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--bg-primary)] text-[var(--text-primary)]">
             <Send className="h-4 w-4" />
           </button>
         </div>

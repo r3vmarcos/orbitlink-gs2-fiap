@@ -94,6 +94,17 @@ function AppInterno() {
         onAbrirStatus={() => abrirPublicacao('status')}
         onVisualizarStatus={setStatusAberto}
         onAbrirDetalhesPost={setPostDetalhe}
+        onAlternarClaroEscuro={alternarTema}
+        categoriasTema={categoriasDoModo}
+        paletasTema={paletasAtivas}
+        categoriaAtivaId={categoriaAtiva}
+        paletaAtivaNome={temaAtivo.name}
+        onSelecionarCategoria={(id) => {
+          const indice = categoriasDoModo.findIndex((categoria) => categoria.id === id);
+          if (tema === 'dark') setIndiceTemaDark(indice);
+          else setIndiceTemaLight(indice);
+        }}
+        onSelecionarPaleta={(indice) => setIndicePaleta(indice)}
       />
       <CriarPostModal aberto={modalPostAberto} abaInicial={abaPublicacao} onFechar={() => setModalPostAberto(false)} />
       <VisualizadorStatus status={statusAberto} onFechar={() => setStatusAberto(undefined)} onVerAr={handleVerAr} />

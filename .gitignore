@@ -4,3 +4,5 @@ vite-dev.out.log
 vite-dev.err.log
 *.tsbuildinfo
 .env
+.wrangler/
+*.zip

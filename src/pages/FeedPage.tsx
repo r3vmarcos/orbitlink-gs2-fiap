@@ -30,6 +30,10 @@ const anunciosPatrocinio = [
   ['Relogio Passagem ISS', 'Alertas de passagem visivel e clima local no pulso.', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=82'],
 ];
 
+function formatarFiltroFeed(item: TipoCategoriaPost | 'todos') {
+  return `#${item.replaceAll('_', '')}`;
+}
+
 export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPost }: FeedPageProps) {
   const { posts, pontosAr, usuarios } = useOrbitLink();
   const [filtro, setFiltro] = useState<TipoCategoriaPost | 'todos'>('todos');
@@ -128,7 +132,7 @@ function PainelFiltros({ filtro, onFiltro }: { filtro: TipoCategoriaPost | 'todo
       <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
         {filtrosFeed.map((item) => (
           <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] ${filtro === item ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
-            {item.replaceAll('_', ' ')}
+            {formatarFiltroFeed(item)}
           </button>
         ))}
       </div>
@@ -138,18 +142,18 @@ function PainelFiltros({ filtro, onFiltro }: { filtro: TipoCategoriaPost | 'todo
 
 function PainelFeed({ busca, filtro, onBusca, onFiltro }: { busca: string; filtro: TipoCategoriaPost | 'todos'; onBusca: (valor: string) => void; onFiltro: (valor: TipoCategoriaPost | 'todos') => void }) {
   return (
-    <CardBase>
-      <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.1em] text-[var(--text-link)] sm:text-xs sm:tracking-[0.18em]">Orbitlink</p>
-      <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:block">
+    <CardBase className="p-3">
+      <div className="flex items-center gap-3">
         <div className="min-w-0">
-          <h1 className="text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl lg:text-4xl">Orbifeed</h1>
+          <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.1em] text-[var(--text-link)]">Orbitlink</p>
+          <h1 className="text-2xl font-black uppercase leading-tight text-[var(--text-text)]">Orbifeed</h1>
         </div>
+        <input value={busca} onChange={(evento) => onBusca(evento.target.value)} className="input-form min-w-0 flex-1 rounded-full px-3 py-2 text-xs" placeholder="Buscar..." />
       </div>
-      <input value={busca} onChange={(evento) => onBusca(evento.target.value)} className="input-form mt-5" placeholder="Buscar em posts, pessoas, locais, pontos AR ou ODS..." />
-      <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
+      <div className="mt-3 flex max-w-full gap-3 overflow-x-auto pb-1">
         {filtrosFeed.map((item) => (
-          <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] ${filtro === item ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
-            {item.replaceAll('_', ' ')}
+          <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 border-b-2 px-0.5 pb-1 font-monoapp text-[11px] font-black uppercase tracking-[0.02em] ${filtro === item ? 'border-[var(--bg-primary)] text-[var(--text-link)]' : 'border-transparent text-[var(--text-muted)]'}`}>
+            {formatarFiltroFeed(item)}
           </button>
         ))}
       </div>
