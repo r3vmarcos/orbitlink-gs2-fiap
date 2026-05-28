@@ -27,7 +27,7 @@ export function PessoasPage() {
       <CardBase>
         <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Pessoas</p>
         <h1 className="mt-2 text-2xl font-black uppercase leading-tight text-[var(--text-text)] sm:text-4xl">Comunidade Orbitlink</h1>
-        <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-4 rounded-full px-3 py-2 text-xs sm:rounded-2xl sm:px-4 sm:py-3 sm:text-sm" placeholder="Buscar pessoas..." />
+        <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-4 max-w-xs rounded-full px-3 py-2 text-xs md:w-1/4" placeholder="Buscar pessoas..." />
       </CardBase>
 
       <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">

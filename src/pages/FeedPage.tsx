@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ListaUltimosChats } from '@/components/chats/ListaUltimosChats';
 import { CardPost } from '@/components/feed/CardPost';
@@ -15,6 +15,7 @@ interface FeedPageProps {
   onAbrirDetalhesPost: (post: PostOrbitLink) => void;
 }
 
+const TAMANHO_LOTE_POSTS = 10;
 const filtrosFeed: Array<TipoCategoriaPost | 'todos'> = ['todos', 'diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento', 'cidade', 'turismo', 'comunidade', 'clima', 'bioma', 'ods'];
 const anunciosPatrocinio = [
   ['Smartphone Astro X', 'Câmera noturna, giroscópio preciso e tela de alto brilho.', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=82'],
@@ -35,16 +36,28 @@ function formatarFiltroFeed(item: TipoCategoriaPost | 'todos') {
   return `#${item.replaceAll('_', '')}`;
 }
 
-export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPost }: FeedPageProps) {
+export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPost }: FeedPageProps) {
   const { posts, pontosAr, usuarios } = useOrbitLink();
   const [filtro, setFiltro] = useState<TipoCategoriaPost | 'todos'>('todos');
   const [busca, setBusca] = useState('');
+  const [limitePosts, setLimitePosts] = useState(TAMANHO_LOTE_POSTS);
+  const sentinelaRef = useRef<HTMLDivElement | null>(null);
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const pontoFiltro = params.get('ponto');
 
   const postsFiltrados = useMemo(() => {
+    const idsExibidos = new Set<string>();
+
     return posts
+      .filter((post) => {
+        if (idsExibidos.has(post.id)) {
+          return false;
+        }
+
+        idsExibidos.add(post.id);
+        return true;
+      })
       .filter((post) => !pontoFiltro || post.pontoArId === pontoFiltro)
       .filter((post) => filtro === 'todos' || post.categoria === filtro)
       .filter((post) => {
@@ -56,108 +69,118 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
       .sort((a, b) => new Date(b.criadoEm).getTime() - new Date(a.criadoEm).getTime());
   }, [busca, filtro, pontoFiltro, pontosAr, posts, usuarios]);
 
+  const postsVisiveis = useMemo(() => postsFiltrados.slice(0, limitePosts), [limitePosts, postsFiltrados]);
+
+  useEffect(() => {
+    setLimitePosts(TAMANHO_LOTE_POSTS);
+  }, [busca, filtro, pontoFiltro]);
+
+  useEffect(() => {
+    const sentinela = sentinelaRef.current;
+
+    if (!sentinela) {
+      return undefined;
+    }
+
+    const observador = new IntersectionObserver((entradas) => {
+      const chegouPertoDoFim = entradas.some((entrada) => entrada.isIntersecting);
+
+      if (chegouPertoDoFim) {
+        setLimitePosts((valorAtual) => Math.min(valorAtual + TAMANHO_LOTE_POSTS, postsFiltrados.length));
+      }
+    }, { rootMargin: '420px 0px' });
+
+    observador.observe(sentinela);
+
+    return () => observador.disconnect();
+  }, [postsFiltrados.length]);
+
   function handleVerAr(pontoId?: string) {
     const query = pontoId ? `?ponto=${pontoId}` : '';
     navigate(`/dualview-ar${query}`);
   }
 
-  const marksRecomendados = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === 'terra').slice(0, 10), [pontosAr]);
+  const marksRecomendados = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === 'terra').slice(0, 8), [pontosAr]);
   const anunciosVisiveis = useMemo(() => {
     const inicio = Math.floor(Math.random() * anunciosPatrocinio.length);
-    return Array.from({ length: 3 }, (_, indice) => anunciosPatrocinio[(inicio + indice) % anunciosPatrocinio.length]);
+    return Array.from({ length: 2 }, (_, indice) => anunciosPatrocinio[(inicio + indice) % anunciosPatrocinio.length]);
   }, []);
 
   return (
-    <div className="grid w-full min-w-0 gap-5 md:grid-cols-[230px_minmax(0,1fr)_230px] lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
-      <aside className="hidden min-w-0 space-y-5 md:sticky md:top-20 md:block md:h-[calc(100dvh-6rem)] md:overflow-y-auto md:pr-1">
-        <PainelFiltros filtro={filtro} onFiltro={setFiltro} />
-        <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
-        <ListaUltimosChats />
-      </aside>
+    <div className="space-y-4">
+      <PainelFiltros filtro={filtro} onFiltro={setFiltro} />
 
-      <div className="min-w-0 space-y-5 md:col-start-2 md:h-[calc(100dvh-6rem)] md:overflow-y-auto md:pr-1">
-        <div className="md:hidden">
-          <PainelFeed busca={busca} filtro={filtro} onBusca={setBusca} onFiltro={setFiltro} />
-        </div>
-
-        <div className="md:hidden">
-          <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
-        </div>
-
-        <CardBase className="hidden md:block">
-          <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form" placeholder="Buscar em posts, pessoas, locais, pontos AR ou ODS..." />
-        </CardBase>
-
-        <div className="space-y-5">
-          {postsFiltrados.map((post) => <CardPost key={post.id} post={post} onVerAr={handleVerAr} onAbrirDetalhes={onAbrirDetalhesPost} />)}
-          {postsFiltrados.length === 0 ? <CardBase>Nenhuma publicação encontrada para a busca atual.</CardBase> : null}
-        </div>
-      </div>
-
-      <aside className="hidden min-w-0 space-y-5 md:sticky md:top-20 md:block md:h-[calc(100dvh-6rem)] md:overflow-y-auto md:pl-1">
-        <CardBase>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocínio</p>
-          <div className="mt-4 space-y-3">
-            {anunciosVisiveis.map(([produto, texto, imagem]) => (
-              <div key={produto} className="flex gap-3 overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-2">
-                <img src={imagem} alt={produto} className="h-16 w-16 shrink-0 rounded-xl object-cover" />
-                <div className="min-w-0 py-1">
-                  <p className="text-sm font-black text-[var(--text-text)]">{produto}</p>
-                  <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">{texto}</p>
-                </div>
-              </div>
-            ))}
+      <div className="grid w-full min-w-0 gap-5 md:grid-cols-[230px_minmax(0,1fr)_230px] lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
+        <aside className="hidden min-h-0 min-w-0 grid-rows-[auto_1fr_auto] gap-4 md:grid md:h-[calc(100dvh-7.5rem)]">
+          <CardBase className="p-3">
+            <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form rounded-full px-3 py-2 text-xs" placeholder="Buscar..." />
+          </CardBase>
+          <div className="min-h-0">
+            <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
           </div>
-        </CardBase>
-        <CardBase>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Marks recomendados</p>
-          <div className="pausar-animacao mt-4 h-[168px] overflow-hidden">
-            <div className="animacao-lista-vertical space-y-2">
-              {[...marksRecomendados, ...marksRecomendados].map((ponto, indice) => (
-                <button key={`${ponto.id}_${indice}`} onClick={() => handleVerAr(ponto.id)} className="h-12 w-full rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] px-4 py-3 text-left text-sm font-bold text-[var(--text-text)] hover:bg-[var(--bg-surface-hover)]">
+          <ListaUltimosChats />
+        </aside>
+
+        <div className="min-w-0 space-y-5 md:col-start-2 md:h-[calc(100dvh-7.5rem)] md:overflow-y-auto md:pr-1">
+          <div className="md:hidden">
+            <CardBase className="p-3">
+              <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form rounded-full px-3 py-2 text-xs" placeholder="Buscar..." />
+            </CardBase>
+          </div>
+
+          <div className="md:hidden">
+            <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
+          </div>
+
+          <div className="space-y-5">
+            {postsVisiveis.map((post) => <CardPost key={post.id} post={post} onVerAr={handleVerAr} onAbrirDetalhes={onAbrirDetalhesPost} />)}
+            {postsFiltrados.length === 0 ? <CardBase>Nenhuma publicação encontrada para a busca atual.</CardBase> : null}
+            <div ref={sentinelaRef} className="h-8" />
+          </div>
+        </div>
+
+        <aside className="hidden min-h-0 min-w-0 grid-rows-[1fr_auto] gap-4 md:grid md:h-[calc(100dvh-7.5rem)]">
+          <CardBase className="min-h-0 overflow-hidden">
+            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocínio</p>
+            <div className="mt-4 space-y-3">
+              {anunciosVisiveis.map(([produto, texto, imagem]) => (
+                <div key={produto} className="flex gap-3 overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-2">
+                  <img src={imagem} alt={produto} className="h-16 w-16 shrink-0 rounded-xl object-cover" loading="lazy" />
+                  <div className="min-w-0 py-1">
+                    <p className="text-sm font-black text-[var(--text-text)]">{produto}</p>
+                    <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">{texto}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardBase>
+          <CardBase>
+            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Marks recomendados</p>
+            <div className="mt-4 grid gap-2">
+              {marksRecomendados.slice(0, 5).map((ponto) => (
+                <button key={ponto.id} onClick={() => handleVerAr(ponto.id)} className="h-10 w-full rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] px-3 text-left text-xs font-bold text-[var(--text-text)] hover:bg-[var(--bg-surface-hover)]">
                   {ponto.nome}
                 </button>
               ))}
             </div>
-          </div>
-        </CardBase>
-      </aside>
+          </CardBase>
+        </aside>
+      </div>
     </div>
   );
 }
 
 function PainelFiltros({ filtro, onFiltro }: { filtro: TipoCategoriaPost | 'todos'; onFiltro: (valor: TipoCategoriaPost | 'todos') => void }) {
   return (
-    <CardBase>
-      <h1 className="text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl lg:text-4xl">Orbifeed</h1>
-      <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
+    <section className="relative left-1/2 w-screen -translate-x-1/2 border-y border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_90%,transparent)] px-3 py-2 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1440px] gap-2 overflow-x-auto px-2 pb-1">
         {filtrosFeed.map((item) => (
           <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] ${filtro === item ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
             {formatarFiltroFeed(item)}
           </button>
         ))}
       </div>
-    </CardBase>
-  );
-}
-
-function PainelFeed({ busca, filtro, onBusca, onFiltro }: { busca: string; filtro: TipoCategoriaPost | 'todos'; onBusca: (valor: string) => void; onFiltro: (valor: TipoCategoriaPost | 'todos') => void }) {
-  return (
-    <CardBase className="p-3">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0">
-          <h1 className="text-2xl font-black uppercase leading-tight text-[var(--text-text)]">Orbifeed</h1>
-        </div>
-        <input value={busca} onChange={(evento) => onBusca(evento.target.value)} className="input-form min-w-0 flex-1 rounded-full px-3 py-2 text-xs" placeholder="Buscar..." />
-      </div>
-      <div className="mt-3 flex max-w-full gap-3 overflow-x-auto pb-1">
-        {filtrosFeed.map((item) => (
-          <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 border-b-2 px-0.5 pb-1 font-monoapp text-[11px] font-black uppercase tracking-[0.02em] ${filtro === item ? 'border-[var(--bg-primary)] text-[var(--text-link)]' : 'border-transparent text-[var(--text-muted)]'}`}>
-            {formatarFiltroFeed(item)}
-          </button>
-        ))}
-      </div>
-    </CardBase>
+    </section>
   );
 }
 /* === FEED PAGE | fim === */

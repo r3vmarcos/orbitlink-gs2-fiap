@@ -1,6 +1,8 @@
 import { Camera, UserPlus } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Botao } from '@/components/ui/Botao';
+import { Modal } from '@/components/ui/Modal';
 import type { UsuarioOrbitLink } from '@/types/orbitlink.types';
 import { formatarNumeroCompacto } from '@/utils/formatadores';
 
@@ -8,6 +10,11 @@ import { formatarNumeroCompacto } from '@/utils/formatadores';
 export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuario: UsuarioOrbitLink; destaque?: boolean; onAlterarFoto?: (foto: string) => void }) {
   const foto = usuario.fotoPerfil ?? `https://i.pravatar.cc/240?u=${usuario.id}`;
   const bio = criarBioUsuario(usuario);
+  const [modalConquistasAberto, setModalConquistasAberto] = useState(false);
+  const [conquistasAtivas, setConquistasAtivas] = useState<string[]>(usuario.conquistas);
+  const conquistasSelecionadas = useMemo(() => usuario.conquistas.filter((conquista) => conquistasAtivas.includes(conquista)), [conquistasAtivas, usuario.conquistas]);
+  const conquistasVisiveis = conquistasSelecionadas.slice(0, 3);
+  const quantidadeOculta = Math.max(0, conquistasSelecionadas.length - conquistasVisiveis.length);
 
   function handleFoto(arquivo?: File) {
     if (!arquivo || !onAlterarFoto) return;
@@ -20,7 +27,7 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
     <article className={`max-w-full overflow-hidden rounded-[1.5rem] border bg-slate-950/68 p-4 backdrop-blur-xl light-theme:bg-white/78 sm:p-5 ${destaque ? 'border-[var(--border-focus)] shadow-neon' : 'border-blue-500/35 light-theme:border-sky-200'}`}>
       <div className="flex items-center gap-4">
         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-[var(--border-border)]">
-          <img src={foto} alt={usuario.nome} className="h-full w-full object-cover" />
+          <img src={foto} alt={usuario.nome} className="h-full w-full object-cover" loading="lazy" />
           {onAlterarFoto ? (
             <label className="absolute inset-x-0 bottom-0 flex cursor-pointer items-center justify-center bg-black/55 py-1 text-white">
               <Camera className="h-3.5 w-3.5" />
@@ -45,8 +52,13 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
           <p className="truncate font-monoapp text-[9px] uppercase tracking-[0.08em] text-blue-300">posts</p>
         </div>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {usuario.conquistas.map((conquista) => <Badge key={conquista} tom="roxo">{conquista}</Badge>)}
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {conquistasVisiveis.map((conquista) => <Badge key={conquista} tom="roxo">{conquista}</Badge>)}
+        {quantidadeOculta > 0 ? (
+          <button onClick={() => setModalConquistasAberto(true)} className="rounded-full border border-[var(--border-border)] px-3 py-1.5 text-xs font-black text-[var(--text-link)]">
+            + mais {quantidadeOculta}
+          </button>
+        ) : null}
       </div>
       {destaque ? (
         <div className="mt-4 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3 text-xs leading-5 text-[var(--text-muted)]">
@@ -56,6 +68,22 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
         </div>
       ) : null}
       {!destaque ? <Botao className="mt-4 w-full" variante="secundario"><UserPlus className="h-4 w-4" /> Seguir</Botao> : null}
+
+      <Modal aberto={modalConquistasAberto} titulo="Conquistas do perfil" onFechar={() => setModalConquistasAberto(false)}>
+        <div className="grid gap-2">
+          {usuario.conquistas.map((conquista) => (
+            <label key={conquista} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3 text-sm font-bold text-[var(--text-text)]">
+              <input
+                type="checkbox"
+                checked={conquistasAtivas.includes(conquista)}
+                onChange={() => setConquistasAtivas((atuais) => atuais.includes(conquista) ? atuais.filter((item) => item !== conquista) : [...atuais, conquista])}
+                className="h-4 w-4 accent-[var(--bg-primary)]"
+              />
+              {conquista}
+            </label>
+          ))}
+        </div>
+      </Modal>
     </article>
   );
 }

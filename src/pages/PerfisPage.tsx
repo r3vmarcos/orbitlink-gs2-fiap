@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Moon, Sun } from 'lucide-react';
+import { ChevronDown, Moon, Sun } from 'lucide-react';
 import { CardPerfil } from '@/components/perfis/CardPerfil';
 import { CardBase } from '@/components/ui/CardBase';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
@@ -22,6 +22,7 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
   const { usuarios, usuarioAtual, posts, tema } = useOrbitLink();
   const { usuarioId } = useParams();
   const [fotosLocais, setFotosLocais] = useState<Record<string, string>>(() => lerLocalStorage('orbitlink_fotos_perfil', {}));
+  const [menuTemaAberto, setMenuTemaAberto] = useState<'dark' | 'light' | undefined>();
   const usuarioFocoId = usuarioId ?? usuarioAtual?.id;
 
   const usuariosComFoto = useMemo(() => usuarios.map((usuario) => ({
@@ -40,8 +41,19 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
     salvarLocalStorage('orbitlink_fotos_perfil', proximo);
   }
 
+  function selecionarTema(id: CategoriaTemaId) {
+    const modoSelecionado = id.startsWith('dark') ? 'dark' : 'light';
+
+    if (tema !== modoSelecionado) {
+      onAlternarClaroEscuro();
+    }
+
+    onSelecionarCategoria(id);
+    setMenuTemaAberto(undefined);
+  }
+
   return (
-    <div className="mx-auto w-full max-w-md space-y-5 md:max-w-xl lg:max-w-3xl">
+    <div className="mx-auto w-full max-w-md space-y-5 overflow-hidden md:max-w-xl lg:max-w-3xl">
       <CardBase>
         <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
         <h1 className="mt-2 text-4xl font-black uppercase text-white light-theme:text-sky-950">Meu perfil</h1>
@@ -56,10 +68,10 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
           />
         ))}
       </div>
-      <CardBase>
+      <CardBase className="max-w-full overflow-hidden">
         <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Personalização</p>
-        <div className="mt-4 grid gap-4">
-          <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
+        <div className="mt-4 grid min-w-0 gap-4">
+          <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
             <div className="min-w-0">
               <p className="text-sm font-black text-[var(--text-text)]">Modo visual</p>
               <p className="text-xs text-[var(--text-muted)]">{tema === 'dark' ? 'Escuro ativo' : 'Claro ativo'}</p>
@@ -69,17 +81,19 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
             </button>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <p className="label-form">Tema</p>
-            <LinhaTemas categorias={categoriasDark} categoriaAtivaId={categoriaAtivaId} onSelecionarCategoria={onSelecionarCategoria} />
-            <LinhaTemas categorias={categoriasLight} categoriaAtivaId={categoriaAtivaId} onSelecionarCategoria={onSelecionarCategoria} />
+            <div className="grid min-w-0 gap-2">
+              <MenuSuspensoTema rotulo="Dark" aberto={menuTemaAberto === 'dark'} categorias={categoriasDark} categoriaAtivaId={categoriaAtivaId} onAlternar={() => setMenuTemaAberto((valor) => valor === 'dark' ? undefined : 'dark')} onSelecionar={selecionarTema} />
+              <MenuSuspensoTema rotulo="Light" aberto={menuTemaAberto === 'light'} categorias={categoriasLight} categoriaAtivaId={categoriaAtivaId} onAlternar={() => setMenuTemaAberto((valor) => valor === 'light' ? undefined : 'light')} onSelecionar={selecionarTema} />
+            </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <p className="label-form">Paleta</p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-2 gap-2">
               {paletasTema.map((paleta, indice) => (
-                <button key={paleta.name} onClick={() => onSelecionarPaleta(indice)} className={`flex min-w-0 items-center gap-2 rounded-2xl border px-3 py-2 text-left text-xs font-bold ${paleta.name === paletaAtivaNome ? 'border-[var(--bg-primary)] bg-[color-mix(in_srgb,var(--bg-primary)_14%,transparent)] text-[var(--text-text)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+                <button key={paleta.name} onClick={() => onSelecionarPaleta(indice)} className={`flex min-w-0 items-center gap-2 rounded-2xl border px-2 py-2 text-left text-[11px] font-bold ${paleta.name === paletaAtivaNome ? 'border-[var(--bg-primary)] bg-[color-mix(in_srgb,var(--bg-primary)_14%,transparent)] text-[var(--text-text)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
                   <span className="h-4 w-4 shrink-0 rounded-full border border-[var(--border-border)]" style={{ backgroundColor: paleta.accent }} />
                   <span className="truncate">{paleta.name}</span>
                 </button>
@@ -101,14 +115,27 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
   );
 }
 
-function LinhaTemas({ categorias, categoriaAtivaId, onSelecionarCategoria }: { categorias: Array<{ id: CategoriaTemaId; nome: string }>; categoriaAtivaId: CategoriaTemaId; onSelecionarCategoria: (id: CategoriaTemaId) => void }) {
+function MenuSuspensoTema({ rotulo, aberto, categorias, categoriaAtivaId, onAlternar, onSelecionar }: { rotulo: string; aberto: boolean; categorias: Array<{ id: CategoriaTemaId; nome: string }>; categoriaAtivaId: CategoriaTemaId; onAlternar: () => void; onSelecionar: (id: CategoriaTemaId) => void }) {
+  const categoriaAtiva = categorias.find((categoria) => categoria.id === categoriaAtivaId);
+
   return (
-    <div className="mb-2 flex gap-2 overflow-x-auto pb-1">
-      {categorias.map((categoria) => (
-        <button key={categoria.id} onClick={() => onSelecionarCategoria(categoria.id)} className={`shrink-0 rounded-full border px-3 py-2 text-xs font-bold ${categoria.id === categoriaAtivaId ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
-          {categoria.nome}
-        </button>
-      ))}
+    <div className="min-w-0 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)]">
+      <button onClick={onAlternar} className="flex w-full min-w-0 items-center justify-between gap-2 px-3 py-2 text-left">
+        <span className="min-w-0">
+          <span className="block font-monoapp text-[10px] font-black uppercase text-[var(--text-link)]">{rotulo}</span>
+          <span className="block truncate text-sm font-bold text-[var(--text-text)]">{categoriaAtiva?.nome ?? `Escolher ${rotulo}`}</span>
+        </span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-[var(--text-link)] transition ${aberto ? 'rotate-180' : ''}`} />
+      </button>
+      {aberto ? (
+        <div className="grid gap-1 border-t border-[var(--border-border)] p-2">
+          {categorias.map((categoria) => (
+            <button key={categoria.id} onClick={() => onSelecionar(categoria.id)} className={`rounded-xl px-3 py-2 text-left text-xs font-bold ${categoria.id === categoriaAtivaId ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
+              {categoria.nome}
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
