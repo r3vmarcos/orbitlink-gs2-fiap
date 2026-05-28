@@ -78,7 +78,7 @@ export function Cabecalho(props: CabecalhoProps) {
           <MenuTemas {...props} />
         </div>
 
-        <nav className="order-2 grid grid-cols-5 gap-1 md:order-none md:ml-auto md:flex md:flex-1 md:items-center md:justify-center md:gap-2">
+        <nav className="order-2 hidden grid-cols-5 gap-1 md:order-none md:ml-auto md:flex md:flex-1 md:items-center md:justify-center md:gap-2">
           {linksAntesPost.map((link) => (
             <NavLink
               key={link.to}
