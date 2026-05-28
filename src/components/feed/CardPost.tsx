@@ -44,7 +44,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
           <p className="truncate text-[11px] font-semibold text-[var(--text-muted)] sm:hidden">{localPostagem}</p>
         </div>
         {post.criadoPeloUsuario ? (
-          <button aria-label="Excluir publicacao" onClick={() => excluirPost(post.id)} className="rounded-xl p-2 text-rose-300 hover:bg-rose-500/10">
+          <button aria-label="Excluir publicação" onClick={() => excluirPost(post.id)} className="rounded-xl p-2 text-rose-300 hover:bg-rose-500/10">
             <Trash2 className="h-4 w-4" />
           </button>
         ) : null}

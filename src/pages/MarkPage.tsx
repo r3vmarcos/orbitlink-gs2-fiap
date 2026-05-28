@@ -24,7 +24,7 @@ export function MarkPage({ onAbrirDetalhesPost }: { onAbrirDetalhesPost: (post: 
         {ponto ? <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{ponto.descricao}</p> : null}
       </CardBase>
       {postsDoPonto.map((post) => <CardPost key={post.id} post={post} onVerAr={handleVerAr} onAbrirDetalhes={onAbrirDetalhesPost} />)}
-      {postsDoPonto.length === 0 ? <CardBase>Nenhuma publicacao vinculada a este mark.</CardBase> : null}
+      {postsDoPonto.length === 0 ? <CardBase>Nenhuma publicação vinculada a este mark.</CardBase> : null}
     </div>
   );
 }

@@ -1,22 +1,22 @@
 # Orbitlink
 
-Rede social espacial criada para a Global Solution - Industria Espacial.
+Rede social espacial criada para a Global Solution - Indústria Espacial.
 
 ![React](https://img.shields.io/badge/React-TSX-61DAFB?style=flat-square)
 ![Vite](https://img.shields.io/badge/Vite-Dev-646CFF?style=flat-square)
 ![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38BDF8?style=flat-square)
 ![NASA](https://img.shields.io/badge/NASA-APIs-0B3D91?style=flat-square)
 
-## Visao geral
+## Visão geral
 
-A Orbitlink usa um feed unico: todos os usuarios veem publicacoes da Terra e do ceu no mesmo Orbifeed.
+A Orbitlink usa um feed único: todos os usuários veem publicações da Terra e do céu no mesmo Orbifeed.
 
-A diferenca acontece na postagem. Ao publicar, o usuario informa onde esta:
+A diferença acontece na postagem. Ao publicar, o usuário informa onde está:
 
 01 - Estou na Terra.  
-02 - Estou no ceu.
+02 - Estou no céu.
 
-Essa informacao aparece no card da publicacao como contexto social.
+Essa informação aparece no card da publicação como contexto social.
 
 ## Stack
 
@@ -45,26 +45,26 @@ http://SEU-IP:5191
 
 ## Banco local
 
-A versao atual usa `localStorage`.
+A versão atual usa `localStorage`.
 
-01 - Usuarios criados ficam no navegador.  
+01 - Usuários criados ficam no navegador.  
 02 - Posts criados ficam no navegador.  
 03 - Status 24h ficam no navegador.  
-04 - Curtidas, salvos, comentarios e compartilhamentos ficam no navegador.  
+04 - Curtidas, salvos, comentários e compartilhamentos ficam no navegador.  
 05 - APIs NASA possuem fallback local/simulado.
 
 ## Fluxo
 
 01 - Entrar ou criar cadastro local.  
 02 - Abrir o Orbifeed.  
-03 - Ver publicacoes de todos.  
-04 - Criar post escolhendo se esta na Terra ou no ceu.  
+03 - Ver publicações de todos.  
+04 - Criar post escolhendo se está na Terra ou no céu.  
 05 - Criar Status Orbitlink 24h.  
-06 - Abrir DualView AR com camada unica.  
-07 - Clicar em marks da Terra e do ceu.  
+06 - Abrir DualView AR com camada única.  
+07 - Clicar em marks da Terra e do céu.  
 08 - Sincronizar APIs NASA quando desejar.
 
-## Validacao
+## Validação
 
 ```bash
 npm run build

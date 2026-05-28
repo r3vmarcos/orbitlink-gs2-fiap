@@ -62,15 +62,15 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
 
 function criarBioUsuario(usuario: UsuarioOrbitLink) {
   const bios: Record<string, string> = {
-    astronauta: 'Compartilha rotina orbital, bastidores de missao e registros para aproximar ciencia espacial da comunidade.',
-    cientista: 'Transforma dados de clima, satelites e observacao terrestre em publicacoes simples para o Orbifeed.',
-    turista_espacial: 'Registra experiencias de viagem, pontos turisticos e a sensacao de ver a Terra por outro angulo.',
-    comunidade_terra: 'Leva relatos locais, fotos e alertas ambientais para conectar a superficie com quem observa do espaco.',
-    observador_terra: 'Acompanha o ceu, passagens orbitais e eventos astronomicos para alimentar os marks em tempo real.',
-    estacao_espacial: 'Perfil institucional com status, diarios tecnicos e atualizacoes de infraestrutura orbital.',
-    missao: 'Central de comunicacao de uma missao ativa, reunindo objetivos, tripulacao e marcos de exploracao.',
+    astronauta: 'Compartilha rotina orbital, bastidores de missão e registros para aproximar ciência espacial da comunidade.',
+    cientista: 'Transforma dados de clima, satélites e observação terrestre em publicações simples para o Orbifeed.',
+    turista_espacial: 'Registra experiências de viagem, pontos turísticos e a sensação de ver a Terra por outro ângulo.',
+    comunidade_terra: 'Leva relatos locais, fotos e alertas ambientais para conectar a superfície com quem observa do espaço.',
+    observador_terra: 'Acompanha o céu, passagens orbitais e eventos astronômicos para alimentar os marks em tempo real.',
+    estacao_espacial: 'Perfil institucional com status, diários técnicos e atualizações de infraestrutura orbital.',
+    missao: 'Central de comunicação de uma missão ativa, reunindo objetivos, tripulação e marcos de exploração.',
   };
 
-  return bios[usuario.tipo] ?? 'Participante Orbitlink com publicacoes conectadas a Terra, ceu e dados espaciais.';
+  return bios[usuario.tipo] ?? 'Participante Orbitlink com publicações conectadas à Terra, ao céu e a dados espaciais.';
 }
 /* === CARD PERFIL | fim === */

@@ -16,18 +16,18 @@ interface FeedPageProps {
 
 const filtrosFeed: Array<TipoCategoriaPost | 'todos'> = ['todos', 'diario_orbital', 'missao', 'estacao', 'lua', 'satelite', 'evento', 'cidade', 'turismo', 'comunidade', 'clima', 'bioma', 'ods'];
 const anunciosPatrocinio = [
-  ['Smartphone Astro X', 'Camera noturna, giroscopio preciso e tela de alto brilho.', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=82'],
-  ['Telescopio Nebula 90', 'Lente compacta para observacao lunar e planetaria.', 'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=700&q=82'],
-  ['Tripe SkyLock', 'Estabilizacao para fotos do ceu e transmissao ao vivo.', 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=82'],
-  ['Binoculo Cosmos 12x', 'Leve para observacao de constelacoes, Lua e passagens orbitais.', 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=82'],
-  ['Camera Aurora Mini', 'Sensor amplo para timelapse noturno e registros de meteoros.', 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=82'],
+  ['Smartphone Astro X', 'Câmera noturna, giroscópio preciso e tela de alto brilho.', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=700&q=82'],
+  ['Telescópio Nebula 90', 'Lente compacta para observação lunar e planetária.', 'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?auto=format&fit=crop&w=700&q=82'],
+  ['Tripé SkyLock', 'Estabilização para fotos do céu e transmissão ao vivo.', 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=82'],
+  ['Binóculo Cosmos 12x', 'Leve para observação de constelações, Lua e passagens orbitais.', 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=700&q=82'],
+  ['Câmera Aurora Mini', 'Sensor amplo para timelapse noturno e registros de meteoros.', 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=700&q=82'],
   ['Mochila Orbital Pro', 'Compartimentos para lente, power bank e suporte de campo.', 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=700&q=82'],
-  ['Power Bank Gaia', 'Energia extra para noites longas de observacao e transmissao.', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=700&q=82'],
-  ['Notebook Mission 14', 'Tela calibrada e GPU leve para mapas, fotos e simulacoes.', 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=82'],
-  ['Lente Lunar Clip', 'Acessorio para aproximar fotos da Lua direto no smartphone.', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=82'],
-  ['Cadeira Campo Zero-G', 'Conforto para observar o ceu por horas sem cansar.', 'https://images.unsplash.com/photo-1470145318698-cb03732f5ddf?auto=format&fit=crop&w=700&q=82'],
-  ['Kit Limpeza Optica', 'Panos, soprador e estojo para lentes e telescopios.', 'https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=700&q=82'],
-  ['Relogio Passagem ISS', 'Alertas de passagem visivel e clima local no pulso.', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=82'],
+  ['Power Bank Gaia', 'Energia extra para noites longas de observação e transmissão.', 'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?auto=format&fit=crop&w=700&q=82'],
+  ['Notebook Mission 14', 'Tela calibrada e GPU leve para mapas, fotos e simulações.', 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=700&q=82'],
+  ['Lente Lunar Clip', 'Acessório para aproximar fotos da Lua direto no smartphone.', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=82'],
+  ['Cadeira Campo Zero-G', 'Conforto para observar o céu por horas sem cansar.', 'https://images.unsplash.com/photo-1470145318698-cb03732f5ddf?auto=format&fit=crop&w=700&q=82'],
+  ['Kit Limpeza Óptica', 'Panos, soprador e estojo para lentes e telescópios.', 'https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=700&q=82'],
+  ['Relógio Passagem ISS', 'Alertas de passagem visível e clima local no pulso.', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=700&q=82'],
 ];
 
 function formatarFiltroFeed(item: TipoCategoriaPost | 'todos') {
@@ -88,7 +88,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
 
         <div className="space-y-5">
           {postsFiltrados.map((post) => <CardPost key={post.id} post={post} onVerAr={handleVerAr} onAbrirDetalhes={onAbrirDetalhesPost} />)}
-          {postsFiltrados.length === 0 ? <CardBase>Nenhuma publicacao encontrada para a busca atual.</CardBase> : null}
+          {postsFiltrados.length === 0 ? <CardBase>Nenhuma publicação encontrada para a busca atual.</CardBase> : null}
         </div>
       </div>
 

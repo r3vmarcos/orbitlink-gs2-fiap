@@ -75,7 +75,7 @@ export function CriarStatusModal({ aberto, onFechar }: CriarStatusModalProps) {
             <span className="label-form">Imagem opcional</span>
             <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="min-w-0 w-full rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3 text-xs text-[var(--text-muted)] file:mb-2 file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--bg-primary)] file:px-3 file:py-2 file:font-bold file:text-[var(--text-primary)] min-[420px]:file:mb-0" />
           </label>
-          {imagem ? <img src={imagem} alt="Preview do status" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : <div className="flex min-h-48 items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--border-border)] text-[var(--text-muted)]"><Camera className="mr-2 h-5 w-5" /> Preview do status</div>}
+          {imagem ? <img src={imagem} alt="Prévia do status" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : <div className="flex min-h-48 items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--border-border)] text-[var(--text-muted)]"><Camera className="mr-2 h-5 w-5" /> Prévia do status</div>}
         </div>
 
         <div className="space-y-4 rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-muted)] p-4">

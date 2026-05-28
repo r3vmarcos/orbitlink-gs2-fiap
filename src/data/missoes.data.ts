@@ -1,6 +1,6 @@
 import type { MissaoOrbitLink } from '@/types/orbitlink.types';
 
-/* === MISSOES SIMULADAS | inicio === */
+/* === MISSÕES SIMULADAS | inicio === */
 export const missoesData: MissaoOrbitLink[] = [
   {
     id: 'missao_aurora',
@@ -13,9 +13,9 @@ export const missoesData: MissaoOrbitLink[] = [
     ods: ['ODS 9', 'ODS 13'],
     pontoArId: 'aurora',
     linhaTempo: [
-      { id: 'm1', data: 'D-7', titulo: 'Preparação da transmissão', descricao: 'Testes do canal social e status orbital.' },
-      { id: 'm2', data: 'Hoje', titulo: 'Passagem sobre América do Sul', descricao: 'Posts e marks vinculados ao Brasil.' },
-      { id: 'm3', data: 'D+2', titulo: 'Sessão perguntas da Terra', descricao: 'Usuários enviam perguntas pelo feed.' },
+      { id: 'm1', data: 'D-7', titulo: 'Preparação da transmissão', descricao: 'Testes do canal social e do status orbital.' },
+      { id: 'm2', data: 'Hoje', titulo: 'Passagem sobre a América do Sul', descricao: 'Posts e marks vinculados ao Brasil.' },
+      { id: 'm3', data: 'D+2', titulo: 'Sessão de perguntas da Terra', descricao: 'Usuários enviam perguntas pelo feed.' },
     ],
   },
   {
@@ -62,4 +62,4 @@ export const missoesData: MissaoOrbitLink[] = [
     ],
   },
 ];
-/* === MISSOES SIMULADAS | fim === */
+/* === MISSÕES SIMULADAS | fim === */

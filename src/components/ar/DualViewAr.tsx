@@ -64,7 +64,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
         }
       } catch {
         setCameraAtiva(false);
-        setErroCamera('Camera indisponivel neste contexto. Use HTTPS, localhost ou mantenha a simulacao por arraste.');
+        setErroCamera('Câmera indisponível neste contexto. Use HTTPS, localhost ou mantenha a simulação por arraste.');
       }
     }
 
@@ -88,7 +88,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
       try {
         await eventoOrientacao.requestPermission();
       } catch {
-        setErroCamera('Permissao de movimento indisponivel. Use o arraste na tela para simular a camera 360.');
+        setErroCamera('Permissão de movimento indisponível. Use o arraste na tela para simular a câmera 360.');
       }
     }
   }
@@ -197,7 +197,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             {zoomCamera.toFixed(1)}x
           </div>
           <div className="absolute left-3 top-3 z-40 flex gap-2">
-            <button aria-label="Calibrar ceu" onClick={() => void calibrarCeu()} className="flex h-11 items-center gap-1 rounded-full border border-cyan-300/55 bg-cyan-300 px-4 font-monoapp text-[10px] font-black uppercase text-slate-950 shadow-neon">
+            <button aria-label="Calibrar céu" onClick={() => void calibrarCeu()} className="flex h-11 items-center gap-1 rounded-full border border-cyan-300/55 bg-cyan-300 px-4 font-monoapp text-[10px] font-black uppercase text-slate-950 shadow-neon">
               <Compass className="h-4 w-4" />
               Calibrar
             </button>
@@ -215,7 +215,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
           </div>
           <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
-            <Badge tom="verde">{cameraAtiva ? 'Camera ativa' : 'Camera abrindo'}</Badge>
+            <Badge tom="verde">{cameraAtiva ? 'Câmera ativa' : 'Câmera abrindo'}</Badge>
             <Badge tom="roxo">AR Terra</Badge>
           </div>
           {erroCamera ? <div className="absolute left-3 right-3 top-16 z-30 rounded-2xl border border-amber-400/50 bg-amber-500/15 p-3 text-xs font-bold leading-5 text-amber-100 light-theme:text-amber-800 sm:left-4 sm:right-4 sm:text-sm">{erroCamera}</div> : null}

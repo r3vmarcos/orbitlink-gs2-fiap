@@ -35,7 +35,7 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
   const perspectivaAtual: TipoPerspectiva = pontoSelecionado?.perspectiva ?? 'terra';
   const categorias = categoriasPorLocal[perspectivaAtual];
   const locais = useMemo(() => [
-    { id: 'local_usuario', nome: usuarioAtual?.localizacaoAtual ?? 'Sao Paulo, Brasil', perspectiva: 'terra' as TipoPerspectiva },
+    { id: 'local_usuario', nome: usuarioAtual?.localizacaoAtual ?? 'São Paulo, Brasil', perspectiva: 'terra' as TipoPerspectiva },
     ...pontosAr.map((ponto) => ({ id: ponto.id, nome: ponto.nome, perspectiva: ponto.perspectiva })),
   ], [pontosAr, usuarioAtual?.localizacaoAtual]);
 
@@ -65,7 +65,7 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
     }
 
     if (arquivo.size > tamanhoMaximoImagemBytes) {
-      alert(`Imagem muito grande. Use uma imagem com ate ${tamanhoMaximoImagemMb} MB.`);
+      alert(`Imagem muito grande. Use uma imagem com até ${tamanhoMaximoImagemMb} MB.`);
       return;
     }
 
@@ -76,7 +76,7 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
 
   function validarCampos() {
     if (!titulo.trim() || !texto.trim()) {
-      alert('Preencha titulo e texto.');
+      alert('Preencha título e texto.');
       return false;
     }
 
@@ -130,12 +130,12 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
       <div className="grid min-w-0 gap-4 lg:grid-cols-[1.2fr_.8fr] lg:gap-5">
         <div className="space-y-4">
           <label className="block">
-            <span className="label-form">Titulo *</span>
-            <input value={titulo} onChange={(evento) => setTitulo(evento.target.value)} className="input-form" placeholder={aba === 'post' ? 'Ex.: Passagem sobre Sao Paulo' : 'Ex.: Camera orbital da noite'} />
+            <span className="label-form">Título *</span>
+            <input value={titulo} onChange={(evento) => setTitulo(evento.target.value)} className="input-form" placeholder={aba === 'post' ? 'Ex.: Passagem sobre São Paulo' : 'Ex.: Câmera orbital da noite'} />
           </label>
           <label className="block">
             <span className="label-form">Texto *</span>
-            <textarea value={texto} onChange={(evento) => setTexto(evento.target.value)} className="input-form min-h-36 resize-y" placeholder="Compartilhe uma experiencia, observacao, foto, cidade, missao ou alerta..." />
+            <textarea value={texto} onChange={(evento) => setTexto(evento.target.value)} className="input-form min-h-36 resize-y" placeholder="Compartilhe uma experiência, observação, foto, cidade, missão ou alerta..." />
           </label>
           <label className="block">
             <span className="label-form">Imagem opcional</span>
@@ -143,16 +143,16 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
               <ImagePlus className="h-5 w-5 shrink-0 text-[var(--text-link)]" />
               <input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(evento) => void handleImagem(evento.target.files?.[0])} className="min-w-0 w-full text-xs text-[var(--text-muted)] file:mb-2 file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--bg-primary)] file:px-3 file:py-2 file:font-bold file:text-[var(--text-primary)] min-[420px]:file:mb-0" />
             </div>
-            <span className="mt-2 block text-xs leading-5 text-[var(--text-muted)]">PNG, JPG ou WebP ate {tamanhoMaximoImagemMb} MB. Fotos muito grandes precisam ser reduzidas antes do envio.</span>
+            <span className="mt-2 block text-xs leading-5 text-[var(--text-muted)]">PNG, JPG ou WebP até {tamanhoMaximoImagemMb} MB. Fotos muito grandes precisam ser reduzidas antes do envio.</span>
           </label>
-          {imagem ? <img src={imagem} alt="Preview da publicacao" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : aba === 'status' ? <div className="flex min-h-48 items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--border-border)] text-[var(--text-muted)]"><Camera className="mr-2 h-5 w-5" /> Preview do status</div> : null}
+          {imagem ? <img src={imagem} alt="Prévia da publicação" className="max-h-64 w-full rounded-[1.5rem] object-cover" /> : aba === 'status' ? <div className="flex min-h-48 items-center justify-center rounded-[1.5rem] border border-dashed border-[var(--border-border)] text-[var(--text-muted)]"><Camera className="mr-2 h-5 w-5" /> Prévia do status</div> : null}
         </div>
 
         <div className="space-y-4 rounded-[1.5rem] border border-[var(--border-border)] bg-[var(--bg-muted)] p-4">
           <label className="block">
-            <span className="label-form">Local da publicacao</span>
+            <span className="label-form">Local da publicação</span>
             <select value={localId} onChange={(evento) => setLocalId(evento.target.value)} className="input-form">
-              {locais.map((local) => <option key={local.id} value={local.id}>{local.id === 'local_usuario' ? `Meu local atual - ${local.nome}` : `${local.nome} - ${local.perspectiva === 'terra' ? 'Terra' : 'Espaco'}`}</option>)}
+              {locais.map((local) => <option key={local.id} value={local.id}>{local.id === 'local_usuario' ? `Meu local atual - ${local.nome}` : `${local.nome} - ${local.perspectiva === 'terra' ? 'Terra' : 'Espaço'}`}</option>)}
             </select>
           </label>
           {aba === 'post' ? (
@@ -176,16 +176,16 @@ export function CriarPostModal({ aberto, onFechar, abaInicial = 'post' }: CriarP
               <select value={tipoStatus} onChange={(evento) => setTipoStatus(evento.target.value as StatusOrbital['tipo'])} className="input-form">
                 <option value="texto">Texto</option>
                 <option value="imagem">Imagem</option>
-                <option value="camera_orbital">Camera orbital simulada</option>
+                <option value="camera_orbital">Câmera orbital simulada</option>
                 <option value="registro_ar">Registro AR</option>
                 <option value="alerta">Alerta</option>
-                <option value="missao">Missao</option>
+                <option value="missao">Missão</option>
               </select>
             </label>
           )}
           <div className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-surface)] p-3 text-sm leading-6 text-[var(--text-muted)]">
             <p className="font-bold text-[var(--text-text)]">{pontoSelecionado ? pontoSelecionado.nome : 'Meu local atual'}</p>
-            <p>{pontoSelecionado ? pontoSelecionado.descricao : `Publicando de ${usuarioAtual?.localizacaoAtual ?? 'Sao Paulo, Brasil'}. Use os outros locais quando a publicacao estiver conectada a um mark, missao ou ponto AR.`}</p>
+            <p>{pontoSelecionado ? pontoSelecionado.descricao : `Publicando de ${usuarioAtual?.localizacaoAtual ?? 'São Paulo, Brasil'}. Use os outros locais quando a publicação estiver conectada a um mark, missão ou ponto AR.`}</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <Botao variante="fantasma" onClick={onFechar} className="flex-1">Cancelar</Botao>

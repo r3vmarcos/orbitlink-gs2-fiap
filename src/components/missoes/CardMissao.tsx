@@ -10,11 +10,13 @@ interface CardMissaoProps {
 }
 
 export function CardMissao({ missao, onVerAr }: CardMissaoProps) {
+  const localFormatado = missao.local === 'orbita' ? 'órbita' : missao.local;
+
   return (
     <article className="rounded-[2rem] border border-blue-500/35 bg-slate-950/68 p-5 backdrop-blur-xl light-theme:border-sky-200 light-theme:bg-white/78">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="font-monoapp text-xs font-black uppercase tracking-[0.16em] text-blue-300 light-theme:text-sky-700">{missao.local}</p>
+          <p className="font-monoapp text-xs font-black uppercase tracking-[0.16em] text-blue-300 light-theme:text-sky-700">{localFormatado}</p>
           <h3 className="mt-2 text-2xl font-black uppercase text-white light-theme:text-sky-950">{missao.nome}</h3>
         </div>
         <Badge tom={missao.status === 'em_andamento' ? 'verde' : 'azul'}>{missao.status.replaceAll('_', ' ')}</Badge>
