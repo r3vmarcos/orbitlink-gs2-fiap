@@ -111,11 +111,11 @@ export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPos
       <PainelFiltros filtro={filtro} onFiltro={setFiltro} />
 
       <div className="grid w-full min-w-0 gap-5 md:grid-cols-[230px_minmax(0,1fr)_230px] lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
-        <aside className="hidden min-h-0 min-w-0 grid-rows-[auto_1fr_auto] gap-4 md:grid md:h-[calc(100dvh-7.5rem)]">
+        <aside className="hidden min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)_auto] gap-4 overflow-hidden md:grid md:h-[calc(100dvh-7.5rem)]">
           <CardBase className="p-3">
             <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form rounded-full px-3 py-2 text-xs" placeholder="Buscar..." />
           </CardBase>
-          <div className="min-h-0">
+          <div className="min-h-0 overflow-hidden">
             <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
           </div>
           <ListaUltimosChats />
@@ -139,7 +139,7 @@ export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPos
           </div>
         </div>
 
-        <aside className="hidden min-h-0 min-w-0 grid-rows-[1fr_auto] gap-4 md:grid md:h-[calc(100dvh-7.5rem)]">
+        <aside className="hidden min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] gap-4 overflow-hidden md:grid md:h-[calc(100dvh-7.5rem)]">
           <CardBase className="min-h-0 overflow-hidden">
             <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocínio</p>
             <div className="mt-4 space-y-3">

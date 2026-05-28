@@ -1,7 +1,6 @@
 import { FormEvent, useMemo, useState } from 'react';
 import { MessageCircle, Plus, Send, UserPlus, UsersRound } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { Botao } from '@/components/ui/Botao';
 import { CardBase } from '@/components/ui/CardBase';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
@@ -39,6 +38,12 @@ export function ChatsPage() {
 
     const outroUsuario = usuarios.find((usuario) => usuario.id !== usuarioAtual?.id && chat.participanteIds.includes(usuario.id));
     return outroUsuario?.nome ?? 'Conversa Orbitlink';
+  }
+
+  function obterFotoChat(chat: ChatOrbitLink) {
+    const outroUsuario = usuarios.find((usuario) => usuario.id !== usuarioAtual?.id && chat.participanteIds.includes(usuario.id));
+    const usuarioFoto = chat.grupo ? usuarios.find((usuario) => usuario.id === chat.criadoPorId) : outroUsuario;
+    return usuarioFoto?.fotoPerfil ?? `https://i.pravatar.cc/120?u=${usuarioFoto?.id ?? chat.id}`;
   }
 
   function obterSubtituloChat(chat: ChatOrbitLink) {
@@ -84,8 +89,8 @@ export function ChatsPage() {
   }
 
   return (
-    <div className="grid min-h-[calc(100dvh-9rem)] gap-4 md:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
-      <CardBase className="min-w-0 p-3 md:h-[calc(100dvh-6rem)] md:overflow-y-auto">
+    <div className="grid min-h-0 gap-4 md:h-[calc(100dvh-6rem)] md:grid-cols-[300px_minmax(0,1fr)] md:overflow-hidden xl:grid-cols-[360px_minmax(0,1fr)]">
+      <CardBase className="min-h-0 min-w-0 overflow-hidden p-3">
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Chats</p>
@@ -94,14 +99,14 @@ export function ChatsPage() {
           <MessageCircle className="h-6 w-6 text-[var(--text-link)]" />
         </div>
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-4 max-h-[calc(100dvh-14rem)] space-y-2 overflow-y-auto pr-1">
           {chats.map((chat) => {
             const ultimaMensagem = chat.mensagens[chat.mensagens.length - 1];
             const ativo = chat.id === chatAtivo?.id;
 
             return (
               <button key={chat.id} onClick={() => navigate(`/chats?chat=${chat.id}`)} className={`flex w-full min-w-0 items-center gap-3 rounded-2xl border p-2 text-left transition ${ativo ? 'border-[var(--bg-primary)] bg-[color-mix(in_srgb,var(--bg-primary)_14%,transparent)]' : 'border-[var(--border-border)] bg-[var(--bg-muted)] hover:bg-[var(--bg-surface-hover)]'}`}>
-                <AvatarOrbital gradiente={chat.grupo ? 'from-blue-400 to-fuchsia-500' : 'from-cyan-300 to-blue-600'} nome={obterTituloChat(chat)} tamanho="sm" />
+                <img src={obterFotoChat(chat)} alt={obterTituloChat(chat)} className="h-10 w-10 shrink-0 rounded-xl border border-[var(--border-border)] object-cover" loading="lazy" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-black text-[var(--text-text)]">{obterTituloChat(chat)}</p>
                   <p className="truncate text-xs text-[var(--text-muted)]">{ultimaMensagem?.texto ?? 'Sem mensagens ainda.'}</p>
@@ -113,13 +118,13 @@ export function ChatsPage() {
         </div>
       </CardBase>
 
-      <div className="grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
-        <CardBase className="flex min-h-[560px] min-w-0 flex-col p-0">
+      <div className="grid min-h-0 min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <CardBase className="flex min-h-[520px] min-w-0 flex-col p-0 md:h-full md:min-h-0">
           {chatAtivo ? (
             <>
               <div className="border-b border-[var(--border-border)] p-4">
                 <div className="flex items-center gap-3">
-                  <AvatarOrbital gradiente={chatAtivo.grupo ? 'from-blue-400 to-fuchsia-500' : 'from-cyan-300 to-blue-600'} nome={obterTituloChat(chatAtivo)} />
+                  <img src={obterFotoChat(chatAtivo)} alt={obterTituloChat(chatAtivo)} className="h-12 w-12 shrink-0 rounded-2xl border border-[var(--border-border)] object-cover" loading="lazy" />
                   <div className="min-w-0">
                     <h2 className="truncate text-xl font-black text-[var(--text-text)]">{obterTituloChat(chatAtivo)}</h2>
                     <p className="truncate text-xs text-[var(--text-muted)]">{obterSubtituloChat(chatAtivo)}</p>
@@ -162,12 +167,12 @@ export function ChatsPage() {
           )}
         </CardBase>
 
-        <CardBase className="min-w-0 p-4">
+        <CardBase className="min-h-0 min-w-0 overflow-hidden p-4">
           <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Nova conversa</p>
           <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-3 rounded-full px-3 py-2 text-xs" placeholder="Buscar pessoas..." />
           <input value={nomeGrupo} onChange={(evento) => setNomeGrupo(evento.target.value)} className="input-form mt-2 rounded-full px-3 py-2 text-xs" placeholder="Nome do grupo, opcional" />
 
-          <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
+          <div className="mt-3 max-h-[calc(100dvh-24rem)] space-y-2 overflow-y-auto pr-1">
             {pessoasDisponiveis.map((usuario) => (
               <PessoaSelecionavel key={usuario.id} usuario={usuario} ativo={selecionados.includes(usuario.id)} onClick={() => alternarSelecionado(usuario.id)} />
             ))}
@@ -197,7 +202,7 @@ export function ChatsPage() {
 function PessoaSelecionavel({ usuario, ativo, onClick }: { usuario: UsuarioOrbitLink; ativo: boolean; onClick: () => void }) {
   return (
     <button onClick={onClick} className={`flex w-full min-w-0 items-center gap-2 rounded-2xl border p-2 text-left ${ativo ? 'border-[var(--bg-primary)] bg-[color-mix(in_srgb,var(--bg-primary)_14%,transparent)]' : 'border-[var(--border-border)] bg-[var(--bg-muted)]'}`}>
-      <AvatarOrbital gradiente={usuario.avatarGradiente} nome={usuario.nome} tamanho="sm" />
+      <img src={usuario.fotoPerfil ?? `https://i.pravatar.cc/120?u=${usuario.id}`} alt={usuario.nome} className="h-10 w-10 shrink-0 rounded-xl border border-[var(--border-border)] object-cover" loading="lazy" />
       <div className="min-w-0">
         <p className="truncate text-sm font-black text-[var(--text-text)]">{usuario.nome}</p>
         <p className="truncate text-xs text-[var(--text-muted)]">{usuario.usuario}</p>

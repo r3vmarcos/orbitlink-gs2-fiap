@@ -1,6 +1,5 @@
 import { MessageCircle } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
 import type { ChatOrbitLink } from '@/types/orbitlink.types';
 import { formatarTempoRelativo } from '@/utils/formatadores';
@@ -32,10 +31,11 @@ export function ListaUltimosChats() {
         {ultimosChats.map((chat) => {
           const ultimaMensagem = chat.mensagens[chat.mensagens.length - 1];
           const autor = usuarios.find((usuario) => usuario.id === (ultimaMensagem?.autorId ?? chat.participanteIds[0])) ?? usuarios[0];
+          const fotoAutor = autor.fotoPerfil ?? `https://i.pravatar.cc/120?u=${autor.id}`;
 
           return (
             <NavLink key={chat.id} to={`/chats?chat=${chat.id}`} className="flex min-w-0 items-center gap-2 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-2 transition hover:bg-[var(--bg-surface-hover)]">
-              <AvatarOrbital gradiente={autor.avatarGradiente} nome={obterTitulo(chat)} tamanho="sm" />
+              <img src={fotoAutor} alt={autor.nome} className="h-9 w-9 shrink-0 rounded-xl border border-[var(--border-border)] object-cover" loading="lazy" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-black text-[var(--text-text)]">{obterTitulo(chat)}</p>
                 <p className="mt-0.5 truncate text-[10px] text-[var(--text-muted)]">{ultimaMensagem?.texto ?? 'Conversa criada. Envie a primeira mensagem.'}</p>
