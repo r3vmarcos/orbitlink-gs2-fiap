@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { galeriaData } from '@/data/galeria.data';
+import { chatsData } from '@/data/chats.data';
 import { missoesData } from '@/data/missoes.data';
 import { odsData } from '@/data/ods.data';
 import { pontosArData } from '@/data/pontos-ar.data';
@@ -17,6 +18,7 @@ import {
 } from '@/services/nasaService';
 import type {
   ImagemNasaApi,
+  ChatOrbitLink,
   ItemGaleria,
   ComentarioPost,
   PontoAr,
@@ -66,6 +68,7 @@ interface OrbitLinkContextValue {
   usuarios: UsuarioOrbitLink[];
   posts: PostOrbitLink[];
   statusOrbitais: StatusOrbital[];
+  chats: ChatOrbitLink[];
   pontosAr: PontoAr[];
   missoes: typeof missoesData;
   galeria: ItemGaleria[];
@@ -92,6 +95,9 @@ interface OrbitLinkContextValue {
   compartilharPost: (postId: string) => void;
   excluirPost: (postId: string) => void;
   seguirPonto: (pontoId: string) => void;
+  criarChat: (participanteIds: string[], nome?: string) => string | undefined;
+  enviarMensagemChat: (chatId: string, texto: string) => void;
+  adicionarParticipantesChat: (chatId: string, participanteIds: string[]) => void;
   sincronizarApisNasa: () => Promise<void>;
 }
 
@@ -123,6 +129,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   );
   const [pontosSeguidos, setPontosSeguidos] = useState<string[]>(() =>
     lerLocalStorage<string[]>('orbitlink_pontos_seguidos', []),
+  );
+  const [chatsUsuario, setChatsUsuario] = useState<ChatOrbitLink[]>(() =>
+    lerLocalStorage<ChatOrbitLink[]>('orbitlink_chats_usuario', []),
   );
   const [usuariosLocais, setUsuariosLocais] = useState<UsuarioOrbitLink[]>(() =>
     lerLocalStorage<UsuarioOrbitLink[]>('orbitlink_usuarios_locais', []),
@@ -166,6 +175,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   useEffect(() => salvarLocalStorage('orbitlink_posts_curtidos', postsCurtidos), [postsCurtidos]);
   useEffect(() => salvarLocalStorage('orbitlink_posts_salvos', postsSalvos), [postsSalvos]);
   useEffect(() => salvarLocalStorage('orbitlink_pontos_seguidos', pontosSeguidos), [pontosSeguidos]);
+  useEffect(() => salvarLocalStorage('orbitlink_chats_usuario', chatsUsuario), [chatsUsuario]);
   useEffect(() => salvarLocalStorage('orbitlink_usuarios_locais', usuariosLocais), [usuariosLocais]);
   useEffect(() => salvarLocalStorage('orbitlink_usuario_atual_id', usuarioAtualId), [usuarioAtualId]);
   useEffect(() => salvarLocalStorage('orbitlink_comentarios_posts', comentariosLocais), [comentariosLocais]);
@@ -219,6 +229,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
         postsCurtidos,
         postsSalvos,
         pontosSeguidos,
+        chatsUsuario,
         usuariosLocais,
         usuarioAtualId,
         comentariosLocais,
@@ -250,6 +261,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     postsCurtidos,
     postsSalvos,
     pontosSeguidos,
+    chatsUsuario,
     usuariosLocais,
     usuarioAtualId,
     comentariosLocais,
@@ -274,6 +286,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     if (remoto.postsCurtidos) setPostsCurtidos(remoto.postsCurtidos);
     if (remoto.postsSalvos) setPostsSalvos(remoto.postsSalvos);
     if (remoto.pontosSeguidos) setPontosSeguidos(remoto.pontosSeguidos);
+    if (remoto.chatsUsuario) setChatsUsuario(remoto.chatsUsuario);
     if (remoto.usuariosLocais) setUsuariosLocais(remoto.usuariosLocais);
     if ('usuarioAtualId' in remoto) setUsuarioAtualId(remoto.usuarioAtualId);
     if (remoto.comentariosLocais) setComentariosLocais(remoto.comentariosLocais);
@@ -292,11 +305,51 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
 
   const statusValidos = useMemo(() => {
     const todos = [...statusBase, ...statusUsuario];
-    return todos.filter((status) => new Date(status.expiraEm).getTime() > Date.now());
+    const agoraStatus = Date.now();
+
+    return todos
+      .map((status) => {
+        if (status.origemDados !== 'simulado' || new Date(status.expiraEm).getTime() > agoraStatus) {
+          return status;
+        }
+
+        const idadeHoras = status.id === 'status_selene' ? 3 : status.id === 'status_amazonia' ? 2 : 6;
+        const criadoEm = new Date(agoraStatus - idadeHoras * 60 * 60 * 1000).toISOString();
+        const expiraEm = new Date(agoraStatus + (24 - idadeHoras) * 60 * 60 * 1000).toISOString();
+
+        return { ...status, criadoEm, expiraEm };
+      })
+      .filter((status) => new Date(status.expiraEm).getTime() > agoraStatus);
   }, [statusBase, statusUsuario]);
 
   const usuarios = useMemo(() => [...usuariosLocais, ...usuariosBase], [usuariosBase, usuariosLocais]);
   const usuarioAtual = useMemo(() => usuarios.find((usuario) => usuario.id === usuarioAtualId), [usuarioAtualId, usuarios]);
+  const chats = useMemo(() => {
+    const idsLocais = new Set(chatsUsuario.map((chat) => chat.id));
+    const conversas = [...chatsUsuario, ...chatsData.filter((chat) => !idsLocais.has(chat.id))]
+      .filter((chat) => !usuarioAtualId || chat.participanteIds.includes(usuarioAtualId))
+      .sort((a, b) => new Date(b.atualizadoEm).getTime() - new Date(a.atualizadoEm).getTime());
+
+    if (!usuarioAtualId || conversas.length > 0) {
+      return conversas;
+    }
+
+    const criadoEm = new Date(Date.now() - 18 * 60 * 1000).toISOString();
+    return [{
+      id: `chat_boas_vindas_${usuarioAtualId}`,
+      grupo: false,
+      participanteIds: [usuarioAtualId, 'lia_novaes'],
+      criadoPorId: 'lia_novaes',
+      criadoEm,
+      atualizadoEm: criadoEm,
+      mensagens: [{
+        id: `msg_boas_vindas_${usuarioAtualId}`,
+        autorId: 'lia_novaes',
+        texto: 'Bem-vindo ao Orbitlink. Chame uma pessoa ou monte um grupo para acompanhar marks, status e missões.',
+        criadoEm,
+      }],
+    }];
+  }, [chatsUsuario, usuarioAtualId]);
   const pontosAr = useMemo(() => [...pontosApi, ...pontosArBase], [pontosApi, pontosArBase]);
   const posts = useMemo(() => {
     const postsExistentes = [...postsUsuario, ...postsBase];
@@ -524,6 +577,102 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     setPontosSeguidos((ids) => (ids.includes(pontoId) ? ids.filter((id) => id !== pontoId) : [...ids, pontoId]));
   }, []);
 
+  const criarChat = useCallback((participanteIds: string[], nome?: string) => {
+    if (!usuarioAtual?.id) {
+      return undefined;
+    }
+
+    const participantesUnicos = Array.from(new Set([usuarioAtual.id, ...participanteIds])).filter(Boolean);
+
+    if (participantesUnicos.length < 2) {
+      return undefined;
+    }
+
+    const chatDiretoExistente = chats.find((chat) => {
+      if (chat.grupo || participantesUnicos.length !== 2 || chat.participanteIds.length !== 2) {
+        return false;
+      }
+
+      return participantesUnicos.every((participanteId) => chat.participanteIds.includes(participanteId));
+    });
+
+    if (chatDiretoExistente) {
+      return chatDiretoExistente.id;
+    }
+
+    const criadoEm = new Date().toISOString();
+    const novoChat: ChatOrbitLink = {
+      id: gerarId('chat'),
+      nome: participantesUnicos.length > 2 ? nome?.trim() || 'Grupo Orbitlink' : undefined,
+      grupo: participantesUnicos.length > 2,
+      participanteIds: participantesUnicos,
+      mensagens: [],
+      criadoPorId: usuarioAtual.id,
+      criadoEm,
+      atualizadoEm: criadoEm,
+    };
+
+    setChatsUsuario((atuais) => [novoChat, ...atuais]);
+    return novoChat.id;
+  }, [chats, usuarioAtual?.id]);
+
+  const enviarMensagemChat = useCallback((chatId: string, texto: string) => {
+    const textoLimpo = texto.trim();
+
+    if (!usuarioAtual?.id || !textoLimpo) {
+      return;
+    }
+
+    const criadoEm = new Date().toISOString();
+    const mensagem = {
+      id: gerarId('mensagem'),
+      autorId: usuarioAtual.id,
+      texto: textoLimpo,
+      criadoEm,
+    };
+
+    setChatsUsuario((atuais) => {
+      const chatAtual = atuais.find((chat) => chat.id === chatId) ?? chats.find((chat) => chat.id === chatId);
+
+      if (!chatAtual || !chatAtual.participanteIds.includes(usuarioAtual.id)) {
+        return atuais;
+      }
+
+      const chatAtualizado: ChatOrbitLink = {
+        ...chatAtual,
+        mensagens: [...chatAtual.mensagens, mensagem],
+        atualizadoEm: criadoEm,
+      };
+
+      return [chatAtualizado, ...atuais.filter((chat) => chat.id !== chatId)];
+    });
+  }, [chats, usuarioAtual?.id]);
+
+  const adicionarParticipantesChat = useCallback((chatId: string, participanteIds: string[]) => {
+    if (!usuarioAtual?.id) {
+      return;
+    }
+
+    setChatsUsuario((atuais) => {
+      const chatAtual = atuais.find((chat) => chat.id === chatId) ?? chats.find((chat) => chat.id === chatId);
+
+      if (!chatAtual || !chatAtual.participanteIds.includes(usuarioAtual.id)) {
+        return atuais;
+      }
+
+      const participantes = Array.from(new Set([...chatAtual.participanteIds, ...participanteIds]));
+      const chatAtualizado: ChatOrbitLink = {
+        ...chatAtual,
+        grupo: participantes.length > 2,
+        nome: participantes.length > 2 ? chatAtual.nome ?? 'Grupo Orbitlink' : chatAtual.nome,
+        participanteIds: participantes,
+        atualizadoEm: new Date().toISOString(),
+      };
+
+      return [chatAtualizado, ...atuais.filter((chat) => chat.id !== chatId)];
+    });
+  }, [chats, usuarioAtual?.id]);
+
   const sincronizarApisNasa = useCallback(async () => {
     setCarregandoApi(true);
     setErroApi(undefined);
@@ -564,6 +713,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     usuarios,
     posts,
     statusOrbitais: statusValidos,
+    chats,
     pontosAr,
     missoes: missoesBase,
     galeria,
@@ -590,12 +740,16 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     compartilharPost,
     excluirPost,
     seguirPonto,
+    criarChat,
+    enviarMensagemChat,
+    adicionarParticipantesChat,
     sincronizarApisNasa,
   }), [
     tema,
     usuarios,
     posts,
     statusValidos,
+    chats,
     pontosAr,
     missoesBase,
     galeria,
@@ -621,6 +775,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     compartilharPost,
     excluirPost,
     seguirPonto,
+    criarChat,
+    enviarMensagemChat,
+    adicionarParticipantesChat,
     sincronizarApisNasa,
   ]);
 

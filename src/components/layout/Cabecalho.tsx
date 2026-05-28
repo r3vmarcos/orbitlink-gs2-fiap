@@ -1,4 +1,4 @@
-import { Moon, Sun } from 'lucide-react';
+import { MessageCircle, Moon, Sun, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import logoBlack from '@/assets/logo_black.png';
@@ -29,7 +29,6 @@ const linksAntesPost = [
 const linksDepoisPost = [
   { to: '/pessoas', label: 'Pessoas' },
   { to: '/galeria', label: 'Fotos' },
-  { to: '/perfis', label: 'Perfil' },
 ];
 
 export function Cabecalho(props: CabecalhoProps) {
@@ -39,7 +38,7 @@ export function Cabecalho(props: CabecalhoProps) {
 
   return (
     <header className="sticky top-0 z-50 max-w-[100vw] border-b border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_88%,transparent)] backdrop-blur-xl">
-      <div className="mx-auto flex max-w-md items-center gap-2 px-2.5 py-2.5 min-[380px]:px-3 lg:max-w-6xl lg:px-6 xl:max-w-7xl 2xl:max-w-[1440px]">
+      <div className="mx-auto flex max-w-md items-center gap-2 px-2.5 py-2.5 min-[380px]:px-3 md:max-w-6xl md:px-6 xl:max-w-7xl 2xl:max-w-[1440px]">
         <NavLink to="/" className="flex min-w-0 items-center gap-2">
           <span
             aria-label="Orbitlink"
@@ -48,7 +47,11 @@ export function Cabecalho(props: CabecalhoProps) {
           />
         </NavLink>
 
-        <nav className="ml-4 hidden flex-1 items-center justify-center gap-2 lg:flex">
+        <div className="hidden md:block">
+          <MenuTemas {...props} />
+        </div>
+
+        <nav className="ml-auto hidden flex-1 items-center justify-center gap-2 md:flex">
           {linksAntesPost.map((link) => (
             <NavLink
               key={link.to}
@@ -62,6 +65,17 @@ export function Cabecalho(props: CabecalhoProps) {
               {link.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/chats"
+            title="Chats"
+            className={({ isActive }) =>
+              `flex h-9 w-9 items-center justify-center rounded-2xl transition ${
+                isActive ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'
+              }`
+            }
+          >
+            <MessageCircle className="h-4 w-4" />
+          </NavLink>
           <button onClick={onAbrirPost} className="rounded-2xl border border-[var(--bg-primary)] bg-transparent px-3 py-2 font-monoapp text-[11px] font-black uppercase tracking-[0.12em] text-[var(--bg-primary)] transition hover:bg-[color-mix(in_srgb,var(--bg-primary)_12%,transparent)]">
             Post
           </button>
@@ -78,10 +92,26 @@ export function Cabecalho(props: CabecalhoProps) {
               {link.label}
             </NavLink>
           ))}
+          <NavLink
+            to="/perfis"
+            title="Perfil"
+            className={({ isActive }) =>
+              `flex h-9 w-9 items-center justify-center rounded-2xl transition ${
+                isActive ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--bg-surface-hover)]'
+              }`
+            }
+          >
+            <UserRound className="h-4 w-4" />
+          </NavLink>
         </nav>
 
-        <div className="ml-auto hidden lg:block">
-          <MenuTemas {...props} />
+        <div className="ml-auto flex items-center gap-1 md:hidden">
+          <NavLink to="/chats" title="Chats" className={({ isActive }) => `flex h-10 w-10 items-center justify-center rounded-2xl ${isActive ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+            <MessageCircle className="h-5 w-5" />
+          </NavLink>
+          <NavLink to="/perfis" title="Perfil" className={({ isActive }) => `flex h-10 w-10 items-center justify-center rounded-2xl ${isActive ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+            <UserRound className="h-5 w-5" />
+          </NavLink>
         </div>
       </div>
     </header>
@@ -91,6 +121,7 @@ export function Cabecalho(props: CabecalhoProps) {
 function MenuTemas({ categoriasTema, paletasTema, categoriaAtivaId, paletaAtivaNome, onSelecionarCategoria, onSelecionarPaleta, onAlternarClaroEscuro }: CabecalhoProps) {
   const [menuAberto, setMenuAberto] = useState<'tema' | 'paleta' | undefined>();
   const { tema } = useOrbitLink();
+  const categoriasDoModo = categoriasTema.filter((categoria) => categoria.id.startsWith(tema));
 
   return (
     <div className="relative flex items-center gap-1.5">
@@ -101,7 +132,7 @@ function MenuTemas({ categoriasTema, paletasTema, categoriaAtivaId, paletaAtivaN
       </button>
       {menuAberto ? (
         <div className="absolute right-0 top-11 z-[80] max-h-80 w-56 overflow-y-auto rounded-2xl border border-[var(--border-border)] bg-[var(--bg-popover)] p-2 shadow-neon">
-          {menuAberto === 'tema' ? categoriasTema.map((categoria) => (
+          {menuAberto === 'tema' ? categoriasDoModo.map((categoria) => (
             <button key={categoria.id} onClick={() => { onSelecionarCategoria(categoria.id); setMenuAberto(undefined); }} className={`block w-full rounded-xl px-3 py-2 text-left text-xs font-bold ${categoria.id === categoriaAtivaId ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-text)] hover:bg-[var(--bg-surface-hover)]'}`}>{categoria.nome}</button>
           )) : paletasTema.map((paleta, indice) => (
             <button key={paleta.name} onClick={() => { onSelecionarPaleta(indice); setMenuAberto(undefined); }} className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs font-bold ${paleta.name === paletaAtivaNome ? 'bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'text-[var(--text-text)] hover:bg-[var(--bg-surface-hover)]'}`}>

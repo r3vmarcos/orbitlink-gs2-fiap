@@ -8,6 +8,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Botao } from '@/components/ui/Botao';
 import { OrbitLinkProvider, useOrbitLink } from '@/context/OrbitLinkContext';
 import { categoriasTema, temasPorCategoria } from '@/data/temas-page-test.data';
+import { lerLocalStorage, salvarLocalStorage } from '@/services/localStorageService';
 import { AppRoutes } from '@/routes/AppRoutes';
 import type { CategoriaTemaId } from '@/types/tema';
 import type { PostOrbitLink, StatusOrbital } from '@/types/orbitlink.types';
@@ -19,17 +20,26 @@ function AppInterno() {
   const [abaPublicacao, setAbaPublicacao] = useState<'post' | 'status'>('post');
   const [statusAberto, setStatusAberto] = useState<StatusOrbital | undefined>();
   const [postDetalhe, setPostDetalhe] = useState<PostOrbitLink | undefined>();
-  const [indiceTemaDark, setIndiceTemaDark] = useState(0);
-  const [indiceTemaLight, setIndiceTemaLight] = useState(0);
-  const [indicePaleta, setIndicePaleta] = useState(0);
+  const [categoriaDarkId, setCategoriaDarkId] = useState<CategoriaTemaId>(() => lerLocalStorage<CategoriaTemaId>('orbitlink_categoria_dark', 'dark'));
+  const [categoriaLightId, setCategoriaLightId] = useState<CategoriaTemaId>(() => lerLocalStorage<CategoriaTemaId>('orbitlink_categoria_light', 'light'));
+  const [indicePaletaDark, setIndicePaletaDark] = useState(() => lerLocalStorage<number>('orbitlink_paleta_dark', 0));
+  const [indicePaletaLight, setIndicePaletaLight] = useState(() => lerLocalStorage<number>('orbitlink_paleta_light', 0));
   const navigate = useNavigate();
   const location = useLocation();
   const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
   const rotaAdmin = location.pathname === '/adm-orbitlink';
   const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
-  const categoriaAtiva = categoriasDoModo[tema === 'dark' ? indiceTemaDark % categoriasDoModo.length : indiceTemaLight % categoriasDoModo.length]?.id as CategoriaTemaId;
+  const categoriaAtiva = tema === 'dark'
+    ? (categoriasDoModo.some((categoria) => categoria.id === categoriaDarkId) ? categoriaDarkId : 'dark')
+    : (categoriasDoModo.some((categoria) => categoria.id === categoriaLightId) ? categoriaLightId : 'light');
   const paletasAtivas = temasPorCategoria[categoriaAtiva];
-  const temaAtivo = paletasAtivas[indicePaleta % paletasAtivas.length] ?? paletasAtivas[0];
+  const indicePaletaAtivo = tema === 'dark' ? indicePaletaDark : indicePaletaLight;
+  const temaAtivo = paletasAtivas[indicePaletaAtivo % paletasAtivas.length] ?? paletasAtivas[0];
+
+  useEffect(() => salvarLocalStorage('orbitlink_categoria_dark', categoriaDarkId), [categoriaDarkId]);
+  useEffect(() => salvarLocalStorage('orbitlink_categoria_light', categoriaLightId), [categoriaLightId]);
+  useEffect(() => salvarLocalStorage('orbitlink_paleta_dark', indicePaletaDark), [indicePaletaDark]);
+  useEffect(() => salvarLocalStorage('orbitlink_paleta_light', indicePaletaLight), [indicePaletaLight]);
 
   useEffect(() => {
     aplicarTokensTema(gerarTokensTema({
@@ -76,19 +86,24 @@ function AppInterno() {
     <LayoutPrincipal
       onAbrirPost={() => abrirPublicacao('post')}
       onAbrirStatus={() => abrirPublicacao('status')}
-      onAlternarTemaVisual={() => tema === 'dark' ? setIndiceTemaDark((valor) => valor + 1) : setIndiceTemaLight((valor) => valor + 1)}
-      onAlternarPaleta={() => setIndicePaleta((valor) => valor + 1)}
+      onAlternarTemaVisual={() => {
+        const indiceAtual = categoriasDoModo.findIndex((categoria) => categoria.id === categoriaAtiva);
+        const proximaCategoria = categoriasDoModo[(indiceAtual + 1) % categoriasDoModo.length]?.id;
+        if (!proximaCategoria) return;
+        if (tema === 'dark') setCategoriaDarkId(proximaCategoria);
+        else setCategoriaLightId(proximaCategoria);
+      }}
+      onAlternarPaleta={() => tema === 'dark' ? setIndicePaletaDark((valor) => valor + 1) : setIndicePaletaLight((valor) => valor + 1)}
       onAlternarClaroEscuro={alternarTema}
-      categoriasTema={categoriasDoModo}
+      categoriasTema={categoriasTema}
       paletasTema={paletasAtivas}
       categoriaAtivaId={categoriaAtiva}
       paletaAtivaNome={temaAtivo.name}
       onSelecionarCategoria={(id) => {
-        const indice = categoriasDoModo.findIndex((categoria) => categoria.id === id);
-        if (tema === 'dark') setIndiceTemaDark(indice);
-        else setIndiceTemaLight(indice);
+        if (id.startsWith('dark')) setCategoriaDarkId(id);
+        else setCategoriaLightId(id);
       }}
-      onSelecionarPaleta={(indice) => setIndicePaleta(indice)}
+      onSelecionarPaleta={(indice) => tema === 'dark' ? setIndicePaletaDark(indice) : setIndicePaletaLight(indice)}
     >
       <AppRoutes
         onAbrirPost={() => abrirPublicacao('post')}
@@ -96,16 +111,15 @@ function AppInterno() {
         onVisualizarStatus={setStatusAberto}
         onAbrirDetalhesPost={setPostDetalhe}
         onAlternarClaroEscuro={alternarTema}
-        categoriasTema={categoriasDoModo}
+        categoriasTema={categoriasTema}
         paletasTema={paletasAtivas}
         categoriaAtivaId={categoriaAtiva}
         paletaAtivaNome={temaAtivo.name}
         onSelecionarCategoria={(id) => {
-          const indice = categoriasDoModo.findIndex((categoria) => categoria.id === id);
-          if (tema === 'dark') setIndiceTemaDark(indice);
-          else setIndiceTemaLight(indice);
+          if (id.startsWith('dark')) setCategoriaDarkId(id);
+          else setCategoriaLightId(id);
         }}
-        onSelecionarPaleta={(indice) => setIndicePaleta(indice)}
+        onSelecionarPaleta={(indice) => tema === 'dark' ? setIndicePaletaDark(indice) : setIndicePaletaLight(indice)}
       />
       <CriarPostModal aberto={modalPostAberto} abaInicial={abaPublicacao} onFechar={() => setModalPostAberto(false)} />
       <VisualizadorStatus status={statusAberto} onFechar={() => setStatusAberto(undefined)} onVerAr={handleVerAr} />

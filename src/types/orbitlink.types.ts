@@ -83,6 +83,24 @@ export interface ComentarioPost {
   criadoEm: string;
 }
 
+export interface MensagemChatOrbitLink {
+  id: string;
+  autorId: string;
+  texto: string;
+  criadoEm: string;
+}
+
+export interface ChatOrbitLink {
+  id: string;
+  nome?: string;
+  grupo: boolean;
+  participanteIds: string[];
+  mensagens: MensagemChatOrbitLink[];
+  criadoPorId: string;
+  criadoEm: string;
+  atualizadoEm: string;
+}
+
 export interface PostOrbitLink {
   id: string;
   autorId: string;

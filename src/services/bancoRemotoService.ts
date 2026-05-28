@@ -1,4 +1,4 @@
-import type { ImagemNasaApi, ItemGaleria, ComentarioPost, PontoAr, PostOrbitLink, StatusOrbital, TipoTema, UsuarioOrbitLink } from '@/types/orbitlink.types';
+import type { ChatOrbitLink, ImagemNasaApi, ItemGaleria, ComentarioPost, PontoAr, PostOrbitLink, StatusOrbital, TipoTema, UsuarioOrbitLink } from '@/types/orbitlink.types';
 import type { galeriaData } from '@/data/galeria.data';
 import type { missoesData } from '@/data/missoes.data';
 import type { odsData } from '@/data/ods.data';
@@ -11,6 +11,7 @@ export interface EstadoRemotoOrbitLink {
   postsCurtidos?: string[];
   postsSalvos?: string[];
   pontosSeguidos?: string[];
+  chatsUsuario?: ChatOrbitLink[];
   usuariosLocais?: UsuarioOrbitLink[];
   usuarioAtualId?: string;
   comentariosLocais?: Record<string, ComentarioPost[]>;
