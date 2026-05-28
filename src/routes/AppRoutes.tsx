@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { AdmOrbitlinkPage } from '@/pages/AdmOrbitlinkPage';
+import { ChatsPage } from '@/pages/ChatsPage';
 import { DadosNasaPage } from '@/pages/DadosNasaPage';
 import { DualViewArPage } from '@/pages/DualViewArPage';
 import { FeedPage } from '@/pages/FeedPage';
@@ -64,6 +65,7 @@ export function AppRoutes({
           />
         }
       />
+      <Route path="/chats" element={<ChatsPage />} />
       <Route path="/dualview-ar" element={<DualViewArPage />} />
       <Route path="/mark/:pontoId" element={<MarkPage onAbrirDetalhesPost={onAbrirDetalhesPost} />} />
       <Route path="/missoes" element={<MissoesPage />} />

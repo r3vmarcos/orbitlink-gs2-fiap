@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ListaUltimosChats } from '@/components/chats/ListaUltimosChats';
 import { CardPost } from '@/components/feed/CardPost';
 import { StatusOrbitalLista } from '@/components/feed/StatusOrbitalLista';
 import { CardBase } from '@/components/ui/CardBase';
@@ -67,22 +68,23 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
   }, []);
 
   return (
-    <div className="grid w-full min-w-0 gap-5 lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
-      <aside className="hidden min-w-0 space-y-5 lg:sticky lg:top-20 lg:block lg:h-[calc(100dvh-6rem)] lg:overflow-hidden lg:pr-1">
+    <div className="grid w-full min-w-0 gap-5 md:grid-cols-[230px_minmax(0,1fr)_230px] lg:grid-cols-[300px_minmax(0,1fr)_320px] xl:grid-cols-[340px_minmax(0,720px)_360px] 2xl:grid-cols-[360px_minmax(0,760px)_380px]">
+      <aside className="hidden min-w-0 space-y-5 md:sticky md:top-20 md:block md:h-[calc(100dvh-6rem)] md:overflow-y-auto md:pr-1">
         <PainelFiltros filtro={filtro} onFiltro={setFiltro} />
         <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
+        <ListaUltimosChats />
       </aside>
 
-      <div className="min-w-0 space-y-5 lg:col-start-2 lg:h-[calc(100dvh-6rem)] lg:overflow-y-auto lg:pr-1">
-        <div className="lg:hidden">
+      <div className="min-w-0 space-y-5 md:col-start-2 md:h-[calc(100dvh-6rem)] md:overflow-y-auto md:pr-1">
+        <div className="md:hidden">
           <PainelFeed busca={busca} filtro={filtro} onBusca={setBusca} onFiltro={setFiltro} />
         </div>
 
-        <div className="lg:hidden">
+        <div className="md:hidden">
           <StatusOrbitalLista onAbrirStatus={onVisualizarStatus} onCriarStatus={onAbrirStatus} />
         </div>
 
-        <CardBase className="hidden lg:block">
+        <CardBase className="hidden md:block">
           <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form" placeholder="Buscar em posts, pessoas, locais, pontos AR ou ODS..." />
         </CardBase>
 
@@ -92,7 +94,7 @@ export function FeedPage({ onAbrirPost, onAbrirStatus, onVisualizarStatus, onAbr
         </div>
       </div>
 
-      <aside className="hidden min-w-0 space-y-5 lg:sticky lg:top-20 lg:block lg:h-[calc(100dvh-6rem)] lg:overflow-hidden lg:pl-1">
+      <aside className="hidden min-w-0 space-y-5 md:sticky md:top-20 md:block md:h-[calc(100dvh-6rem)] md:overflow-y-auto md:pl-1">
         <CardBase>
           <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Patrocínio</p>
           <div className="mt-4 space-y-3">
@@ -128,7 +130,7 @@ function PainelFiltros({ filtro, onFiltro }: { filtro: TipoCategoriaPost | 'todo
   return (
     <CardBase>
       <h1 className="text-3xl font-black uppercase leading-tight text-[var(--text-text)] min-[380px]:text-4xl lg:text-4xl">Orbifeed</h1>
-      <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 lg:flex-wrap lg:overflow-visible">
+      <div className="mt-4 flex max-w-full gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
         {filtrosFeed.map((item) => (
           <button key={item} onClick={() => onFiltro(item)} className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase tracking-[0.08em] ${filtro === item ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
             {formatarFiltroFeed(item)}

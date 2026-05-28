@@ -31,6 +31,8 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
 
   const usuariosOrdenados = useMemo(() => usuariosComFoto.filter((usuario) => usuario.id === usuarioFocoId), [usuarioFocoId, usuariosComFoto]);
   const fotosDoPerfil = useMemo(() => posts.filter((post) => post.autorId === usuarioFocoId && post.imagem).slice(0, 9), [posts, usuarioFocoId]);
+  const categoriasDark = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith('dark')), [categoriasTema]);
+  const categoriasLight = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith('light')), [categoriasTema]);
 
   function alterarFoto(usuarioId: string, foto: string) {
     const proximo = { ...fotosLocais, [usuarioId]: foto };
@@ -39,7 +41,7 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
   }
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-5 lg:max-w-3xl">
+    <div className="mx-auto w-full max-w-md space-y-5 md:max-w-xl lg:max-w-3xl">
       <CardBase>
         <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
         <h1 className="mt-2 text-4xl font-black uppercase text-white light-theme:text-sky-950">Meu perfil</h1>
@@ -55,7 +57,7 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
         ))}
       </div>
       <CardBase>
-        <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Personalizacao</p>
+        <p className="font-monoapp text-[11px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Personalização</p>
         <div className="mt-4 grid gap-4">
           <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
             <div className="min-w-0">
@@ -69,13 +71,8 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
 
           <div>
             <p className="label-form">Tema</p>
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {categoriasTema.map((categoria) => (
-                <button key={categoria.id} onClick={() => onSelecionarCategoria(categoria.id)} className={`shrink-0 rounded-full border px-3 py-2 text-xs font-bold ${categoria.id === categoriaAtivaId ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
-                  {categoria.nome}
-                </button>
-              ))}
-            </div>
+            <LinhaTemas categorias={categoriasDark} categoriaAtivaId={categoriaAtivaId} onSelecionarCategoria={onSelecionarCategoria} />
+            <LinhaTemas categorias={categoriasLight} categoriaAtivaId={categoriaAtivaId} onSelecionarCategoria={onSelecionarCategoria} />
           </div>
 
           <div>
@@ -100,6 +97,18 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
           {fotosDoPerfil.length === 0 ? <p className="col-span-3 text-sm text-[var(--text-muted)]">Este perfil ainda não publicou fotos.</p> : null}
         </div>
       </CardBase>
+    </div>
+  );
+}
+
+function LinhaTemas({ categorias, categoriaAtivaId, onSelecionarCategoria }: { categorias: Array<{ id: CategoriaTemaId; nome: string }>; categoriaAtivaId: CategoriaTemaId; onSelecionarCategoria: (id: CategoriaTemaId) => void }) {
+  return (
+    <div className="mb-2 flex gap-2 overflow-x-auto pb-1">
+      {categorias.map((categoria) => (
+        <button key={categoria.id} onClick={() => onSelecionarCategoria(categoria.id)} className={`shrink-0 rounded-full border px-3 py-2 text-xs font-bold ${categoria.id === categoriaAtivaId ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+          {categoria.nome}
+        </button>
+      ))}
     </div>
   );
 }

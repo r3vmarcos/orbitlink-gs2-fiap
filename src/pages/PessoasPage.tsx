@@ -6,7 +6,7 @@ import { lerLocalStorage } from '@/services/localStorageService';
 
 /* === PESSOAS PAGE | inicio === */
 export function PessoasPage() {
-  const { usuarios } = useOrbitLink();
+  const { usuarios, usuarioAtual } = useOrbitLink();
   const [busca, setBusca] = useState('');
   const [fotosLocais] = useState<Record<string, string>>(() => lerLocalStorage('orbitlink_fotos_perfil', {}));
 
@@ -14,12 +14,13 @@ export function PessoasPage() {
     const termo = busca.toLowerCase();
 
     return usuarios
+      .filter((usuario) => usuario.id !== usuarioAtual?.id)
       .map((usuario) => ({ ...usuario, fotoPerfil: fotosLocais[usuario.id] ?? usuario.fotoPerfil }))
       .filter((usuario) => {
         const alvo = `${usuario.nome} ${usuario.usuario} ${usuario.tipo} ${usuario.cargo} ${usuario.localizacaoAtual} ${usuario.conquistas.join(' ')}`.toLowerCase();
         return alvo.includes(termo);
       });
-  }, [busca, fotosLocais, usuarios]);
+  }, [busca, fotosLocais, usuarioAtual?.id, usuarios]);
 
   return (
     <div className="space-y-5">
