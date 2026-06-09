@@ -1,41 +1,59 @@
-import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { Badge } from '@/components/ui/Badge';
+import { Botao } from '@/components/ui/Botao';
 import { CardPerfil } from '@/components/perfis/CardPerfil';
 import { CardBase } from '@/components/ui/CardBase';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
-import { lerLocalStorage, salvarLocalStorage } from '@/services/localStorageService';
+import type { UsuarioOrbitLink } from '@/types/orbitlink.types';
+
+const tiposPagina: Array<UsuarioOrbitLink['tipo']> = ['instituicao', 'empresa_espacial', 'estacao_espacial', 'missao'];
 
 /* === PERFIS PAGE | inicio === */
 export function PerfisPage() {
-  const { usuarios, usuarioAtual, posts, postsCurtidos, pontosAr, pontosSeguidos, usuariosSeguidos, seguirUsuario } = useOrbitLink();
+  const { usuarios, usuarioAtual, posts, postsCurtidos, pontosAr, pontosSeguidos, usuariosSeguidos, usuariosSeguidosPorUsuario, fotosPerfil, seguirUsuario, atualizarFotoPerfil, sairUsuario } = useOrbitLink();
+  const navigate = useNavigate();
   const { usuarioId } = useParams();
-  const [fotosLocais, setFotosLocais] = useState<Record<string, string>>(() => lerLocalStorage('orbitlink_fotos_perfil', {}));
   const usuarioFocoId = usuarioId ?? usuarioAtual?.id;
 
   const usuariosComFoto = useMemo(() => usuarios.map((usuario) => ({
     ...usuario,
-    fotoPerfil: fotosLocais[usuario.id] ?? usuario.fotoPerfil,
-  })), [fotosLocais, usuarios]);
+    fotoPerfil: fotosPerfil[usuario.id] ?? usuario.fotoPerfil,
+  })), [fotosPerfil, usuarios]);
 
   const usuariosOrdenados = useMemo(() => usuariosComFoto.filter((usuario) => usuario.id === usuarioFocoId), [usuarioFocoId, usuariosComFoto]);
   const fotosDoPerfil = useMemo(() => posts.filter((post) => post.autorId === usuarioFocoId && post.imagem).slice(0, 9), [posts, usuarioFocoId]);
   const postsCurtidosVisiveis = useMemo(() => posts.filter((post) => postsCurtidos.includes(post.id)).slice(0, 4), [posts, postsCurtidos]);
-  const conexoesPessoas = useMemo(() => usuariosComFoto.filter((usuario) => usuariosSeguidos.includes(usuario.id)), [usuariosComFoto, usuariosSeguidos]);
+  const idsSeguidosPerfil = useMemo(() => {
+    if (!usuarioFocoId) return [];
+    return usuariosSeguidosPorUsuario[usuarioFocoId] ?? (usuarioFocoId === usuarioAtual?.id ? usuariosSeguidos : []);
+  }, [usuarioAtual?.id, usuarioFocoId, usuariosSeguidos, usuariosSeguidosPorUsuario]);
+  const conexoesPessoas = useMemo(() => usuariosComFoto.filter((usuario) => idsSeguidosPerfil.includes(usuario.id) && !tiposPagina.includes(usuario.tipo)), [idsSeguidosPerfil, usuariosComFoto]);
+  const conexoesPaginasUsuario = useMemo(() => usuariosComFoto.filter((usuario) => idsSeguidosPerfil.includes(usuario.id) && tiposPagina.includes(usuario.tipo)), [idsSeguidosPerfil, usuariosComFoto]);
   const conexoesPaginas = useMemo(() => pontosAr.filter((ponto) => pontosSeguidos.includes(ponto.id)).slice(0, 4), [pontosAr, pontosSeguidos]);
-
-  function alterarFoto(usuarioId: string, foto: string) {
-    const proximo = { ...fotosLocais, [usuarioId]: foto };
-    setFotosLocais(proximo);
-    salvarLocalStorage('orbitlink_fotos_perfil', proximo);
-  }
 
   return (
     <div className="mx-auto w-full max-w-md space-y-5 overflow-hidden md:max-w-xl lg:max-w-3xl">
       <CardBase>
-        <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
-        <h1 className="titulo-pagina mt-2">Minha órbita</h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
+            <h1 className="titulo-pagina mt-2">Minha órbita</h1>
+          </div>
+          {usuarioFocoId && usuarioAtual?.id === usuarioFocoId ? (
+            <Botao
+              variante="secundario"
+              className="w-full sm:w-auto"
+              onClick={() => {
+                sairUsuario();
+                navigate('/');
+              }}
+            >
+              Encerrar sessão
+            </Botao>
+          ) : null}
+        </div>
       </CardBase>
       <div className="grid gap-5">
         {usuariosOrdenados.map((usuario) => (
@@ -45,7 +63,7 @@ export function PerfisPage() {
             destaque={usuario.id === usuarioAtual?.id}
             seguindo={usuariosSeguidos.includes(usuario.id)}
             onSeguir={usuario.id !== usuarioAtual?.id ? () => seguirUsuario(usuario.id) : undefined}
-            onAlterarFoto={usuario.id === usuarioAtual?.id ? (foto) => alterarFoto(usuario.id, foto) : undefined}
+            onAlterarFoto={usuario.id === usuarioAtual?.id ? (foto) => atualizarFotoPerfil(usuario.id, foto) : undefined}
           />
         ))}
       </div>
@@ -103,12 +121,24 @@ export function PerfisPage() {
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.14em] text-blue-300">Páginas</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {conexoesPaginasUsuario.map((usuario) => (
+                <div key={usuario.id} className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
+                  <div className="flex items-center gap-3">
+                    <AvatarOrbital gradiente={usuario.avatarGradiente} nome={usuario.nome} tamanho="sm" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-black text-[var(--text-text)]">{usuario.nome}</p>
+                      <p className="truncate text-xs text-[var(--text-muted)]">{usuario.usuario}</p>
+                    </div>
+                  </div>
+                  <Badge tom="azul">Seguindo</Badge>
+                </div>
+              ))}
               {conexoesPaginas.length > 0 ? conexoesPaginas.map((ponto) => (
                 <div key={ponto.id} className="rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
                   <p className="text-sm font-black text-[var(--text-text)] line-clamp-2">{ponto.nome}</p>
                   <p className="mt-1 text-xs text-[var(--text-muted)] line-clamp-2">{ponto.camada.join(' · ')}</p>
                 </div>
-              )) : <p className="text-sm text-[var(--text-muted)]">Nenhuma página conectada no momento.</p>}
+              )) : conexoesPaginasUsuario.length === 0 ? <p className="text-sm text-[var(--text-muted)]">Nenhuma página conectada no momento.</p> : null}
             </div>
           </div>
         </div>
