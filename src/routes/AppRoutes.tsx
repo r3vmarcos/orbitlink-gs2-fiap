@@ -75,6 +75,7 @@ export function AppRoutes({
       <Route path="/loja/:produtoId" element={<LojaPage />} />
       <Route path="/perfis" element={<PerfisPage />} />
       <Route path="/perfis/:usuarioId" element={<PerfisPage />} />
+      <Route path="/comunidade" element={<PessoasPage />} />
       <Route path="/pessoas" element={<PessoasPage />} />
       <Route
         path="/personalização_perfil"
