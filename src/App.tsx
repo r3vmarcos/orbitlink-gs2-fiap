@@ -20,6 +20,7 @@ const PALETA_DARK_PADRAO = 'Radio Telescope';
 const PALETA_LIGHT_PADRAO = 'Paper Review';
 const INDICE_PALETA_DARK_PADRAO = temasPorCategoria[CATEGORIA_DARK_PADRAO].findIndex((paleta) => paleta.name === PALETA_DARK_PADRAO);
 const INDICE_PALETA_LIGHT_PADRAO = temasPorCategoria[CATEGORIA_LIGHT_PADRAO].findIndex((paleta) => paleta.name === PALETA_LIGHT_PADRAO);
+const ID_USUARIO_PADRAO = 'marcos_nunes';
 
 function lerCategoriaTemaPadrao(chave: string, categoriaPadrao: CategoriaTemaId, categoriaClassica: CategoriaTemaId) {
   const categoriaSalva = lerLocalStorage<CategoriaTemaId>(chave, categoriaPadrao);
@@ -48,7 +49,7 @@ function AppInterno() {
   const [indicePaletaLight, setIndicePaletaLight] = useState(() => lerIndicePaletaPadrao('orbitlink_categoria_light', 'orbitlink_paleta_light', CATEGORIA_LIGHT_PADRAO, 'light', Math.max(INDICE_PALETA_LIGHT_PADRAO, 0)));
   const navigate = useNavigate();
   const location = useLocation();
-  const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
+  const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema, entrarUsuarioPorId } = useOrbitLink();
   const rotaAdmin = location.pathname === '/adm-orbitlink';
   const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
   const categoriaAtiva = tema === 'dark'
@@ -85,6 +86,25 @@ function AppInterno() {
       }
     }
   }, [location.pathname, navigate, rotaAdmin, usuarioAutenticado]);
+
+  useEffect(() => {
+    if (rotaAdmin || usuarioAutenticado || location.pathname !== '/') {
+      return;
+    }
+
+    if (sessionStorage.getItem('orbitlink_forcar_login') === '1') {
+      return;
+    }
+
+    const perfilPadrao = usuarios.find((usuario) => usuario.id === ID_USUARIO_PADRAO);
+
+    if (!perfilPadrao) {
+      return;
+    }
+
+    entrarUsuarioPorId(perfilPadrao.id);
+    navigate(`/perfis/${perfilPadrao.id}`, { replace: true });
+  }, [entrarUsuarioPorId, location.pathname, navigate, rotaAdmin, usuarioAutenticado, usuarios]);
 
   if (!usuarioAutenticado && !rotaAdmin) {
     return <AcessoUsuario />;
@@ -131,7 +151,11 @@ function AppInterno() {
       <Modal aberto={Boolean(postDetalhe)} titulo={postDetalhe?.titulo ?? 'Publicação'} onFechar={() => setPostDetalhe(undefined)} telaCheiaMobile>
         {postDetalhe ? (
           <div className="space-y-5">
-            {postDetalhe.imagem ? <img src={postDetalhe.imagem} alt={postDetalhe.titulo} className="max-h-[58dvh] w-full rounded-[1.5rem] object-cover sm:max-h-[62dvh] sm:rounded-[2rem]" /> : null}
+            {postDetalhe.imagem ? (
+              <div className="max-h-[58dvh] overflow-hidden rounded-[1.5rem] sm:max-h-[62dvh] sm:rounded-[2rem]">
+                <img src={postDetalhe.imagem} alt={postDetalhe.titulo} className="block max-h-[58dvh] w-[180%] max-w-none -translate-x-[22.222%] object-cover object-center sm:max-h-[62dvh]" />
+              </div>
+            ) : null}
             <div>
               <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.08em] text-blue-300 sm:text-xs sm:tracking-[0.16em]">
                 {autorPost?.nome ?? 'Orbitlink'} · {pontoPost?.nome ?? 'Sem ponto AR'}
