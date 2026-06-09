@@ -25,7 +25,9 @@ export type TipoPerfil =
   | 'comunidade_terra'
   | 'observador_terra'
   | 'estacao_espacial'
-  | 'missao';
+  | 'missao'
+  | 'instituicao'
+  | 'empresa_espacial';
 
 export type TipoPontoAr =
   | 'planeta'
@@ -108,6 +110,10 @@ export interface PostOrbitLink {
   titulo: string;
   texto: string;
   imagem?: string;
+  imagemCredito?: string;
+  imagemFonte?: string;
+  imagemOrigemUrl?: string;
+  imagemBusca?: string;
   categoria: TipoCategoriaPost;
   pontoArId?: string;
   ods: TipoOds[];
@@ -148,6 +154,12 @@ export interface PontoAr {
   latitude?: number;
   longitude?: number;
   imagem?: string;
+  imagemCredito?: string;
+  imagemFonte?: string;
+  imagemOrigemUrl?: string;
+  imagemBusca?: string;
+  autorId?: string;
+  postId?: string;
   dadosResumo: string[];
   ods: TipoOds[];
   origemDados: TipoOrigemDados;
