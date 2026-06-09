@@ -89,103 +89,43 @@ export function ChatsPage() {
   }
 
   return (
-    <div className="grid h-[calc(100dvh-7rem)] min-h-0 gap-4 overflow-hidden md:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
-      <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-3">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Chats</p>
-            <h1 className="titulo-pagina mt-1">Mensagens</h1>
+    <div className="grid h-[calc(100dvh-7rem)] min-h-0 gap-4 overflow-hidden md:grid-cols-[40vw_minmax(0,60vw)] lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
+      <div className="grid min-h-0 min-w-0 gap-4 md:grid-rows-[40vh_60vh]">
+        <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Chats</p>
+              <h1 className="titulo-pagina mt-1">Mensagens</h1>
+            </div>
+            <MessageCircle className="h-6 w-6 text-[var(--text-link)]" />
           </div>
-          <MessageCircle className="h-6 w-6 text-[var(--text-link)]" />
-        </div>
 
-        <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-          {chats.map((chat) => {
-            const ultimaMensagem = chat.mensagens[chat.mensagens.length - 1];
-            const ativo = chat.id === chatAtivo?.id;
+          <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+            {chats.map((chat) => {
+              const ultimaMensagem = chat.mensagens[chat.mensagens.length - 1];
+              const ativo = chat.id === chatAtivo?.id;
 
-            return (
-              <button
-                key={chat.id}
-                onClick={() => navigate(`/chats?chat=${chat.id}`)}
-                className={`flex w-full min-w-0 items-center gap-3 rounded-2xl border p-2 text-left transition ${ativo ? "border-[var(--bg-primary)] bg-[color-mix(in_srgb,var(--bg-primary)_14%,transparent)]" : "border-[var(--border-border)] bg-[var(--bg-muted)] hover:bg-[var(--bg-surface-hover)]"}`}
-              >
-                <img
-                  src={obterFotoChat(chat)}
-                  alt={obterTituloChat(chat)}
-                  className="h-10 w-10 shrink-0 rounded-xl border border-[var(--border-border)] object-cover"
-                  loading="lazy"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-black text-[var(--text-text)]">{obterTituloChat(chat)}</p>
-                  <p className="truncate text-xs text-[var(--text-muted)]">{ultimaMensagem?.texto ?? "Sem mensagens ainda."}</p>
-                </div>
-                <span className="shrink-0 font-monoapp text-[8px] uppercase text-[var(--text-muted)]">{formatarTempoRelativo(chat.atualizadoEm)}</span>
-              </button>
-            );
-          })}
-        </div>
-      </CardBase>
-
-      <div className="grid min-h-0 min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_320px]">
-        <CardBase className="flex min-h-[520px] min-w-0 flex-col p-0 md:h-full md:min-h-0">
-          {chatAtivo ? (
-            <>
-              <div className="border-b border-[var(--border-border)] p-4">
-                <div className="flex items-center gap-3">
+              return (
+                <button
+                  key={chat.id}
+                  onClick={() => navigate(`/chats?chat=${chat.id}`)}
+                  className={`flex w-full min-w-0 items-center gap-3 rounded-2xl border p-2 text-left transition ${ativo ? "border-[var(--bg-primary)] bg-[color-mix(in_srgb,var(--bg-primary)_14%,transparent)]" : "border-[var(--border-border)] bg-[var(--bg-muted)] hover:bg-[var(--bg-surface-hover)]"}`}
+                >
                   <img
-                    src={obterFotoChat(chatAtivo)}
-                    alt={obterTituloChat(chatAtivo)}
-                    className="h-12 w-12 shrink-0 rounded-2xl border border-[var(--border-border)] object-cover"
+                    src={obterFotoChat(chat)}
+                    alt={obterTituloChat(chat)}
+                    className="h-10 w-10 shrink-0 rounded-xl border border-[var(--border-border)] object-cover"
                     loading="lazy"
                   />
-                  <div className="min-w-0">
-                    <h2 className="truncate text-xl font-black text-[var(--text-text)]">{obterTituloChat(chatAtivo)}</h2>
-                    <p className="truncate text-xs text-[var(--text-muted)]">{obterSubtituloChat(chatAtivo)}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-black text-[var(--text-text)]">{obterTituloChat(chat)}</p>
+                    <p className="truncate text-xs text-[var(--text-muted)]">{ultimaMensagem?.texto ?? "Sem mensagens ainda."}</p>
                   </div>
-                </div>
-              </div>
-
-              <div className="flex-1 space-y-3 overflow-y-auto p-4">
-                {chatAtivo.mensagens.map((item) => {
-                  const autor = usuarios.find((usuario) => usuario.id === item.autorId);
-                  const minhaMensagem = item.autorId === usuarioAtual?.id;
-
-                  return (
-                    <div key={item.id} className={`flex ${minhaMensagem ? "justify-end" : "justify-start"}`}>
-                      <div
-                        className={`max-w-[82%] rounded-2xl border px-4 py-3 ${minhaMensagem ? "border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]" : "border-[var(--border-border)] bg-[var(--bg-muted)] text-[var(--text-text)]"}`}
-                      >
-                        <p className="text-[11px] font-black uppercase opacity-80">{autor?.nome ?? "Orbitlink"}</p>
-                        <p className="mt-1 text-sm leading-6">{item.texto}</p>
-                        <p className="mt-2 text-right font-monoapp text-[9px] opacity-70">{formatarTempoRelativo(item.criadoEm)}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {chatAtivo.mensagens.length === 0 ? (
-                  <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-[var(--border-border)] p-6 text-center text-sm text-[var(--text-muted)]">
-                    Envie a primeira mensagem para iniciar a conversa.
-                  </div>
-                ) : null}
-              </div>
-
-              <form onSubmit={enviarMensagem} className="flex gap-2 border-t border-[var(--border-border)] p-3">
-                <input
-                  value={mensagem}
-                  onChange={(evento) => setMensagem(evento.target.value)}
-                  className="input-form rounded-full px-4 py-3"
-                  placeholder="Digite sua mensagem..."
-                />
-                <button className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--bg-primary)] text-[var(--text-primary)]" title="Enviar mensagem">
-                  <Send className="h-5 w-5" />
+                  <span className="shrink-0 font-monoapp text-[8px] uppercase text-[var(--text-muted)]">{formatarTempoRelativo(chat.atualizadoEm)}</span>
                 </button>
-              </form>
-            </>
-          ) : (
-            <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-[var(--text-muted)]">Crie uma conversa para começar.</div>
-          )}
+              );
+            })}
+          </div>
         </CardBase>
 
         <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-4">
@@ -223,6 +163,66 @@ export function ChatsPage() {
           </div>
         </CardBase>
       </div>
+
+      <CardBase className="flex min-h-0 min-w-0 flex-col p-0 md:h-full md:min-h-0">
+        {chatAtivo ? (
+          <>
+            <div className="border-b border-[var(--border-border)] p-4">
+              <div className="flex items-center gap-3">
+                <img
+                  src={obterFotoChat(chatAtivo)}
+                  alt={obterTituloChat(chatAtivo)}
+                  className="h-12 w-12 shrink-0 rounded-2xl border border-[var(--border-border)] object-cover"
+                  loading="lazy"
+                />
+                <div className="min-w-0">
+                  <h2 className="truncate text-xl font-black text-[var(--text-text)]">{obterTituloChat(chatAtivo)}</h2>
+                  <p className="truncate text-xs text-[var(--text-muted)]">{obterSubtituloChat(chatAtivo)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+              {chatAtivo.mensagens.map((item) => {
+                const autor = usuarios.find((usuario) => usuario.id === item.autorId);
+                const minhaMensagem = item.autorId === usuarioAtual?.id;
+
+                return (
+                  <div key={item.id} className={`flex ${minhaMensagem ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[82%] rounded-2xl border px-4 py-3 ${minhaMensagem ? "border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]" : "border-[var(--border-border)] bg-[var(--bg-muted)] text-[var(--text-text)]"}`}
+                    >
+                      <p className="text-[11px] font-black uppercase opacity-80">{autor?.nome ?? "Orbitlink"}</p>
+                      <p className="mt-1 text-sm leading-6">{item.texto}</p>
+                      <p className="mt-2 text-right font-monoapp text-[9px] opacity-70">{formatarTempoRelativo(item.criadoEm)}</p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {chatAtivo.mensagens.length === 0 ? (
+                <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-[var(--border-border)] p-6 text-center text-sm text-[var(--text-muted)]">
+                  Envie a primeira mensagem para iniciar a conversa.
+                </div>
+              ) : null}
+            </div>
+
+            <form onSubmit={enviarMensagem} className="flex gap-2 border-t border-[var(--border-border)] p-3">
+              <input
+                value={mensagem}
+                onChange={(evento) => setMensagem(evento.target.value)}
+                className="input-form rounded-full px-4 py-3"
+                placeholder="Digite sua mensagem..."
+              />
+              <button className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[var(--bg-primary)] text-[var(--text-primary)]" title="Enviar mensagem">
+                <Send className="h-5 w-5" />
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-[var(--text-muted)]">Crie uma conversa para começar.</div>
+        )}
+      </CardBase>
     </div>
   );
 }

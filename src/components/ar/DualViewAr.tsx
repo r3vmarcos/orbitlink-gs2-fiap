@@ -8,6 +8,7 @@ import type { PontoAr, TipoCamadaAr } from "@/types/orbitlink.types";
 /* === DUALVIEW AR | inicio === */
 interface DualViewArProps {
   pontoInicialId?: string;
+  camadaInicial?: TipoCamadaAr;
   onVerPosts: (pontoId: string) => void;
   onVerStatus: (pontoId: string) => void;
 }
@@ -20,9 +21,9 @@ const perspectivaCamera = "terra";
 const inclinacaoCeuPadrao = 58;
 const betaReferenciaPadrao = 90;
 
-export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
+export function DualViewAr({ pontoInicialId, camadaInicial, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr } = useOrbitLink();
-  const [camadasAtivas, setCamadasAtivas] = useState<TipoCamadaAr[]>(camadasOrbitlink);
+  const [camadasAtivas, setCamadasAtivas] = useState<TipoCamadaAr[]>(camadaInicial && camadasOrbitlink.includes(camadaInicial) ? [camadaInicial] : camadasOrbitlink);
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
   const [cameraAtiva, setCameraAtiva] = useState(false);

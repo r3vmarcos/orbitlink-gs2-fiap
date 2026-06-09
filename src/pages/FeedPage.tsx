@@ -229,8 +229,8 @@ export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPos
     ultimaRolagemFeedRef.current = rolagemAtual;
   }
 
-  function handleVerAr(pontoId?: string) {
-    const query = pontoId ? `?ponto=${pontoId}` : "";
+  function handleVerAr(pontoId?: string, camada?: string) {
+    const query = pontoId ? `?ponto=${encodeURIComponent(pontoId)}${camada ? `&camada=${encodeURIComponent(camada)}` : ""}` : "";
     navigate(`/dualview-ar${query}`);
   }
 
@@ -297,7 +297,7 @@ export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPos
   );
 }
 
-function GaleriaMarksRecomendados({ pontos, onAbrirMark }: { pontos: ReturnType<typeof useOrbitLink>["pontosAr"]; onAbrirMark: (pontoId?: string) => void }) {
+function GaleriaMarksRecomendados({ pontos, onAbrirMark }: { pontos: ReturnType<typeof useOrbitLink>["pontosAr"]; onAbrirMark: (pontoId?: string, camada?: string) => void }) {
   const [pontosMosaico, setPontosMosaico] = useState(() => montarPontosMosaico(pontos));
   const [indiceImagem, setIndiceImagem] = useState(0);
   const [indiceLayout, setIndiceLayout] = useState(0);
@@ -386,7 +386,7 @@ function CardMarkGaleria({
   ponto: ReturnType<typeof useOrbitLink>["pontosAr"][number];
   classeTamanho: string;
   indiceImagem: number;
-  onAbrirMark: (pontoId?: string) => void;
+  onAbrirMark: (pontoId?: string, camada?: string) => void;
   onPreview: (preview: PreviewMark | null) => void;
 }) {
   const cor = corCamadaMark(ponto.camada[0]);
@@ -394,7 +394,7 @@ function CardMarkGaleria({
 
   return (
     <button
-      onClick={() => onAbrirMark(ponto.id)}
+      onClick={() => onAbrirMark(ponto.id, ponto.camada[0])}
       onMouseEnter={() => onPreview({ ponto, imagem })}
       onMouseLeave={() => onPreview(null)}
       onFocus={() => onPreview({ ponto, imagem })}

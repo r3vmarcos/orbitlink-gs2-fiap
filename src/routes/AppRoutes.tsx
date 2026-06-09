@@ -10,6 +10,7 @@ import { LojaPage } from '@/pages/LojaPage';
 import { MarkPage } from '@/pages/MarkPage';
 import { MissoesPage } from '@/pages/MissoesPage';
 import { PerfisPage } from '@/pages/PerfisPage';
+import { PersonalizacaoPerfilPage } from '@/pages/PersonalizacaoPerfilPage';
 import { PessoasPage } from '@/pages/PessoasPage';
 import type { CategoriaTemaId, TemaVisual } from '@/types/tema';
 import type { PostOrbitLink, StatusOrbital } from '@/types/orbitlink.types';
@@ -72,35 +73,23 @@ export function AppRoutes({
       <Route path="/missoes" element={<MissoesPage />} />
       <Route path="/galeria" element={<GaleriaPage />} />
       <Route path="/loja/:produtoId" element={<LojaPage />} />
-      <Route
-        path="/perfis"
-        element={
-          <PerfisPage
-            onAlternarClaroEscuro={onAlternarClaroEscuro}
-            categoriasTema={categoriasTema}
-            paletasTema={paletasTema}
-            categoriaAtivaId={categoriaAtivaId}
-            paletaAtivaNome={paletaAtivaNome}
-            onSelecionarCategoria={onSelecionarCategoria}
-            onSelecionarPaleta={onSelecionarPaleta}
-          />
-        }
-      />
-      <Route
-        path="/perfis/:usuarioId"
-        element={
-          <PerfisPage
-            onAlternarClaroEscuro={onAlternarClaroEscuro}
-            categoriasTema={categoriasTema}
-            paletasTema={paletasTema}
-            categoriaAtivaId={categoriaAtivaId}
-            paletaAtivaNome={paletaAtivaNome}
-            onSelecionarCategoria={onSelecionarCategoria}
-            onSelecionarPaleta={onSelecionarPaleta}
-          />
-        }
-      />
+      <Route path="/perfis" element={<PerfisPage />} />
+      <Route path="/perfis/:usuarioId" element={<PerfisPage />} />
       <Route path="/pessoas" element={<PessoasPage />} />
+      <Route
+        path="/personalização_perfil"
+        element={
+          <PersonalizacaoPerfilPage
+            onAlternarClaroEscuro={onAlternarClaroEscuro}
+            categoriasTema={categoriasTema}
+            paletasTema={paletasTema}
+            categoriaAtivaId={categoriaAtivaId}
+            paletaAtivaNome={paletaAtivaNome}
+            onSelecionarCategoria={onSelecionarCategoria}
+            onSelecionarPaleta={onSelecionarPaleta}
+          />
+        }
+      />
       <Route path="/impacto" element={<ImpactoPage />} />
       <Route path="/dados-nasa" element={<DadosNasaPage />} />
       <Route path="/adm-orbitlink" element={<AdmOrbitlinkPage />} />

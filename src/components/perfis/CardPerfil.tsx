@@ -7,7 +7,7 @@ import type { UsuarioOrbitLink } from '@/types/orbitlink.types';
 import { formatarNumeroCompacto } from '@/utils/formatadores';
 
 /* === CARD PERFIL | inicio === */
-export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuario: UsuarioOrbitLink; destaque?: boolean; onAlterarFoto?: (foto: string) => void }) {
+export function CardPerfil({ usuario, destaque = false, seguindo = false, onSeguir, onAlterarFoto }: { usuario: UsuarioOrbitLink; destaque?: boolean; seguindo?: boolean; onSeguir?: () => void; onAlterarFoto?: (foto: string) => void }) {
   const foto = usuario.fotoPerfil ?? `https://i.pravatar.cc/240?u=${usuario.id}`;
   const bio = criarBioUsuario(usuario);
   const [modalConquistasAberto, setModalConquistasAberto] = useState(false);
@@ -67,7 +67,11 @@ export function CardPerfil({ usuario, destaque = false, onAlterarFoto }: { usuar
           <p>Light [Tema] [Paleta]</p>
         </div>
       ) : null}
-      {!destaque ? <Botao className="mt-4 w-full" variante="secundario"><UserPlus className="h-4 w-4" /> Seguir</Botao> : null}
+      {!destaque ? (
+        <Botao className="mt-4 w-full" variante={seguindo ? 'primario' : 'secundario'} onClick={onSeguir}>
+          <UserPlus className="h-4 w-4" /> {seguindo ? 'Seguindo' : 'Seguir'}
+        </Botao>
+      ) : null}
 
       <Modal aberto={modalConquistasAberto} titulo="Conquistas do perfil" onFechar={() => setModalConquistasAberto(false)}>
         <div className="grid gap-2">

@@ -1,7 +1,6 @@
 import { Bookmark, Heart, MapPin, MessageCircle, Send, Share2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { Badge } from '@/components/ui/Badge';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
 import type { PostOrbitLink } from '@/types/orbitlink.types';
@@ -20,6 +19,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   const [comentario, setComentario] = useState('');
   const [comentariosAbertos, setComentariosAbertos] = useState(false);
   const autor = usuarios.find((usuario) => usuario.id === post.autorId) ?? usuarios[0];
+  const fotoAutor = autor.fotoPerfil ?? `https://i.pravatar.cc/120?u=${autor.id}`;
   const ponto = pontosAr.find((pontoAr) => pontoAr.id === post.pontoArId);
   const curtido = postsCurtidos.includes(post.id);
   const salvo = postsSalvos.includes(post.id);
@@ -35,7 +35,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   return (
     <article className="animate-subir overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-transparent shadow-soft backdrop-blur-xl">
       <header className="flex items-center gap-3 p-3 sm:p-4">
-        <AvatarOrbital gradiente={autor.avatarGradiente} nome={autor.nome} />
+        <img src={fotoAutor} alt={autor.nome} className="h-12 w-12 shrink-0 rounded-2xl border border-[var(--border-border)] object-cover" loading="lazy" />
         <div className="min-w-0 flex-1">
           <button onClick={() => navigate(`/perfis/${autor.id}`)} className="block max-w-full truncate text-left text-sm font-black text-[var(--text-text)] hover:text-[var(--text-link)]">{autor.nome}</button>
           <p className="truncate font-monoapp text-[9px] uppercase tracking-[0.04em] text-[var(--text-muted)] min-[380px]:text-[10px] min-[380px]:tracking-[0.08em]">

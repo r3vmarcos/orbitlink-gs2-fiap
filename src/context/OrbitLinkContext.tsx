@@ -95,6 +95,8 @@ interface OrbitLinkContextValue {
   compartilharPost: (postId: string) => void;
   excluirPost: (postId: string) => void;
   seguirPonto: (pontoId: string) => void;
+  usuariosSeguidos: string[];
+  seguirUsuario: (usuarioId: string) => void;
   criarChat: (participanteIds: string[], nome?: string) => string | undefined;
   enviarMensagemChat: (chatId: string, texto: string) => void;
   adicionarParticipantesChat: (chatId: string, participanteIds: string[]) => void;
@@ -129,6 +131,9 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   );
   const [pontosSeguidos, setPontosSeguidos] = useState<string[]>(() =>
     lerLocalStorage<string[]>('orbitlink_pontos_seguidos', []),
+  );
+  const [usuariosSeguidos, setUsuariosSeguidos] = useState<string[]>(() =>
+    lerLocalStorage<string[]>('orbitlink_usuarios_seguidos', []),
   );
   const [chatsUsuario, setChatsUsuario] = useState<ChatOrbitLink[]>(() =>
     lerLocalStorage<ChatOrbitLink[]>('orbitlink_chats_usuario', []),
@@ -175,6 +180,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
   useEffect(() => salvarLocalStorage('orbitlink_posts_curtidos', postsCurtidos), [postsCurtidos]);
   useEffect(() => salvarLocalStorage('orbitlink_posts_salvos', postsSalvos), [postsSalvos]);
   useEffect(() => salvarLocalStorage('orbitlink_pontos_seguidos', pontosSeguidos), [pontosSeguidos]);
+  useEffect(() => salvarLocalStorage('orbitlink_usuarios_seguidos', usuariosSeguidos), [usuariosSeguidos]);
   useEffect(() => salvarLocalStorage('orbitlink_chats_usuario', chatsUsuario), [chatsUsuario]);
   useEffect(() => salvarLocalStorage('orbitlink_usuarios_locais', usuariosLocais), [usuariosLocais]);
   useEffect(() => salvarLocalStorage('orbitlink_usuario_atual_id', usuarioAtualId), [usuarioAtualId]);
@@ -577,6 +583,10 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     setPontosSeguidos((ids) => (ids.includes(pontoId) ? ids.filter((id) => id !== pontoId) : [...ids, pontoId]));
   }, []);
 
+  const seguirUsuario = useCallback((usuarioId: string) => {
+    setUsuariosSeguidos((ids) => (ids.includes(usuarioId) ? ids.filter((id) => id !== usuarioId) : [...ids, usuarioId]));
+  }, []);
+
   const criarChat = useCallback((participanteIds: string[], nome?: string) => {
     if (!usuarioAtual?.id) {
       return undefined;
@@ -740,6 +750,8 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     compartilharPost,
     excluirPost,
     seguirPonto,
+    usuariosSeguidos,
+    seguirUsuario,
     criarChat,
     enviarMensagemChat,
     adicionarParticipantesChat,
@@ -757,6 +769,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     postsCurtidos,
     postsSalvos,
     pontosSeguidos,
+    usuariosSeguidos,
     carregandoApi,
     erroApi,
     ultimaSincronizacaoApi,
@@ -775,6 +788,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     compartilharPost,
     excluirPost,
     seguirPonto,
+    seguirUsuario,
     criarChat,
     enviarMensagemChat,
     adicionarParticipantesChat,

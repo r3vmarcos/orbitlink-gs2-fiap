@@ -62,14 +62,16 @@ export function GaleriaPage() {
 
   return (
     <div className="space-y-5">
-      <section className="flex flex-col gap-3 rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_82%,transparent)] p-5 shadow-soft backdrop-blur-xl md:flex-row md:items-center">
-        <h1 className="titulo-pagina shrink-0 text-center md:text-left">Galeria do Universo</h1>
-        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1.5 pb-1 text-center md:justify-end">
-          {filtrosGaleria.map((categoria) => (
-            <button key={categoria} onClick={() => alternarFiltro(categoria)} className={`shrink-0 rounded-full border px-2.5 py-1 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] lg:text-[14px] ${(categoria === 'todas' && filtrosAtivos.length === 0) || (categoria !== 'todas' && filtrosAtivos.includes(categoria)) ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
-              #{categoria}
-            </button>
-          ))}
+      <section className="flex flex-col items-center gap-3 rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_82%,transparent)] p-5 shadow-soft backdrop-blur-xl lg:flex-row lg:justify-center lg:items-center">
+        <h1 className="titulo-pagina shrink-0 text-center">Galeria do Universo</h1>
+        <div className="min-w-0 w-full">
+          <div className="grid w-full grid-cols-4 gap-2 text-center lg:grid-cols-[repeat(8,minmax(0,1fr))]">
+            {filtrosGaleria.map((categoria) => (
+              <button key={categoria} onClick={() => alternarFiltro(categoria)} className={`rounded-full border px-2.5 py-1 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] lg:text-[14px] ${(categoria === 'todas' && filtrosAtivos.length === 0) || (categoria !== 'todas' && filtrosAtivos.includes(categoria)) ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+                #{categoria}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
