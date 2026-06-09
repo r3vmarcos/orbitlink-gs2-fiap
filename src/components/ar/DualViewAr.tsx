@@ -20,6 +20,12 @@ const intensidadeArrasteCamera = 0.32;
 const perspectivaCamera = "terra";
 const inclinacaoCeuPadrao = 58;
 const betaReferenciaPadrao = 90;
+const limiteMapaDesktop = {
+  esquerda: 30,
+  direita: 85,
+  topo: 10,
+  baixo: 90,
+};
 
 export function DualViewAr({ pontoInicialId, camadaInicial, onVerPosts, onVerStatus }: DualViewArProps) {
   const { pontosAr } = useOrbitLink();
@@ -38,10 +44,10 @@ export function DualViewAr({ pontoInicialId, camadaInicial, onVerPosts, onVerSta
   const ultimoAzimuteSensorRef = useRef(0);
 
   const pontosVisiveis = useMemo(() => {
-    return pontosAr.filter((ponto) => ponto.perspectiva === perspectivaCamera && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
+    return pontosAr.filter((ponto) => ponto.camada.some((camada) => camadasAtivas.includes(camada)));
   }, [camadasAtivas, pontosAr]);
   const pontosMapa = useMemo(() => {
-    return pontosAr.filter((ponto) => ponto.perspectiva === "espaco" && ponto.camada.some((camada) => camadasAtivas.includes(camada)));
+    return reduzirPontosPorCamada(pontosAr, camadasAtivas);
   }, [camadasAtivas, pontosAr]);
   const pontoSelecionado = pontosAr.find((ponto) => ponto.id === pontoSelecionadoId);
 
@@ -398,9 +404,10 @@ function MapaMarks({
       <Map className="pointer-events-none absolute right-5 top-5 h-6 w-6 text-cyan-200/70 light-theme:text-sky-900/70" />
       {pontos.map((ponto) => {
         const ativo = ponto.id === pontoSelecionadoId;
+        const posicaoMapa = calcularPosicaoMapaDesktop(ponto);
 
         return (
-          <div key={ponto.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${ponto.x}%`, top: `${ponto.y}%` }}>
+          <div key={ponto.id} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${posicaoMapa.x}%`, top: `${posicaoMapa.y}%` }}>
             <button
               onClick={(evento) => {
                 evento.stopPropagation();
@@ -450,6 +457,28 @@ function menorDiferencaGraus(destino: number, origem: number) {
 
 function limitar(valor: number, minimo: number, maximo: number) {
   return Math.min(Math.max(valor, minimo), maximo);
+}
+
+function calcularPosicaoMapaDesktop(ponto: PontoAr) {
+  return {
+    x: limiteMapaDesktop.esquerda + (ponto.x / 100) * (limiteMapaDesktop.direita - limiteMapaDesktop.esquerda),
+    y: limiteMapaDesktop.topo + (ponto.y / 100) * (limiteMapaDesktop.baixo - limiteMapaDesktop.topo),
+  };
+}
+
+function reduzirPontosPorCamada(pontos: PontoAr[], camadasAtivas: TipoCamadaAr[]) {
+  const idsSelecionados = new Set<string>();
+
+  camadasAtivas.forEach((camadaAtiva) => {
+    const pontosDaCamada = pontos.filter((ponto) => ponto.camada.includes(camadaAtiva));
+    const limiteCamada = Math.ceil(pontosDaCamada.length / 2);
+
+    pontosDaCamada.slice(0, limiteCamada).forEach((ponto) => {
+      idsSelecionados.add(ponto.id);
+    });
+  });
+
+  return pontos.filter((ponto) => idsSelecionados.has(ponto.id));
 }
 
 function corCamada(camada?: TipoCamadaAr) {
