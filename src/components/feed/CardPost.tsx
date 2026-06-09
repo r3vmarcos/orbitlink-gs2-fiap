@@ -51,9 +51,16 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
       </header>
 
       {post.imagem ? (
-        <button onClick={() => onAbrirDetalhes?.(post)} className="group block w-full overflow-hidden">
-          <img src={post.imagem} alt={post.titulo} className="aspect-[5/3] w-full object-cover transition duration-500 group-hover:scale-105 sm:aspect-[20/9]" loading="lazy" />
-        </button>
+        <div>
+          <button onClick={() => onAbrirDetalhes?.(post)} className="group block aspect-[5/3] w-full overflow-hidden sm:aspect-[20/9]">
+            <img src={post.imagem} alt={post.titulo} className="block h-full w-[180%] max-w-none -translate-x-[22.222%] object-cover object-center transition duration-500 group-hover:scale-105" loading="lazy" />
+          </button>
+          {(post.imagemCredito || post.imagemFonte) ? (
+            <p className="border-t border-[var(--border-border)] bg-[var(--bg-muted)] px-3 py-1.5 text-[10px] font-semibold text-[var(--text-muted)] sm:px-4">
+              Imagem: {post.imagemCredito ?? 'curadoria OrbitLink'}{post.imagemFonte ? ` · ${post.imagemFonte}` : ''}
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <div className="space-y-4 p-3 sm:p-4">
