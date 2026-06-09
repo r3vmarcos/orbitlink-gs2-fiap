@@ -3,16 +3,14 @@ import { Search } from 'lucide-react';
 import { CardPerfil } from '@/components/perfis/CardPerfil';
 import { CardBase } from '@/components/ui/CardBase';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
-import { lerLocalStorage } from '@/services/localStorageService';
 
 /* === PESSOAS PAGE | inicio === */
-const placeholdersBuscaPessoas = ['CONECTE A PESSOAS', 'ENCONTRE MISSÕES', 'ACHE COMUNIDADES'];
+const placeholdersBuscaPessoas = ['CONECTE A COMUNIDADE', 'ENCONTRE EMPRESAS', 'ACHE INSTITUIÇÕES'];
 
 export function PessoasPage() {
-  const { usuarios, usuarioAtual } = useOrbitLink();
+  const { usuarios, usuarioAtual, fotosPerfil, usuariosSeguidos, seguirUsuario } = useOrbitLink();
   const [busca, setBusca] = useState('');
   const [indicePlaceholderBusca, setIndicePlaceholderBusca] = useState(0);
-  const [fotosLocais] = useState<Record<string, string>>(() => lerLocalStorage('orbitlink_fotos_perfil', {}));
 
   useEffect(() => {
     const temporizador = window.setInterval(() => {
@@ -27,12 +25,12 @@ export function PessoasPage() {
 
     return usuarios
       .filter((usuario) => usuario.id !== usuarioAtual?.id)
-      .map((usuario) => ({ ...usuario, fotoPerfil: fotosLocais[usuario.id] ?? usuario.fotoPerfil }))
+      .map((usuario) => ({ ...usuario, fotoPerfil: fotosPerfil[usuario.id] ?? usuario.fotoPerfil }))
       .filter((usuario) => {
         const alvo = `${usuario.nome} ${usuario.usuario} ${usuario.tipo} ${usuario.cargo} ${usuario.localizacaoAtual} ${usuario.conquistas.join(' ')}`.toLowerCase();
         return alvo.includes(termo);
       });
-  }, [busca, fotosLocais, usuarioAtual?.id, usuarios]);
+  }, [busca, fotosPerfil, usuarioAtual?.id, usuarios]);
 
   return (
     <div className="space-y-5">
@@ -55,7 +53,14 @@ export function PessoasPage() {
       </CardBase>
 
       <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {pessoas.map((usuario) => <CardPerfil key={usuario.id} usuario={usuario} />)}
+        {pessoas.map((usuario) => (
+          <CardPerfil
+            key={usuario.id}
+            usuario={usuario}
+            seguindo={usuariosSeguidos.includes(usuario.id)}
+            onSeguir={() => seguirUsuario(usuario.id)}
+          />
+        ))}
       </div>
     </div>
   );
