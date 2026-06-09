@@ -19,7 +19,7 @@ export function GaleriaPage() {
   const [limiteFotos, setLimiteFotos] = useState(TAMANHO_LOTE_FOTOS);
   const sentinelaRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const itens = galeria;
+  const itens = useMemo(() => misturarGaleria(galeria), [galeria]);
   const itensFiltrados = useMemo(() => itens.filter((item) => filtrosAtivos.length === 0 || filtrosAtivos.includes(item.categoria)), [filtrosAtivos, itens]);
   const itensVisiveis = useMemo(() => itensFiltrados.slice(0, limiteFotos), [itensFiltrados, limiteFotos]);
 
@@ -94,5 +94,13 @@ export function GaleriaPage() {
       </Modal>
     </div>
   );
+}
+
+function misturarGaleria(itens: ItemGaleria[]) {
+  return [...itens].sort((itemA, itemB) => chaveMisturaGaleria(itemA.id) - chaveMisturaGaleria(itemB.id));
+}
+
+function chaveMisturaGaleria(id: string) {
+  return Array.from(id).reduce((total, caractere, indice) => total + caractere.charCodeAt(0) * (indice + 11), 0) % 997;
 }
 /* === GALERIA PAGE | fim === */
