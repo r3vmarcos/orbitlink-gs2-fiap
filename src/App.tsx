@@ -14,24 +14,46 @@ import type { CategoriaTemaId } from '@/types/tema';
 import type { PostOrbitLink, StatusOrbital } from '@/types/orbitlink.types';
 import { aplicarTokensTema, gerarTokensTema } from '@/utils/tema';
 
+const CATEGORIA_DARK_PADRAO: CategoriaTemaId = 'dark-sci';
+const CATEGORIA_LIGHT_PADRAO: CategoriaTemaId = 'light-editorial';
+const PALETA_DARK_PADRAO = 'Radio Telescope';
+const PALETA_LIGHT_PADRAO = 'Paper Review';
+const INDICE_PALETA_DARK_PADRAO = temasPorCategoria[CATEGORIA_DARK_PADRAO].findIndex((paleta) => paleta.name === PALETA_DARK_PADRAO);
+const INDICE_PALETA_LIGHT_PADRAO = temasPorCategoria[CATEGORIA_LIGHT_PADRAO].findIndex((paleta) => paleta.name === PALETA_LIGHT_PADRAO);
+
+function lerCategoriaTemaPadrao(chave: string, categoriaPadrao: CategoriaTemaId, categoriaClassica: CategoriaTemaId) {
+  const categoriaSalva = lerLocalStorage<CategoriaTemaId>(chave, categoriaPadrao);
+  return categoriaSalva === categoriaClassica ? categoriaPadrao : categoriaSalva;
+}
+
+function lerIndicePaletaPadrao(chaveCategoria: string, chavePaleta: string, categoriaPadrao: CategoriaTemaId, categoriaClassica: CategoriaTemaId, indicePadrao: number) {
+  const categoriaSalva = lerLocalStorage<CategoriaTemaId>(chaveCategoria, categoriaPadrao);
+
+  if (categoriaSalva === categoriaClassica) {
+    return indicePadrao;
+  }
+
+  return lerLocalStorage<number>(chavePaleta, indicePadrao);
+}
+
 /* === APP INTERNO | inicio === */
 function AppInterno() {
   const [modalPostAberto, setModalPostAberto] = useState(false);
   const [abaPublicacao, setAbaPublicacao] = useState<'post' | 'status'>('post');
   const [statusAberto, setStatusAberto] = useState<StatusOrbital | undefined>();
   const [postDetalhe, setPostDetalhe] = useState<PostOrbitLink | undefined>();
-  const [categoriaDarkId, setCategoriaDarkId] = useState<CategoriaTemaId>(() => lerLocalStorage<CategoriaTemaId>('orbitlink_categoria_dark', 'dark'));
-  const [categoriaLightId, setCategoriaLightId] = useState<CategoriaTemaId>(() => lerLocalStorage<CategoriaTemaId>('orbitlink_categoria_light', 'light'));
-  const [indicePaletaDark, setIndicePaletaDark] = useState(() => lerLocalStorage<number>('orbitlink_paleta_dark', 0));
-  const [indicePaletaLight, setIndicePaletaLight] = useState(() => lerLocalStorage<number>('orbitlink_paleta_light', 0));
+  const [categoriaDarkId, setCategoriaDarkId] = useState<CategoriaTemaId>(() => lerCategoriaTemaPadrao('orbitlink_categoria_dark', CATEGORIA_DARK_PADRAO, 'dark'));
+  const [categoriaLightId, setCategoriaLightId] = useState<CategoriaTemaId>(() => lerCategoriaTemaPadrao('orbitlink_categoria_light', CATEGORIA_LIGHT_PADRAO, 'light'));
+  const [indicePaletaDark, setIndicePaletaDark] = useState(() => lerIndicePaletaPadrao('orbitlink_categoria_dark', 'orbitlink_paleta_dark', CATEGORIA_DARK_PADRAO, 'dark', Math.max(INDICE_PALETA_DARK_PADRAO, 0)));
+  const [indicePaletaLight, setIndicePaletaLight] = useState(() => lerIndicePaletaPadrao('orbitlink_categoria_light', 'orbitlink_paleta_light', CATEGORIA_LIGHT_PADRAO, 'light', Math.max(INDICE_PALETA_LIGHT_PADRAO, 0)));
   const navigate = useNavigate();
   const location = useLocation();
   const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
   const rotaAdmin = location.pathname === '/adm-orbitlink';
   const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
   const categoriaAtiva = tema === 'dark'
-    ? (categoriasDoModo.some((categoria) => categoria.id === categoriaDarkId) ? categoriaDarkId : 'dark')
-    : (categoriasDoModo.some((categoria) => categoria.id === categoriaLightId) ? categoriaLightId : 'light');
+    ? (categoriasDoModo.some((categoria) => categoria.id === categoriaDarkId) ? categoriaDarkId : CATEGORIA_DARK_PADRAO)
+    : (categoriasDoModo.some((categoria) => categoria.id === categoriaLightId) ? categoriaLightId : CATEGORIA_LIGHT_PADRAO);
   const paletasAtivas = temasPorCategoria[categoriaAtiva];
   const indicePaletaAtivo = tema === 'dark' ? indicePaletaDark : indicePaletaLight;
   const temaAtivo = paletasAtivas[indicePaletaAtivo % paletasAtivas.length] ?? paletasAtivas[0];
@@ -86,24 +108,7 @@ function AppInterno() {
     <LayoutPrincipal
       onAbrirPost={() => abrirPublicacao('post')}
       onAbrirStatus={() => abrirPublicacao('status')}
-      onAlternarTemaVisual={() => {
-        const indiceAtual = categoriasDoModo.findIndex((categoria) => categoria.id === categoriaAtiva);
-        const proximaCategoria = categoriasDoModo[(indiceAtual + 1) % categoriasDoModo.length]?.id;
-        if (!proximaCategoria) return;
-        if (tema === 'dark') setCategoriaDarkId(proximaCategoria);
-        else setCategoriaLightId(proximaCategoria);
-      }}
-      onAlternarPaleta={() => tema === 'dark' ? setIndicePaletaDark((valor) => valor + 1) : setIndicePaletaLight((valor) => valor + 1)}
       onAlternarClaroEscuro={alternarTema}
-      categoriasTema={categoriasTema}
-      paletasTema={paletasAtivas}
-      categoriaAtivaId={categoriaAtiva}
-      paletaAtivaNome={temaAtivo.name}
-      onSelecionarCategoria={(id) => {
-        if (id.startsWith('dark')) setCategoriaDarkId(id);
-        else setCategoriaLightId(id);
-      }}
-      onSelecionarPaleta={(indice) => tema === 'dark' ? setIndicePaletaDark(indice) : setIndicePaletaLight(indice)}
     >
       <AppRoutes
         onAbrirPost={() => abrirPublicacao('post')}

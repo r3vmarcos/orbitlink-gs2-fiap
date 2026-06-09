@@ -2,7 +2,6 @@ import { Compass, Layers3, Map, ZoomIn, ZoomOut } from 'lucide-react';
 import type { PointerEvent, TouchEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
-import { Botao } from '@/components/ui/Botao';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
 import type { PontoAr, TipoCamadaAr } from '@/types/orbitlink.types';
 
@@ -22,7 +21,7 @@ const inclinacaoCeuPadrao = 58;
 const betaReferenciaPadrao = 90;
 
 export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualViewArProps) {
-  const { pontosAr, sincronizarApisNasa, carregandoApi } = useOrbitLink();
+  const { pontosAr } = useOrbitLink();
   const [camadasAtivas, setCamadasAtivas] = useState<TipoCamadaAr[]>(camadasOrbitlink);
   const [pontoSelecionadoId, setPontoSelecionadoId] = useState<string | undefined>(pontoInicialId);
   const [erroCamera, setErroCamera] = useState<string | undefined>();
@@ -77,6 +76,10 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
 
   function alternarCamada(camada: TipoCamadaAr) {
     setCamadasAtivas((atuais) => (atuais.includes(camada) ? atuais.filter((item) => item !== camada) : [...atuais, camada]));
+  }
+
+  function alternarTodasCamadas() {
+    setCamadasAtivas((atuais) => (atuais.length === camadasOrbitlink.length ? [] : camadasOrbitlink));
   }
 
   async function solicitarPermissaoMovimento() {
@@ -211,7 +214,7 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
             </button>
           </div>
           <div className="absolute left-3 top-16 z-30 max-w-[calc(100vw-1.5rem)]">
-            <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} recolhidoMobile />
+            <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} onAlternarTodas={alternarTodasCamadas} recolhidoMobile />
           </div>
           <div className="absolute bottom-24 left-3 right-3 flex flex-wrap gap-2">
             <Badge tom="azul">{pontosVisiveis.length} marks ativos</Badge>
@@ -224,16 +227,12 @@ export function DualViewAr({ pontoInicialId, onVerPosts, onVerStatus }: DualView
 
       <section className="fixed inset-x-0 bottom-0 top-[58px] z-40 hidden overflow-hidden bg-[var(--bg-background)] p-4 lg:block">
         <div className="absolute left-5 right-5 top-5 z-30">
-          <div className="flex items-start justify-between gap-4 rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_82%,transparent)] p-3 backdrop-blur-xl">
-            <div>
-              <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.18em] text-[var(--text-link)]">Mapa</p>
-              <h1 className="text-lg font-black uppercase text-[var(--text-text)]">Mapa Orbitlink</h1>
-            </div>
-            <div className="min-w-0 flex-1">
-              <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} />
-            </div>
-            <Botao tamanho="sm" variante="secundario" onClick={() => void sincronizarApisNasa()} disabled={carregandoApi}>{carregandoApi ? 'Sync' : 'NASA'}</Botao>
+          <div className="inline-flex p-3">
+            <h1 className="text-2xl font-black uppercase leading-tight text-white sm:text-4xl">Mapa Orbitlink</h1>
           </div>
+        </div>
+        <div className="absolute bottom-3 left-5 top-24 z-30 w-44">
+          <MenuCamadas camadasAtivas={camadasAtivas} onAlternarCamada={alternarCamada} onAlternarTodas={alternarTodasCamadas} />
         </div>
         <MapaMarks pontos={pontosMapa} pontoSelecionadoId={pontoSelecionadoId} onSelecionar={setPontoSelecionadoId} onAbrir={onVerPosts} />
       </section>
@@ -278,17 +277,24 @@ function PontoArVisual({ ponto, ativo, visaoCamera, zoomCamera, onSelecionar, on
   );
 }
 
-function MenuCamadas({ camadasAtivas, onAlternarCamada, recolhidoMobile = false }: { camadasAtivas: TipoCamadaAr[]; onAlternarCamada: (camada: TipoCamadaAr) => void; recolhidoMobile?: boolean }) {
+function MenuCamadas({ camadasAtivas, onAlternarCamada, onAlternarTodas, recolhidoMobile = false }: { camadasAtivas: TipoCamadaAr[]; onAlternarCamada: (camada: TipoCamadaAr) => void; onAlternarTodas: () => void; recolhidoMobile?: boolean }) {
   const [aberto, setAberto] = useState(!recolhidoMobile);
   const mostrarItens = aberto || !recolhidoMobile;
+  const todasAtivas = camadasAtivas.length === camadasOrbitlink.length;
 
   return (
-    <div className="rounded-2xl border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-background)_78%,transparent)] p-2 backdrop-blur-xl">
-      <button onClick={() => setAberto((valor) => !valor)} className="flex items-center gap-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.12em] text-[var(--text-muted)]">
+    <div className="flex h-full min-h-0 flex-col rounded-2xl border border-[var(--border-border)] bg-transparent p-2 backdrop-blur-xl">
+      <button onClick={() => setAberto((valor) => !valor)} className={`items-center gap-1.5 font-monoapp text-[9px] font-black uppercase tracking-[0.12em] text-[var(--text-muted)] ${recolhidoMobile ? 'flex' : 'hidden'}`}>
         <Layers3 className="h-3.5 w-3.5" />
         Camadas
       </button>
-      <div className={`${mostrarItens ? 'mt-2 max-h-[430px] opacity-100' : 'max-h-0 opacity-0'} grid max-w-full gap-2 overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${recolhidoMobile ? 'grid-cols-1' : 'grid-cols-2 xl:grid-cols-6'}`}>
+      <div className={`${mostrarItens ? `${recolhidoMobile ? 'mt-2' : ''} max-h-[430px] opacity-100` : 'max-h-0 opacity-0'} min-h-0 max-w-full flex-1 gap-1.5 overflow-hidden transition-[max-height,opacity] duration-300 ease-out ${recolhidoMobile ? 'grid grid-cols-1' : 'flex flex-col items-center justify-between'}`}>
+        <button
+          onClick={onAlternarTodas}
+          className={`w-full shrink-0 rounded-full border px-2.5 py-1 text-center font-monoapp text-[10px] font-black uppercase tracking-[0.06em] ${todasAtivas ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}
+        >
+          Todas {todasAtivas ? '-' : '+'}
+        </button>
         {camadasOrbitlink.map((camada) => {
           const ativa = camadasAtivas.includes(camada);
 
@@ -296,7 +302,7 @@ function MenuCamadas({ camadasAtivas, onAlternarCamada, recolhidoMobile = false 
             <button
               key={camada}
               onClick={() => onAlternarCamada(camada)}
-              className={`shrink-0 rounded-full border px-3 py-1.5 text-left font-monoapp text-[9px] font-black uppercase tracking-[0.06em] ${ativa ? 'text-slate-950' : 'text-[var(--text-muted)]'}`}
+              className={`w-full shrink-0 rounded-full border px-2.5 py-1 text-center font-monoapp text-[10px] font-black uppercase tracking-[0.06em] ${ativa ? 'text-slate-950' : 'text-[var(--text-muted)]'}`}
               style={{ backgroundColor: ativa ? corCamada(camada) : 'transparent', borderColor: corCamada(camada) }}
             >
               {camada}

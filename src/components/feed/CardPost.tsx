@@ -33,7 +33,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
   }
 
   return (
-    <article className="animate-subir overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_86%,transparent)] shadow-soft backdrop-blur-xl">
+    <article className="animate-subir overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-transparent shadow-soft backdrop-blur-xl">
       <header className="flex items-center gap-3 p-3 sm:p-4">
         <AvatarOrbital gradiente={autor.avatarGradiente} nome={autor.nome} />
         <div className="min-w-0 flex-1">
@@ -52,7 +52,7 @@ export function CardPost({ post, onVerAr, onAbrirDetalhes }: CardPostProps) {
 
       {post.imagem ? (
         <button onClick={() => onAbrirDetalhes?.(post)} className="group block w-full overflow-hidden">
-          <img src={post.imagem} alt={post.titulo} className="aspect-[4/3] w-full object-cover transition duration-500 group-hover:scale-105 sm:aspect-[16/9]" loading="lazy" />
+          <img src={post.imagem} alt={post.titulo} className="aspect-[5/3] w-full object-cover transition duration-500 group-hover:scale-105 sm:aspect-[20/9]" loading="lazy" />
         </button>
       ) : null}
 

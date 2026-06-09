@@ -6,6 +6,7 @@ import { DualViewArPage } from '@/pages/DualViewArPage';
 import { FeedPage } from '@/pages/FeedPage';
 import { GaleriaPage } from '@/pages/GaleriaPage';
 import { ImpactoPage } from '@/pages/ImpactoPage';
+import { LojaPage } from '@/pages/LojaPage';
 import { MarkPage } from '@/pages/MarkPage';
 import { MissoesPage } from '@/pages/MissoesPage';
 import { PerfisPage } from '@/pages/PerfisPage';
@@ -70,6 +71,7 @@ export function AppRoutes({
       <Route path="/mark/:pontoId" element={<MarkPage onAbrirDetalhesPost={onAbrirDetalhesPost} />} />
       <Route path="/missoes" element={<MissoesPage />} />
       <Route path="/galeria" element={<GaleriaPage />} />
+      <Route path="/loja/:produtoId" element={<LojaPage />} />
       <Route
         path="/perfis"
         element={

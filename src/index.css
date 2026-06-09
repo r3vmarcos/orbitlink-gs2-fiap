@@ -74,6 +74,11 @@ body {
 
 /* === FORMULARIOS | inicio === */
 @layer components {
+  .titulo-painel {
+    @apply font-monoapp text-xs font-black uppercase tracking-[0.14em];
+    color: var(--text-link);
+  }
+
   .input-form {
     @apply w-full rounded-2xl border px-4 py-3 text-sm font-semibold outline-none transition;
     border-color: var(--border-input);
@@ -97,6 +102,17 @@ body {
 }
 /* === FORMULARIOS | fim === */
 
+/* === SCROLL OCULTO | inicio === */
+.sem-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sem-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* === SCROLL OCULTO | fim === */
+
 /* === AJUSTES MOBILE FULLSCREEN | inicio === */
 @supports (height: 100dvh) {
   .h-tela-mobile {
@@ -116,6 +132,26 @@ body {
   }
 }
 
+@keyframes orbitlink-status-esquerda {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes orbitlink-status-direita {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes orbitlink-lista-vertical {
   from {
     transform: translateY(0);
@@ -132,6 +168,21 @@ body {
 
 .animacao-lista-vertical {
   animation: orbitlink-lista-vertical 20s linear infinite;
+}
+
+.animacao-status-esquerda {
+  animation: orbitlink-status-esquerda 16s linear infinite;
+}
+
+.animacao-status-direita {
+  animation: orbitlink-status-direita 16s linear infinite;
+}
+
+@media (min-width: 768px) {
+  .grupo-marquee-status:hover .animacao-status-esquerda,
+  .grupo-marquee-status:hover .animacao-status-direita {
+    animation-play-state: paused;
+  }
 }
 
 .pausar-animacao:hover .animacao-marquee-horizontal,
