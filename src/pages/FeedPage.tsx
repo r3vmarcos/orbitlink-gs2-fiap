@@ -120,7 +120,7 @@ export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPos
   }, [busca, filtrosAtivos, pontoFiltro, pontosAr, posts, usuarios]);
 
   const postsVisiveis = useMemo(() => postsFiltrados.slice(0, limitePosts), [limitePosts, postsFiltrados]);
-  const marksRecomendados = useMemo(() => pontosAr.filter((ponto) => ponto.perspectiva === "terra").slice(0, 12), [pontosAr]);
+  const marksRecomendados = useMemo(() => selecionarMarksDiversos(pontosAr), [pontosAr]);
   const [anunciosVisiveis, setAnunciosVisiveis] = useState<ProdutoOrbitLink[]>(selecionarProdutosAleatorios);
 
   useEffect(() => {
@@ -297,6 +297,33 @@ export function FeedPage({ onAbrirStatus, onVisualizarStatus, onAbrirDetalhesPos
   );
 }
 
+function selecionarMarksDiversos(pontos: PontoAr[]) {
+  const camadasPreferidas = ["social", "planetas", "lua", "estacoes", "satelites", "missoes", "eventos", "cidades", "turismo", "clima", "biomas", "ods"];
+  const selecionados: PontoAr[] = [];
+  const idsSelecionados = new Set<string>();
+
+  camadasPreferidas.forEach((camada) => {
+    const ponto = pontos.find((item) => item.perspectiva === "terra" && item.camada.includes(camada as PontoAr["camada"][number]) && !idsSelecionados.has(item.id));
+
+    if (ponto) {
+      selecionados.push(ponto);
+      idsSelecionados.add(ponto.id);
+    }
+  });
+
+  if (selecionados.length < 12) {
+    pontos
+      .filter((ponto) => ponto.perspectiva === "terra" && !idsSelecionados.has(ponto.id))
+      .slice(0, 12 - selecionados.length)
+      .forEach((ponto) => {
+        selecionados.push(ponto);
+        idsSelecionados.add(ponto.id);
+      });
+  }
+
+  return selecionados.slice(0, 12);
+}
+
 function GaleriaMarksRecomendados({ pontos, onAbrirMark }: { pontos: ReturnType<typeof useOrbitLink>["pontosAr"]; onAbrirMark: (pontoId?: string, camada?: string) => void }) {
   const [pontosMosaico, setPontosMosaico] = useState(() => montarPontosMosaico(pontos));
   const [indiceImagem, setIndiceImagem] = useState(0);
@@ -399,9 +426,9 @@ function CardMarkGaleria({
       onMouseLeave={() => onPreview(null)}
       onFocus={() => onPreview({ ponto, imagem })}
       onBlur={() => onPreview(null)}
-      className={`group relative h-full min-h-0 w-full overflow-hidden rounded-2xl border border-[var(--border-border)] bg-transparent text-left transition-all duration-1000 ease-in-out hover:-translate-y-0.5 hover:border-[var(--bg-primary)] ${classeTamanho}`}
+      className={`group relative h-full min-h-0 w-full overflow-hidden rounded-2xl bg-transparent text-left transition-all duration-1000 ease-in-out hover:-translate-y-0.5 ${classeTamanho}`}
     >
-      <img src={imagem} alt={ponto.nome} className="h-full w-full object-cover transition duration-1000 ease-in-out group-hover:scale-105" loading="lazy" />
+      <img src={imagem} alt={ponto.nome} className="block h-full w-[180%] max-w-none -translate-x-[22.222%] object-cover object-center transition duration-1000 ease-in-out group-hover:scale-105" loading="lazy" />
       <span className="absolute inset-0 opacity-30 mix-blend-screen" style={{ background: `radial-gradient(circle at 25% 20%, ${cor}, transparent 34%)` }} />
       <span className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
       <span className="absolute inset-x-0 bottom-0 p-2">
@@ -426,7 +453,7 @@ function PreviewCentralMark({ preview }: { preview: PreviewMark | null }) {
       {preview ? (
         <div className="overflow-hidden rounded-[1.35rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-popover)_94%,transparent)] shadow-[0_28px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl">
           <div className="relative h-52 overflow-hidden">
-            <img src={preview.imagem} alt="" className="h-full w-full object-cover" />
+            <img src={preview.imagem} alt="" className="h-full w-[180%] max-w-none -translate-x-[22.222%] object-cover object-center" />
             <span className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/18 to-transparent" />
             <span className="absolute left-4 top-4 rounded-full px-3 py-1 font-monoapp text-[10px] font-black uppercase text-slate-950" style={{ backgroundColor: cor }}>
               {preview.ponto.camada[0]}
