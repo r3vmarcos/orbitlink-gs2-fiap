@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AvatarOrbital } from '@/components/ui/AvatarOrbital';
 import { Badge } from '@/components/ui/Badge';
+import { Botao } from '@/components/ui/Botao';
 import { CardPerfil } from '@/components/perfis/CardPerfil';
 import { CardBase } from '@/components/ui/CardBase';
 import { useOrbitLink } from '@/context/OrbitLinkContext';
@@ -9,7 +10,8 @@ import { lerLocalStorage, salvarLocalStorage } from '@/services/localStorageServ
 
 /* === PERFIS PAGE | inicio === */
 export function PerfisPage() {
-  const { usuarios, usuarioAtual, posts, postsCurtidos, pontosAr, pontosSeguidos, usuariosSeguidos, seguirUsuario } = useOrbitLink();
+  const { usuarios, usuarioAtual, posts, postsCurtidos, pontosAr, pontosSeguidos, usuariosSeguidos, seguirUsuario, sairUsuario } = useOrbitLink();
+  const navigate = useNavigate();
   const { usuarioId } = useParams();
   const [fotosLocais, setFotosLocais] = useState<Record<string, string>>(() => lerLocalStorage('orbitlink_fotos_perfil', {}));
   const usuarioFocoId = usuarioId ?? usuarioAtual?.id;
@@ -34,8 +36,24 @@ export function PerfisPage() {
   return (
     <div className="mx-auto w-full max-w-md space-y-5 overflow-hidden md:max-w-xl lg:max-w-3xl">
       <CardBase>
-        <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
-        <h1 className="titulo-pagina mt-2">Minha órbita</h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
+            <h1 className="titulo-pagina mt-2">Minha órbita</h1>
+          </div>
+          {usuarioFocoId && usuarioAtual?.id === usuarioFocoId ? (
+            <Botao
+              variante="secundario"
+              className="w-full sm:w-auto"
+              onClick={() => {
+                sairUsuario();
+                navigate('/');
+              }}
+            >
+              Encerrar sessão
+            </Botao>
+          ) : null}
+        </div>
       </CardBase>
       <div className="grid gap-5">
         {usuariosOrdenados.map((usuario) => (

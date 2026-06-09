@@ -85,6 +85,7 @@ interface OrbitLinkContextValue {
   cadastrarUsuario: (entrada: CadastroUsuarioEntrada) => { sucesso: boolean; mensagem?: string };
   criarUsuarioAdmin: (entrada: AdminCriarUsuarioEntrada) => { sucesso: boolean; mensagem?: string };
   entrarUsuario: (email: string, senha: string) => { sucesso: boolean; mensagem?: string };
+  entrarUsuarioPorId: (usuarioId: string) => { sucesso: boolean; mensagem?: string };
   sairUsuario: () => void;
   alternarTema: () => void;
   criarPost: (entrada: NovoPostEntrada) => void;
@@ -438,6 +439,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
       criadoLocalmente: true,
     };
 
+    sessionStorage.removeItem('orbitlink_forcar_login');
     setUsuariosLocais((atuais) => [novoUsuario, ...atuais]);
     setUsuarioAtualId(novoUsuario.id);
     return { sucesso: true };
@@ -486,14 +488,28 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     );
 
     if (!usuarioEncontrado) {
-      return { sucesso: false, mensagem: 'E-mail ou senha invalidos para este banco remoto.' };
+      return { sucesso: false, mensagem: 'E-mail ou senha inválidos para este banco remoto.' };
     }
 
+    sessionStorage.removeItem('orbitlink_forcar_login');
+    setUsuarioAtualId(usuarioEncontrado.id);
+    return { sucesso: true };
+  }, [usuariosBase, usuariosLocais]);
+
+  const entrarUsuarioPorId = useCallback((usuarioId: string) => {
+    const usuarioEncontrado = [...usuariosLocais, ...usuariosBase].find((usuario) => usuario.id === usuarioId);
+
+    if (!usuarioEncontrado) {
+      return { sucesso: false, mensagem: 'Usuário padrão não encontrado.' };
+    }
+
+    sessionStorage.removeItem('orbitlink_forcar_login');
     setUsuarioAtualId(usuarioEncontrado.id);
     return { sucesso: true };
   }, [usuariosBase, usuariosLocais]);
 
   const sairUsuario = useCallback(() => {
+    sessionStorage.setItem('orbitlink_forcar_login', '1');
     setUsuarioAtualId(undefined);
   }, []);
 
@@ -740,6 +756,7 @@ export function OrbitLinkProvider({ children }: { children: ReactNode }) {
     cadastrarUsuario,
     criarUsuarioAdmin,
     entrarUsuario,
+    entrarUsuarioPorId,
     sairUsuario,
     alternarTema,
     criarPost,

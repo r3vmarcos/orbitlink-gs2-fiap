@@ -20,6 +20,7 @@ const PALETA_DARK_PADRAO = 'Radio Telescope';
 const PALETA_LIGHT_PADRAO = 'Paper Review';
 const INDICE_PALETA_DARK_PADRAO = temasPorCategoria[CATEGORIA_DARK_PADRAO].findIndex((paleta) => paleta.name === PALETA_DARK_PADRAO);
 const INDICE_PALETA_LIGHT_PADRAO = temasPorCategoria[CATEGORIA_LIGHT_PADRAO].findIndex((paleta) => paleta.name === PALETA_LIGHT_PADRAO);
+const ID_USUARIO_PADRAO = 'marcos_nunes';
 
 function lerCategoriaTemaPadrao(chave: string, categoriaPadrao: CategoriaTemaId, categoriaClassica: CategoriaTemaId) {
   const categoriaSalva = lerLocalStorage<CategoriaTemaId>(chave, categoriaPadrao);
@@ -48,7 +49,7 @@ function AppInterno() {
   const [indicePaletaLight, setIndicePaletaLight] = useState(() => lerIndicePaletaPadrao('orbitlink_categoria_light', 'orbitlink_paleta_light', CATEGORIA_LIGHT_PADRAO, 'light', Math.max(INDICE_PALETA_LIGHT_PADRAO, 0)));
   const navigate = useNavigate();
   const location = useLocation();
-  const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema } = useOrbitLink();
+  const { usuarios, pontosAr, tema, usuarioAutenticado, alternarTema, entrarUsuarioPorId } = useOrbitLink();
   const rotaAdmin = location.pathname === '/adm-orbitlink';
   const categoriasDoModo = useMemo(() => categoriasTema.filter((categoria) => categoria.id.startsWith(tema)), [tema]);
   const categoriaAtiva = tema === 'dark'
@@ -85,6 +86,25 @@ function AppInterno() {
       }
     }
   }, [location.pathname, navigate, rotaAdmin, usuarioAutenticado]);
+
+  useEffect(() => {
+    if (rotaAdmin || usuarioAutenticado || location.pathname !== '/') {
+      return;
+    }
+
+    if (sessionStorage.getItem('orbitlink_forcar_login') === '1') {
+      return;
+    }
+
+    const perfilPadrao = usuarios.find((usuario) => usuario.id === ID_USUARIO_PADRAO);
+
+    if (!perfilPadrao) {
+      return;
+    }
+
+    entrarUsuarioPorId(perfilPadrao.id);
+    navigate(`/perfis/${perfilPadrao.id}`, { replace: true });
+  }, [entrarUsuarioPorId, location.pathname, navigate, rotaAdmin, usuarioAutenticado, usuarios]);
 
   if (!usuarioAutenticado && !rotaAdmin) {
     return <AcessoUsuario />;

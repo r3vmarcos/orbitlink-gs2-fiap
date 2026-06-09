@@ -13,8 +13,22 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Curadora do Orbifeed',
     localizacaoAtual: 'São Paulo, Brasil',
     seguidores: 1480,
-    publicacoes: 18,
+    publicacoes: 3,
     conquistas: ['Conta local ativa', 'Curadoria social', 'Primeiro acesso Orbifeed'],
+  },
+  {
+    id: 'marcos_nunes',
+    nome: 'Marcos Nunes',
+    usuario: '@marcos.nunes',
+    email: 'marcos@orbitlink.local',
+    senha: 'orbitlink123',
+    tipo: 'observador_terra',
+    avatarGradiente: 'from-slate-400 to-sky-700',
+    cargo: 'Mentor de rede orbital',
+    localizacaoAtual: 'São Paulo, Brasil',
+    seguidores: 17200,
+    publicacoes: 4,
+    conquistas: ['Perfil público', 'Conexão Terra-Espaço', 'Visão de mentor'],
   },
   {
     id: 'helena_duarte',
@@ -26,7 +40,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     localizacaoAtual: 'Estação Orbital Aurora',
     missaoAtual: 'Estação Orbital Aurora',
     seguidores: 24000,
-    publicacoes: 82,
+    publicacoes: 5,
     conquistas: ['180 dias em órbita', 'Diário orbital', 'Ponte Terra-Espaço'],
   },
   {
@@ -39,7 +53,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     localizacaoAtual: 'Observatório Terra Viva',
     missaoAtual: 'Observatório Terra Viva',
     seguidores: 18400,
-    publicacoes: 57,
+    publicacoes: 4,
     conquistas: ['ODS 13', 'Sentinela climático', 'Dados orbitais'],
   },
   {
@@ -52,7 +66,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     localizacaoAtual: 'Lua - Mar da Tranquilidade',
     missaoAtual: 'Colônia Lunar Selene',
     seguidores: 36400,
-    publicacoes: 36,
+    publicacoes: 5,
     conquistas: ['Habitat lunar', 'Energia solar', 'Comunicação Terra-Lua'],
   },
   {
@@ -64,7 +78,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Comunidade de monitoramento ambiental',
     localizacaoAtual: 'Amazônia, Brasil',
     seguidores: 13200,
-    publicacoes: 45,
+    publicacoes: 4,
     conquistas: ['ODS 13', 'Relatos locais', 'Monitoramento colaborativo'],
   },
   {
@@ -76,7 +90,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Turista espacial e criador de conteúdo',
     localizacaoAtual: 'Órbita terrestre baixa',
     seguidores: 9100,
-    publicacoes: 21,
+    publicacoes: 4,
     conquistas: ['Primeiro voo suborbital', 'Criador orbital', 'Status 24h'],
   },
   {
@@ -88,7 +102,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Bióloga de biomas conectados',
     localizacaoAtual: 'Lagos, Nigéria',
     seguidores: 8700,
-    publicacoes: 28,
+    publicacoes: 3,
     conquistas: ['Rede de biomas', 'ODS 2', 'Laboratório aberto'],
   },
   {
@@ -100,7 +114,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Engenheiro de satélites sociais',
     localizacaoAtual: 'Tóquio, Japão',
     seguidores: 15100,
-    publicacoes: 44,
+    publicacoes: 5,
     conquistas: ['Malha Gaia', 'Telemetria azul', 'Rota polar'],
   },
   {
@@ -112,7 +126,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Guia de turismo orbital',
     localizacaoAtual: 'Rio de Janeiro, Brasil',
     seguidores: 22400,
-    publicacoes: 61,
+    publicacoes: 5,
     conquistas: ['Rota Rio orbital', 'Galeria viva', 'Status diário'],
   },
   {
@@ -125,7 +139,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     localizacaoAtual: 'Marrakesh, Marrocos',
     missaoAtual: 'Janela Marte 2031',
     seguidores: 19800,
-    publicacoes: 39,
+    publicacoes: 5,
     conquistas: ['Solo vermelho', 'Missão aberta', 'Habitat análogo'],
   },
   {
@@ -137,7 +151,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Moderadora de comunidades costeiras',
     localizacaoAtual: 'Lisboa, Portugal',
     seguidores: 6200,
-    publicacoes: 25,
+    publicacoes: 3,
     conquistas: ['Atlântico vivo', 'Relatos locais', 'Mapa cidadão'],
   },
   {
@@ -150,7 +164,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     localizacaoAtual: 'Órbita terrestre baixa',
     missaoAtual: 'Aurora EVA-7',
     seguidores: 31200,
-    publicacoes: 74,
+    publicacoes: 6,
     conquistas: ['EVA segura', 'Braço robótico', 'Registro AR'],
   },
   {
@@ -162,7 +176,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Analista de ODS urbanos',
     localizacaoAtual: 'Curitiba, Brasil',
     seguidores: 5500,
-    publicacoes: 31,
+    publicacoes: 2,
     conquistas: ['ODS 11', 'Cidade sensível', 'Indicadores locais'],
   },
   {
@@ -174,7 +188,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Operador de rádio profundo',
     localizacaoAtual: 'Atacama, Chile',
     seguidores: 10100,
-    publicacoes: 33,
+    publicacoes: 4,
     conquistas: ['Sinal limpo', 'Janela lunar', 'Escuta profunda'],
   },
   {
@@ -186,7 +200,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Curadora de imagens EPIC',
     localizacaoAtual: 'Seul, Coreia do Sul',
     seguidores: 17600,
-    publicacoes: 52,
+    publicacoes: 3,
     conquistas: ['Imagem do dia', 'Terra completa', 'Arquivo NASA'],
   },
   {
@@ -198,7 +212,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Narrador de lançamentos',
     localizacaoAtual: 'Cabo Canaveral, EUA',
     seguidores: 28800,
-    publicacoes: 69,
+    publicacoes: 6,
     conquistas: ['Contagem regressiva', 'Janela limpa', 'Foguete social'],
   },
   {
@@ -210,7 +224,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Cartógrafa de cidades noturnas',
     localizacaoAtual: 'Buenos Aires, Argentina',
     seguidores: 7400,
-    publicacoes: 27,
+    publicacoes: 4,
     conquistas: ['Noite urbana', 'Mapa luminoso', 'ODS 11'],
   },
   {
@@ -222,7 +236,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Monitor comunitário de oceanos',
     localizacaoAtual: 'Recife, Brasil',
     seguidores: 6800,
-    publicacoes: 22,
+    publicacoes: 5,
     conquistas: ['Atlântico limpo', 'Alerta costeiro', 'Rede azul'],
   },
   {
@@ -235,7 +249,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     localizacaoAtual: 'Transferência Terra-Lua',
     missaoAtual: 'Selene Ponte 4',
     seguidores: 20500,
-    publicacoes: 48,
+    publicacoes: 5,
     conquistas: ['Órbita lunar', 'Pouso simulado', 'Diário Selene'],
   },
   {
@@ -247,7 +261,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Fotógrafo de janelas orbitais',
     localizacaoAtual: 'Paris, França',
     seguidores: 11900,
-    publicacoes: 40,
+    publicacoes: 4,
     conquistas: ['Galeria orbital', 'Luz de cidade', 'Roteiro visual'],
   },
   {
@@ -259,7 +273,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Planejadora de missões educacionais',
     localizacaoAtual: 'Xangai, China',
     seguidores: 9300,
-    publicacoes: 34,
+    publicacoes: 5,
     conquistas: ['Sala de missão', 'Aula orbital', 'Equipe aberta'],
   },
   {
@@ -271,7 +285,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Especialista em alertas ambientais',
     localizacaoAtual: 'Cairo, Egito',
     seguidores: 14300,
-    publicacoes: 46,
+    publicacoes: 5,
     conquistas: ['Alerta rápido', 'Clima extremo', 'Rede EONET'],
   },
   {
@@ -283,7 +297,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Observador de passagens orbitais',
     localizacaoAtual: 'Belo Horizonte, Brasil',
     seguidores: 4800,
-    publicacoes: 19,
+    publicacoes: 3,
     conquistas: ['Passagem visível', 'Céu limpo', 'Agenda local'],
   },
   {
@@ -295,7 +309,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Roteirista de pontos icônicos',
     localizacaoAtual: 'Mumbai, Índia',
     seguidores: 12600,
-    publicacoes: 37,
+    publicacoes: 5,
     conquistas: ['Monte Fuji', 'Turismo orbital', 'Mapa afetivo'],
   },
   {
@@ -307,7 +321,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Designer de experiências AR',
     localizacaoAtual: 'Milão, Itália',
     seguidores: 8100,
-    publicacoes: 29,
+    publicacoes: 6,
     conquistas: ['Interface orbital', 'Pontos AR', 'Camada social'],
   },
   {
@@ -319,7 +333,7 @@ export const usuariosData: UsuarioOrbitLink[] = [
     cargo: 'Educadora de ciência cidadã',
     localizacaoAtual: 'Fortaleza, Brasil',
     seguidores: 7600,
-    publicacoes: 26,
+    publicacoes: 4,
     conquistas: ['Turma conectada', 'ODS 9', 'Ciência aberta'],
   },
 ];
