@@ -15,11 +15,11 @@ export function StatusOrbitalLista({ onAbrirStatus }: StatusOrbitalListaProps) {
   const statusEspaco = statusOrbitais.filter((status) => status.perspectiva === 'espaco');
 
   return (
-    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-3 backdrop-blur-xl">
+    <section className="flex h-56 min-h-0 flex-col overflow-hidden rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-3 backdrop-blur-xl md:h-full">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="titulo-painel min-w-0">Status Orbitlink 24h</h2>
       </div>
-      <div className="min-h-0 flex-1 space-y-3 overflow-hidden">
+      <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-3 overflow-hidden">
         <LinhaStatus status={statusTerra.length > 0 ? statusTerra : statusOrbitais} direcao="esquerda" usuarios={usuarios} onAbrirStatus={onAbrirStatus} />
         <LinhaStatus status={statusEspaco.length > 0 ? statusEspaco : statusOrbitais} direcao="direita" usuarios={usuarios} onAbrirStatus={onAbrirStatus} />
       </div>
@@ -32,16 +32,16 @@ function LinhaStatus({ status, direcao, usuarios, onAbrirStatus }: { status: Sta
   const itensDuplicados = [...itensBase, ...itensBase];
 
   return (
-    <div className="grupo-marquee-status sem-scrollbar min-h-0 overflow-x-auto overflow-y-hidden rounded-2xl md:overflow-hidden">
-      <div className={`flex min-h-0 gap-3 ${direcao === 'direita' ? 'animacao-status-direita' : 'animacao-status-esquerda'}`}>
+    <div className="grupo-marquee-status sem-scrollbar h-full min-h-0 overflow-x-auto overflow-y-hidden rounded-2xl md:overflow-hidden">
+      <div className={`flex h-full min-h-0 items-stretch gap-3 ${direcao === 'direita' ? 'animacao-status-direita' : 'animacao-status-esquerda'}`}>
         {itensDuplicados.map((item, indice) => {
           const autor = usuarios.find((usuario) => usuario.id === item.autorId) ?? usuarios[0];
           const fotoAutor = autor.fotoPerfil ?? `https://i.pravatar.cc/120?u=${autor.id}`;
 
           return (
-            <button key={`${item.id}_${indice}`} onClick={() => onAbrirStatus(item)} className="group w-[80%] shrink-0 overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] text-left transition hover:bg-[var(--bg-surface-hover)]">
+            <button key={`${item.id}_${indice}`} onClick={() => onAbrirStatus(item)} className="group grid h-full min-h-0 w-[80%] shrink-0 grid-rows-[minmax(0,1fr)_auto] overflow-hidden rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] text-left transition hover:bg-[var(--bg-surface-hover)]">
               {item.imagem ? (
-                <img src={item.imagem} alt={item.titulo} className="h-20 w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
+                <img src={item.imagem} alt={item.titulo} className="h-full min-h-0 w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
               ) : null}
               <div className="flex items-center gap-2 p-2">
                 <div className="relative shrink-0">

@@ -23,7 +23,7 @@ export function Modal({ aberto, titulo, children, onFechar, telaCheiaMobile = fa
         }`}
       >
         <header className="flex min-w-0 items-center justify-between gap-3 border-b border-blue-500/20 px-4 py-3 sm:px-5 sm:py-4">
-          <h2 className="min-w-0 text-balance font-monoapp text-xs font-black uppercase tracking-[0.08em] text-blue-200 light-theme:text-sky-900 sm:text-sm sm:tracking-[0.16em]">{titulo}</h2>
+          <h2 className="titulo-pagina min-w-0 text-balance">{titulo}</h2>
           <button onClick={onFechar} className="shrink-0 rounded-full p-2 text-slate-300 transition hover:bg-blue-500/10 hover:text-white light-theme:text-sky-900" aria-label="Fechar modal">
             <X className="h-5 w-5" />
           </button>

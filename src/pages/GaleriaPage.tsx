@@ -15,12 +15,12 @@ const TAMANHO_LOTE_FOTOS = 20;
 export function GaleriaPage() {
   const { galeria, sincronizarApisNasa, carregandoApi } = useOrbitLink();
   const [itemAberto, setItemAberto] = useState<ItemGaleria | undefined>();
-  const [filtro, setFiltro] = useState<FiltroGaleria>('todas');
+  const [filtrosAtivos, setFiltrosAtivos] = useState<Array<ItemGaleria['categoria']>>([]);
   const [limiteFotos, setLimiteFotos] = useState(TAMANHO_LOTE_FOTOS);
   const sentinelaRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const itens = galeria;
-  const itensFiltrados = useMemo(() => itens.filter((item) => filtro === 'todas' || item.categoria === filtro), [filtro, itens]);
+  const itensFiltrados = useMemo(() => itens.filter((item) => filtrosAtivos.length === 0 || filtrosAtivos.includes(item.categoria)), [filtrosAtivos, itens]);
   const itensVisiveis = useMemo(() => itensFiltrados.slice(0, limiteFotos), [itensFiltrados, limiteFotos]);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function GaleriaPage() {
 
   useEffect(() => {
     setLimiteFotos(TAMANHO_LOTE_FOTOS);
-  }, [filtro]);
+  }, [filtrosAtivos]);
 
   useEffect(() => {
     const sentinela = sentinelaRef.current;
@@ -51,13 +51,22 @@ export function GaleriaPage() {
     return () => observador.disconnect();
   }, [itensFiltrados.length]);
 
+  function alternarFiltro(categoria: FiltroGaleria) {
+    if (categoria === 'todas') {
+      setFiltrosAtivos([]);
+      return;
+    }
+
+    setFiltrosAtivos((atuais) => atuais.includes(categoria) ? atuais.filter((item) => item !== categoria) : [...atuais, categoria]);
+  }
+
   return (
     <div className="space-y-5">
       <section className="flex flex-col gap-3 rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_82%,transparent)] p-5 shadow-soft backdrop-blur-xl md:flex-row md:items-center">
-        <h1 className="shrink-0 text-2xl font-black uppercase leading-tight text-white light-theme:text-sky-950 sm:text-3xl">Galeria do Universo</h1>
-        <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 md:justify-end">
+        <h1 className="titulo-pagina shrink-0 text-center md:text-left">Galeria do Universo</h1>
+        <div className="flex min-w-0 flex-1 flex-wrap items-center justify-center gap-1.5 pb-1 text-center md:justify-end">
           {filtrosGaleria.map((categoria) => (
-            <button key={categoria} onClick={() => setFiltro(categoria)} className={`shrink-0 rounded-full border px-3 py-2 font-monoapp text-[10px] font-black uppercase ${filtro === categoria ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
+            <button key={categoria} onClick={() => alternarFiltro(categoria)} className={`shrink-0 rounded-full border px-2.5 py-1 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] lg:text-[14px] ${(categoria === 'todas' && filtrosAtivos.length === 0) || (categoria !== 'todas' && filtrosAtivos.includes(categoria)) ? 'border-[var(--bg-primary)] bg-[var(--bg-primary)] text-[var(--text-primary)]' : 'border-[var(--border-border)] text-[var(--text-muted)]'}`}>
               #{categoria}
             </button>
           ))}

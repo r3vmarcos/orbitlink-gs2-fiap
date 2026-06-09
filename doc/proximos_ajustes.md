@@ -133,3 +133,228 @@ Faltou as fotos no feed que tinham, uma direfente da outra
 
 refaça os posts
 em [Fotos] Traduza o conteudo da NASA, e coloque mais fotos. Coloque umas 30
+
+=================================
+
+deixe os anuncios pequenos como estavam mas com fotos
+volte ao tamanho que estavam
+
+no Mobile/tablet
+[PERFIL]
+Apareça somente as informações do usuario.
+
+em [AR] 360 terra
+
+nao esta simulando o ambiente 3d
+como mostra as imagens
+
+veja que "Copernicus Eco" moveu-se junto com o mover do celular
+nao criou um ambiente 3d
+
+arrume isso e coloque os pontos em posição superior simulando um ceu com os pontos
+
+================ 28/05 ============================
+crie [CHATS]
+faça todo a logica para criar um sistema de mensagens entre pessoas
+
+-- nivel global
+em [Pessoas]
+nao exiba o meu perfil
+
+no [Header]
+tablet/note/PC/ultrawide
+Tema e Paletas fique ao lado do logo
+
+Deixe na ordem
+Feed
+Mapa
+chats
+Post
+Pessoas
+Fotos
+Perfil
+
+em mobile
+deixe abaixo a ordem
+Feed
+AR
+Post
+Pessoas
+Fotos
+
+deixe no header
+[chats] somente icone
+[Perfil] somente icone
+
+-- no Mobile/tablet
+em [PERFIL]
+Pegue todos os temas do projeto em
+X:\0projetos_organizados\page_test_theme\page_test_theme_v1
+e implemente na parte do perfil
+separe por Dark e light
+deixe 2 linhas para os temas
+deixe a ultima escolha do usuario como ativa para Dark e light
+
+Ajuste isso no Mobile/tablet
+como as imagens monstram, estão usando o tamanho pc/note
+ajuste
+
+-- no tablet
+em [FEED]
+deixe como note/PC/ultrawide
+com as 3 colunas
+deixe o feed com o tamanho que esta, so add a coluna a esquerda e a direita e ajuste
+
+-- no tablet/note/PC/ultrawide
+em [FEED]
+"Status Orbitlink 24h" nao estava funcionando, revise o funcionamento
+
+abaixo de "Status Orbitlink 24h" mostre os [CHATS]
+as ultimas conversas
+
+reviser a ortografia em pt-br
+verifique se tem mojibakes
+faça a branch no github na main
+faça o deploy no cloudflare
+
+## ===2222222222222==============================
+
+## cada "---" separa um pedido
+
+no [HEADER]
+em tablet/note/PC/ultrawide
+"Chats" deve ser Nome
+somente icone no MOBILE
+
+---
+
+o [HEADER] deve ser fixo em todas as resoluções
+mas ao rolar para baixo ele deve ocultado para cima (espere 2s para fazer)
+e ao rolar para cima apareça novamente
+
+---
+
+exiba no mobile
+no [header]
+na esquerda: Logo, Tema, Paletas
+na direita: Perfil, troca tema
+abaixo: Feed, AR, Post, Pessoas, Fotos
+
+---
+
+exiba no Tablet
+no [header]
+na esquerda: Logo, Tema, Paletas
+centro: Feed, Mapa, Post, Pessoas, Fotos
+na direita: Perfil, troca tema
+
+---
+
+exiba no note/PC/ultrawide
+no [header]
+na esquerda: Logo, Tema, Paletas
+centro: Feed, Mapa, Post, Pessoas, Fotos
+na direita: Perfil, troca tema
+
+---
+
+note/PC/ultrawide
+no [FEED]
+as colunas 1 e 3 devem estar distribuidas em 100vh sem rolagem
+somente role as postagens
+
+diminua a pesquisa
+
+deixe os filtros
+(#todos
+#diarioorbital
+#missao
+#estacao
+#lua
+#satelite
+#evento
+#cidade
+#turismo
+#comunidade
+#clima
+#bioma
+#odsa)
+acima de tudo em 100vw
+
+a busca fique na coluna 1 acima de "Status Orbitlink 24h"
+"Status Orbitlink 24h" deixe maior H com a imagem no card
+
+---
+
+Precisamos rever a aruiterura de dados
+o [FEED]
+precisamos que as postagens sejam "Infinite Scrolling"
+carregue somente 10 postagens e ao chegar em um ponto seguro, carregue mais 10
+faça que cada postagem tenha um id para nao ser exibida com duplicidade
+conseguimos que seja "Lazy Loading" para melhor fluidez?
+conseguimos tambem implantar "Redis" ? para melhorar o desenpenho?
+uma vez que precisamos ter poucos requests
+
+---
+
+Em [Pessoas]
+deixe a busca 75% menor e coloque as conquistas (ex: Ponte Terra-Espaço, Sentinela climático) ao lado ate acabar a linha, quando acabar a linha deixe um botão com a quantidade que tem (Ex: "+ mais 58") que devem aparecer como modal para ativar quais o usuario quer
+
+---
+
+no MOBILE
+em [PERFIL]
+em Personalização
+[Modo visual], [Tema], [Paleta]
+nao estão ajsutados para 100vw![alt text]
+estão passando da tela
+ajuste para caber
+
+Deixe em menu suspenso personalizado
+[Dark] com os temas darks
+[Light] com os temas Lights
+
+"PALETA"
+seja em 2 colunas
+sem ultrapassar a tela em W
+
+---
+
+revise somente o codigo add a ortografia em pt-br e mojibakes
+faça a branch no github na main
+faça o deploy no cloudflare
+
+=========333==========================================
+
+note/PC/ultrawide
+
+[FEED]
+ajuste para caber sem scrool em 100vh as colunas 1 e 3
+somente role as postagens
+
+tenha no banco 100 postagens para a terra
+tenha no banco 100 postagens para o espaço
+
+cada postagem deve ser relacioanada com a foto
+
+[MAPA] esta correto
+
+[CHATS]
+ajuste para caber sem scrool em 100vh
+
+[PESSOAS]
+
+deixe #todas
+#espaco
+#terra
+#lua
+#marte
+#clima
+#cidade
+#turismo
+
+na mesma linha de "Galeria do Universo"
+
+retire "Galeria Orbitlink"
+
+[FOTOS]

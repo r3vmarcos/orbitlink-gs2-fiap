@@ -6,7 +6,7 @@ import type { ChatOrbitLink } from '@/types/orbitlink.types';
 /* === LISTA DE ULTIMOS CHATS | inicio === */
 export function ListaUltimosChats() {
   const { chats, usuarios, usuarioAtual } = useOrbitLink();
-  const ultimosChats = chats.slice(0, 5);
+  const ultimosChats = chats.slice(0, 3);
 
   function obterTitulo(chat: ChatOrbitLink) {
     if (chat.grupo) {
@@ -18,7 +18,7 @@ export function ListaUltimosChats() {
   }
 
   return (
-    <section className="mb-2 flex h-[calc(100%-0.5rem)] min-h-0 flex-col rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-3 backdrop-blur-xl">
+    <section className="flex h-full min-h-0 flex-col rounded-[1.5rem] border border-[var(--border-border)] bg-[color-mix(in_srgb,var(--bg-surface)_78%,transparent)] p-3 backdrop-blur-xl">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h2 className="titulo-painel">Chats</h2>
         <NavLink to="/chats" className="flex h-8 w-8 items-center justify-center rounded-xl border border-[var(--border-border)] text-[var(--text-link)]" title="Abrir chats">

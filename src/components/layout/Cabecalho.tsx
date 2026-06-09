@@ -31,6 +31,11 @@ export function Cabecalho(props: CabecalhoProps) {
   const timerOcultarRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
+    function atualizarVisibilidadeMobile(evento: Event) {
+      const detalhe = (evento as CustomEvent<{ oculto: boolean }>).detail;
+      setOculto(Boolean(detalhe?.oculto));
+    }
+
     function controlarCabecalho() {
       const scrollAtual = window.scrollY;
       const descendo = scrollAtual > ultimoScrollRef.current && scrollAtual > 96;
@@ -46,9 +51,11 @@ export function Cabecalho(props: CabecalhoProps) {
       ultimoScrollRef.current = scrollAtual;
     }
 
+    window.addEventListener('orbitlink:cabecalho-mobile', atualizarVisibilidadeMobile);
     window.addEventListener('scroll', controlarCabecalho, { passive: true });
 
     return () => {
+      window.removeEventListener('orbitlink:cabecalho-mobile', atualizarVisibilidadeMobile);
       window.removeEventListener('scroll', controlarCabecalho);
       window.clearTimeout(timerOcultarRef.current);
     };

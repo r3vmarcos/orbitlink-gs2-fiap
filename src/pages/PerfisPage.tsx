@@ -56,7 +56,7 @@ export function PerfisPage({ onAlternarClaroEscuro, categoriasTema, paletasTema,
     <div className="mx-auto w-full max-w-md space-y-5 overflow-hidden md:max-w-xl lg:max-w-3xl">
       <CardBase>
         <p className="font-monoapp text-xs font-black uppercase tracking-[0.18em] text-blue-300">Perfis Orbitlink</p>
-        <h1 className="mt-2 text-4xl font-black uppercase text-white light-theme:text-sky-950">Meu perfil</h1>
+        <h1 className="titulo-pagina mt-2">Meu perfil</h1>
       </CardBase>
       <div className="grid gap-5">
         {usuariosOrdenados.map((usuario) => (
