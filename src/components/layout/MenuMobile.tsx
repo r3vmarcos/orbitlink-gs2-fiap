@@ -28,9 +28,9 @@ export function MenuMobile({ onAbrirPost, onAbrirStatus }: MenuMobileProps) {
           <Plus className="h-[18px] w-[18px]" />
           <span className="truncate">Post</span>
         </button>
-        <NavLink to="/pessoas" className={itemClasse}>
+        <NavLink to="/comunidade" className={itemClasse}>
           <UsersRound className="h-[18px] w-[18px]" />
-          <span className="truncate">Pessoas</span>
+          <span className="truncate">Comunidade</span>
         </NavLink>
         <NavLink to="/galeria" className={itemClasse}>
           <Images className="h-[18px] w-[18px]" />
