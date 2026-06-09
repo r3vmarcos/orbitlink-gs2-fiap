@@ -34,6 +34,16 @@ export function CardPontoAr({ ponto, onVerPosts, onVerStatus }: CardPontoArProps
         </div>
         {ponto.statusAtivo ? <Badge tom="laranja">Status ativo</Badge> : null}
       </div>
+      {ponto.imagem ? (
+        <div className="mt-4 overflow-hidden rounded-2xl">
+          <img src={ponto.imagem} alt={ponto.nome} className="block h-36 w-[180%] max-w-none -translate-x-[22.222%] object-cover object-center" loading="lazy" />
+          {(ponto.imagemCredito || ponto.imagemFonte) ? (
+            <p className="bg-slate-950/70 px-3 py-1.5 text-[10px] font-semibold text-slate-300 light-theme:bg-white/80 light-theme:text-slate-600">
+              Imagem: {ponto.imagemCredito ?? 'curadoria OrbitLink'}{ponto.imagemFonte ? ` · ${ponto.imagemFonte}` : ''}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <p className="mt-3 text-sm leading-6 text-slate-300 light-theme:text-slate-700">{ponto.descricao}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {ponto.ods.map((ods) => <Badge key={ods} tom="verde">{ods}</Badge>)}
