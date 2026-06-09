@@ -1,7 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
-import { MessageCircle, Plus, Send, UserPlus, UsersRound } from "lucide-react";
+import { Plus, Send, UserPlus, UsersRound } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Botao } from "@/components/ui/Botao";
 import { CardBase } from "@/components/ui/CardBase";
 import { useOrbitLink } from "@/context/OrbitLinkContext";
 import type { ChatOrbitLink, UsuarioOrbitLink } from "@/types/orbitlink.types";
@@ -89,18 +88,15 @@ export function ChatsPage() {
   }
 
   return (
-    <div className="grid h-[calc(100dvh-7rem)] min-h-0 gap-4 overflow-hidden md:grid-cols-[40vw_minmax(0,60vw)] lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
-      <div className="grid min-h-0 min-w-0 gap-4 md:grid-rows-[40vh_60vh]">
-        <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-3">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Chats</p>
-              <h1 className="titulo-pagina mt-1">Mensagens</h1>
-            </div>
-            <MessageCircle className="h-6 w-6 text-[var(--text-link)]" />
-          </div>
+    <div className="flex h-[calc(100dvh-7rem)] min-h-0 flex-col gap-4 overflow-hidden">
+      <h1 className="titulo-pagina whitespace-nowrap text-center md:text-left">Mensagens</h1>
 
-          <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+      <div className="grid min-h-0 flex-1 gap-4 overflow-hidden md:grid-cols-[40vw_minmax(0,60vw)] lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[360px_minmax(0,1fr)]">
+      <div className="grid h-full min-h-0 min-w-0 gap-4 md:grid-rows-[minmax(0,1fr)_minmax(0,1.15fr)]">
+        <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-3">
+          <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Chats</p>
+
+          <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
             {chats.map((chat) => {
               const ultimaMensagem = chat.mensagens[chat.mensagens.length - 1];
               const ativo = chat.id === chatAtivo?.id;
@@ -128,15 +124,35 @@ export function ChatsPage() {
           </div>
         </CardBase>
 
-        <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-4">
-          <p className="font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Nova conversa</p>
-          <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-3 rounded-full px-3 py-2 text-xs" placeholder="Buscar pessoas..." />
-          <input
-            value={nomeGrupo}
-            onChange={(evento) => setNomeGrupo(evento.target.value)}
-            className="input-form mt-2 rounded-full px-3 py-2 text-xs"
-            placeholder="Nome do grupo, opcional"
-          />
+        <CardBase className="flex min-h-0 min-w-0 flex-col overflow-hidden p-3">
+          <p className="min-w-0 truncate font-monoapp text-[10px] font-black uppercase tracking-[0.14em] text-[var(--text-link)]">Nova conversa / Criar Grupo</p>
+          <input value={busca} onChange={(evento) => setBusca(evento.target.value)} className="input-form mt-3 min-w-0 rounded-full px-3 py-2 text-xs" placeholder="Buscar pessoas, grupos..." />
+
+          <div className="mt-3 grid min-w-0 grid-cols-2 gap-2">
+            <button
+              onClick={iniciarChat}
+              disabled={selecionados.length === 0}
+              className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-full bg-[var(--bg-primary)] px-2 py-2 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] text-[var(--text-primary)] shadow-neon transition disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus className="h-3.5 w-3.5 shrink-0" />
+              <span className="min-w-0 truncate">Criar</span>
+            </button>
+            <button
+              onClick={adicionarAoChat}
+              disabled={!chatAtivo || selecionados.length === 0}
+              className="inline-flex min-w-0 items-center justify-center gap-1.5 rounded-full border border-[var(--border-border)] bg-[var(--bg-muted)] px-2 py-2 font-monoapp text-[9px] font-black uppercase tracking-[0.06em] text-[var(--text-text)] transition hover:bg-[var(--bg-surface-hover)] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <UserPlus className="h-3.5 w-3.5 shrink-0" />
+              <span className="min-w-0 truncate">Adicionar</span>
+            </button>
+          </div>
+
+          {selecionados.length ? (
+            <div className="mt-2 flex min-w-0 items-center gap-2 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] px-3 py-2">
+              <UsersRound className="h-4 w-4 shrink-0 text-[var(--text-link)]" />
+              <p className="min-w-0 truncate text-[10px] font-bold text-[var(--text-muted)]">{selecionados.length} pessoa(s) escolhida(s)</p>
+            </div>
+          ) : null}
 
           <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
             {pessoasDisponiveis.map((usuario) => (
@@ -144,23 +160,6 @@ export function ChatsPage() {
             ))}
           </div>
 
-          <div className="mt-3 grid shrink-0 gap-2">
-            <Botao onClick={iniciarChat} disabled={selecionados.length === 0}>
-              <Plus className="h-4 w-4" /> Criar chat
-            </Botao>
-            <Botao variante="secundario" onClick={adicionarAoChat} disabled={!chatAtivo || selecionados.length === 0}>
-              <UserPlus className="h-4 w-4" /> Adicionar ao chat
-            </Botao>
-          </div>
-
-          <div className="mt-3 shrink-0 rounded-2xl border border-[var(--border-border)] bg-[var(--bg-muted)] p-3">
-            <div className="flex items-center gap-2 text-xs font-black uppercase text-[var(--text-text)]">
-              <UsersRound className="h-4 w-4" /> Selecionados
-            </div>
-            <p className="mt-2 text-xs leading-5 text-[var(--text-muted)]">
-              {selecionados.length ? `${selecionados.length} pessoa(s) escolhida(s).` : "Escolha uma pessoa para chat direto ou várias para grupo."}
-            </p>
-          </div>
         </CardBase>
       </div>
 
@@ -223,6 +222,7 @@ export function ChatsPage() {
           <div className="flex flex-1 items-center justify-center p-6 text-center text-sm text-[var(--text-muted)]">Crie uma conversa para começar.</div>
         )}
       </CardBase>
+      </div>
     </div>
   );
 }
@@ -239,7 +239,7 @@ function PessoaSelecionavel({ usuario, ativo, onClick }: { usuario: UsuarioOrbit
         className="h-10 w-10 shrink-0 rounded-xl border border-[var(--border-border)] object-cover"
         loading="lazy"
       />
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-black text-[var(--text-text)]">{usuario.nome}</p>
         <p className="truncate text-xs text-[var(--text-muted)]">{usuario.usuario}</p>
       </div>
