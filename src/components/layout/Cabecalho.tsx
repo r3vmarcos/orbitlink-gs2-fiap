@@ -18,7 +18,7 @@ const linksAntesPost = [
 ];
 
 const linksDepoisPost = [
-  { to: '/pessoas', label: 'Pessoas', mobile: 'Pessoas' },
+  { to: '/comunidade', label: 'Comunidade', mobile: 'Comunidade' },
   { to: '/galeria', label: 'Fotos', mobile: 'Fotos' },
 ];
 
